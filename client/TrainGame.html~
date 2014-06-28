@@ -1,0 +1,17 @@
+<html>
+
+<head>
+<title>HTTP POST test</title>
+<script src="jquery.js" type="text/javascript"></script>
+<script src="d3.js" type="text/javascript"></script>
+<script src="raphael-min.js" type="text/javascript"></script>
+<script src="raphael-groups.js" type="text/javascript"></script>
+<script src="underscore.js" type="text/javascript"></script>
+<script src="Main.js" type="text/javascript"></script>
+</head>
+
+<body>
+<p>Yay! It works!</p>
+</body>
+
+</html>
