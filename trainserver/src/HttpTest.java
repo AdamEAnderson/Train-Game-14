@@ -25,7 +25,7 @@ public class HttpTest {
 	         public void run()
 	         {
 	        	 try {
-	        		 HttpSnoopServer.startServer();
+	        		 HttpTrainServer.startServer();
 	        	 } catch (Exception e) {
 	        		 
 	        	 }
@@ -66,7 +66,7 @@ public class HttpTest {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new HttpSnoopClientInitializer(sslCtx));
+             .handler(new HttpTriainClientInitializer(sslCtx));
 
             // Make the connection attempt.
             Channel ch = b.connect(host, port).sync().channel();
@@ -103,7 +103,7 @@ public class HttpTest {
 	         public void run()
 	         {
 	        	 try {
-	        		 HttpSnoopServer.startServer();
+	        		 HttpTrainServer.startServer();
 	        	 } catch (Exception e) {
 	        		 
 	        	 }
@@ -144,7 +144,7 @@ public class HttpTest {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new HttpSnoopClientInitializer(sslCtx));
+             .handler(new HttpTriainClientInitializer(sslCtx));
 
             // Make the connection attempt.
             Channel ch = b.connect(host, port).sync().channel();

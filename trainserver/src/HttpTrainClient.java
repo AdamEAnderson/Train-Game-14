@@ -33,9 +33,9 @@ import java.net.URI;
 
 /**
  * A simple HTTP client that prints out the content of the HTTP response to
- * {@link System#out} to test {@link HttpSnoopServer}.
+ * {@link System#out} to test {@link HttpTrainServer}.
  */
-public final class HttpSnoopClient {
+public final class HttpTrainClient {
 
     static final String URL = System.getProperty("url", "http://127.0.0.1:8080/");
 
@@ -72,7 +72,7 @@ public final class HttpSnoopClient {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new HttpSnoopClientInitializer(sslCtx));
+             .handler(new HttpTriainClientInitializer(sslCtx));
 
             // Make the connection attempt.
             Channel ch = b.connect(host, port).sync().channel();
