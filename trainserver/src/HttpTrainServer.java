@@ -20,6 +20,9 @@
       static final boolean SSL = System.getProperty("ssl") != null;
       static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
   
+      static private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+      static private EventLoopGroup workerGroup = new NioEventLoopGroup();
+
       public static void main(String[] args) throws Exception {
 
     	  // Set up logging
@@ -68,8 +71,8 @@
           }
   
           // Configure the server.
-          EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-          EventLoopGroup workerGroup = new NioEventLoopGroup();
+          bossGroup = new NioEventLoopGroup(1);
+          workerGroup = new NioEventLoopGroup();
           try {
               ServerBootstrap b = new ServerBootstrap();
               b.group(bossGroup, workerGroup)
@@ -87,6 +90,11 @@
               bossGroup.shutdownGracefully();
               workerGroup.shutdownGracefully();
           }
+      }
+      
+      static public void stopServer() {
+          bossGroup.shutdownGracefully();
+          workerGroup.shutdownGracefully();
       }
 
   }
