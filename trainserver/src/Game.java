@@ -28,7 +28,7 @@ public class Game implements AbstractGame {
 	@Override
 	public void buildTrack(String pid,
 			MilePostId[] mileposts) throws GameException {
-		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
 		log.info("])");
@@ -38,7 +38,7 @@ public class Game implements AbstractGame {
 	@Override
 	public void upgradeTrain(String pid, UpgradeType upgrade)
 			throws GameException {
-		log.info("upgradeTrain(pid={}, color={})", pid, upgrade);
+		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
 	}
 
 	@Override

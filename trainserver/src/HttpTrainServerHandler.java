@@ -252,10 +252,10 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (data.upgradeType == "Capacity" && data.upgradeType == "Speed")
+		if (!data.upgradeType.equals("Capacity") && !data.upgradeType.equals("Speed"))
 			throw new GameException(GameException.INVALID_UPGRADE);
 		game.upgradeTrain(data.pid,
-				data.upgradeType == "Capacity" ? UpgradeType.CAPACITY
+				data.upgradeType.equals("Capacity") ? UpgradeType.CAPACITY
 						: UpgradeType.SPEED);
 	}
 
