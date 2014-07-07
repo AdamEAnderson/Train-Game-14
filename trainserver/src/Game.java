@@ -21,8 +21,8 @@ public class Game implements AbstractGame {
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 
-	public Game(String gameType, String ruleSet){
-		map = new TrainMap("");
+	public Game(TrainMap map, String ruleSet){
+		this.map = map;
 		//deck = Card.init();
 		discard = new ArrayList<Card>();
 		//players = Player.init();

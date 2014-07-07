@@ -18,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 class DirectoryFileFilter implements FileFilter {
 
 	@Override
@@ -62,13 +59,12 @@ public class TrainServer {
 		NewGameResponse() {}
 	}
 	
-	static public String newGame(String requestText) throws GameException, FileNotFoundException {			
+	static public String newGame(String requestText) throws GameException {			
 		String gameId = null;
 		Gson gson = new GsonBuilder().create();
 		NewGameData data = gson.fromJson(requestText, NewGameData.class);
-		TrainMap map = getMapData(data.gameType);
 		
-		Game game = new Game(m, data.ruleSet);
+		Game game = new Game(getMapData(data.gameType), data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
 		game.joinGame(data.pid, data.color);
