@@ -1,6 +1,7 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 
@@ -27,11 +28,13 @@ public class Player {
 	}
 	
 	public void buildTrack(Queue<Milepost> mileposts){
-		rail.build(mileposts);
-		//TODO
-		/*Account for the cost of etc. 
-		 * 
-		 */
+		if(mileposts.isEmpty()) return;
+		Milepost origin = mileposts.poll();
+		if(mileposts.isEmpty()) return;
+		Milepost next = mileposts.peek();
+		int cost = rail.build(origin, next);
+		money -= cost; //does not check for affordability or the twenty that can be legally built
+		buildTrack(mileposts);
 	}
 	
 	public void deliverLoad(Card c){

@@ -5,24 +5,26 @@ import map.Milepost;
 
 public final class Track {
 	public final Milepost[] ends;
-	public final Edge[] travel;
 	
 	Track(Milepost one, Milepost two)/*throws GameException*/ {
+		assert one != null && two != null; //neither @param may be null
+		assert one.isNeighbor(two); //mileposts are neighbors: there's a build-able edge between them
 		Milepost[] temp = new Milepost[2];
 		Edge[] tempE = new Edge[2];
 		temp[0] = one;
 		temp[1] = two;
 		ends = temp;
-		for(int i = 0; i < one.edges.length; i++){
-			if(one.edges[i].destination.equals(two)){
-				tempE[0] = one.edges[i];
+	}
+	
+	/**
+	 * @return the edge from Milepost one to Milepost two
+	 */
+	Edge getEdge(){
+		for(int i = 0; i < ends[0].edges.length; i++){
+			if(ends[0].edges[i].destination.equals(ends[1])){
+				return ends[0].edges[i];
 			}
 		}
-		for(int i = 0; i < one.edges.length; i++){
-			if(two.edges[i].destination.equals(one)){
-				tempE[1] = two.edges[i];
-			}
-		}
-		travel = tempE;
+		return null; //or throw a game exception
 	}
 }
