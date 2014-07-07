@@ -15,7 +15,7 @@ public final class Card {
 		trips = temp;
 	}
 	
-	final class Trip {
+	public final class Trip {
 		public final City dest;
 		public final Load load;
 		public final int cost;

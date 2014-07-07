@@ -92,6 +92,13 @@ public class Train {
 		return loads;
 	}
 	
+	public boolean containsLoad(Load l){
+		for(int i = 0; i < loads.length; i++){
+			if(loads[i].equals(l)) return true;
+		}
+		return false;
+	}
+	
 	public Milepost getLocation(){
 		return loc;
 	}
