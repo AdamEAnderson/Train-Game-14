@@ -1,6 +1,4 @@
 
-
-
 interface AbstractGame {
 	
 	// Create a new game. Returns the ID of the new game. 
@@ -42,7 +40,7 @@ interface AbstractGame {
 	// CITY_NOT_FOUND
 	// PLAYER_NOT_FOUND
 	// GAME_NOT_FOUND
-	void startTrain(String player, String city);
+	void startTrain(String player, String city); //should change City to MilePostId
 	
 	// Player moves their train
 	// Error values:
