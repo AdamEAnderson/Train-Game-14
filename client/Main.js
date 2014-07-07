@@ -1,6 +1,6 @@
 //Global Variables
 var paper;
-var server = 'http://www.posttestserver.com/post.php';
+var server = 'http://127.0.0.1:8080';
 var pid, gid;
 
 //Loaded
@@ -25,8 +25,8 @@ $(document).ready(function(){
 	$('#mainMenu').append('<br/>');
 	$('#mainMenu').append('<button id="newGameButton">New Game</button>');
 	$('#newGameButton').button().click(function(){
-		if($('#handlePicker').value() && $('#handlePicker').value().length > 0){
-			newGame(document.getElementById("colorPicker").value,$('#handlePicker').value());
+		if($('#handlePicker').val() && $('#handlePicker').val().length > 0){
+			newGame(document.getElementById("colorPicker").value,$('#handlePicker').val());
 		}
 	});
 	$('#lobby').append('<h3 id="lobbyText">Lobby</h3>');
@@ -39,12 +39,12 @@ $(document).ready(function(){
 	//}
 	//$('#mainMenuJUI').menu('refresh');
 
-	statusGet();
+	//statusGet();
 });
 
 //Tells server we've joined a game
 var joinGame = function(GID,color,handle) {
-	post({messageType:'joinGame', game:GID, color:color, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
+	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
 	pid = handle;
 };
 
@@ -54,7 +54,11 @@ var startGame = function() {
 };
 
 var newGame = function(color, handle) {
-	post({messageType:'newGame', color:color, pid:handle}, function(data) {gid = data.GID; $('#mainMenu').hide(); $('#lobby').show();});
+	post({messageType:'newGame', color:color, pid:handle}, function(data) {
+		gid = data.gid;
+		$('#mainMenu').hide();
+		$('#lobby').show();
+	});
 	pid = handle;
 }
 
@@ -106,7 +110,7 @@ var processStatus = function(data) {
 		$('#mainMenuJUI').clear();
 		for(var i = 0; i < data.games.length; i++){
 			$('#mainMenuJUI').append('<li id="' + data.games[i].gid + '" >' + data.games[i].name + '</li>').click(data.games[i].gid,function(e){
-				if($('#handlePicker').value() && $('#handlePicker').value().length > 0){
+				if($('#handlePicker').val() && $('#handlePicker').val().length > 0){
 					joinGame(e.eventData, document.getElementById("colorPicker").value,$('#handlePicker').value());
 				}
 			});
@@ -132,11 +136,11 @@ var processStatus = function(data) {
 };
 
 //Post
-var post = function(data,url,callback){
+var post = function(data,callback){
 	$.ajax({
 		type: "POST",
 		url: server,
-		data: data,
+		data: JSON.stringify(data),
 		success: callback,
 		error: callback,
 		dataType: 'json'

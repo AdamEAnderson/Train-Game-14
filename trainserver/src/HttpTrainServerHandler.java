@@ -13,9 +13,6 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.util.CharsetUtil;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +22,8 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
+/** Translates incoming http GET and PUT into calls on TrainGame interface */
 public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> {
 
 	private HttpRequest request;
@@ -48,13 +45,6 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String END_GAME = "endGame";
 	
 	private static Logger log = LoggerFactory.getLogger(HttpTrainServerHandler.class);
-
-	private static RandomString gameNamer = new RandomString(8); // use for
-																	// generating
-																	// (semi)unique
-																	// gameIds
-
-	Map<String, Game> games = new HashMap<String, Game>(); // games currently in progress;
 
 	@Override
 	public void channelReadComplete(ChannelHandlerContext ctx) {
@@ -92,46 +82,47 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 				ByteBuf content = httpContent.content();
 				if (content.isReadable()) {
 					String requestText = content.toString(CharsetUtil.UTF_8);
+					log.info("requestText: {}", requestText);
 					String requestType = parseMessageType(requestText);
 					try {
 						switch (requestType) {
 						case NEW_GAME:
-							String strResponse = newGame(requestText);
+							String strResponse = TrainServer.newGame(requestText);
 							buf.append(strResponse);
 							log.info("newGame buf {}", buf);
 							break;
 						case JOIN_GAME:
-							joinGame(requestText);
+							TrainServer.joinGame(requestText);
 							break;
 						case START_GAME:
-							startGame(requestText);
+							TrainServer.startGame(requestText);
 							break;
 						case BUILD_TRACK:
-							buildTrack(requestText);
+							TrainServer.buildTrack(requestText);
 							break;
 						case UPGRADE_TRAIN:
-							upgradeTrain(requestText);
+							TrainServer.upgradeTrain(requestText);
 							break;
 						case START_TRAIN:
-							startTrain(requestText);
+							TrainServer.startTrain(requestText);
 							break;
 						case MOVE_TRAIN:
-							moveTrain(requestText);
+							TrainServer.moveTrain(requestText);
 							break;
 						case PICKUP_LOAD:
-							pickupLoad(requestText);
+							TrainServer.pickupLoad(requestText);
 							break;
 						case DELIVER_LOAD:
-							deliverLoad(requestText);
+							TrainServer.deliverLoad(requestText);
 							break;
 						case DUMP_LOAD:
-							dumpLoad(requestText);
+							TrainServer.dumpLoad(requestText);
 							break;
 						case END_TURN:
-							endTurn(requestText);
+							TrainServer.endTurn(requestText);
 							break;
 						case END_GAME:
-							endGame(requestText);
+							TrainServer.endGame(requestText);
 							break;
 						default:
 							throw new GameException(GameException.INVALID_MESSAGE_TYPE);
@@ -164,205 +155,6 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	private String status() {
 		return null;
-	}
-
-	class NewGameData {
-		//public String messageType;
-		public String pid; // host playerId
-		public String color; // color for track building
-		public String ruleSet; // name for rules of the game
-		public String gameType; // which game (Africa, Eurasia, etc.)
-		
-		NewGameData() {}
-	}
-	
-	class NewGameResponse {
-		public String gid;
-		NewGameResponse() {}
-	}
-	
-	private String newGame(String requestText) throws GameException {			
-		String gameId = null;
-		Gson gson = new GsonBuilder().create();
-		NewGameData data = gson.fromJson(requestText, NewGameData.class);
-		Game game = new Game();
-		gameId = gameNamer.nextString();
-		games.put(gameId, game);
-		game.newGame(data.pid, data.color, data.ruleSet, data.gameType);
-		NewGameResponse response = new NewGameResponse();
-		response.gid = gameId;
-		return gson.toJson(response);
-	}
-
-	class JoinGameData {
-		public String gid;
-		public String pid;
-		public String color;
-		}
-	
-	private void joinGame(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.joinGame(data.pid, data.color);
-
-	}
-
-	class StartGameData {
-		public String gid;
-		public String pid;
-	}
-
-	private void startGame(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		StartGameData data = gson.fromJson(requestText, StartGameData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.startGame(data.pid);
-	}
-
-	class BuildTrackData {
-		public String gid;
-		public String pid;
-		public MilePostId[] mileposts;
-	}
-
-	private void buildTrack(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.buildTrack(data.pid, data.mileposts);
-	}
-
-	class UpgradeTrainData {
-		public String gid;
-		public String pid;
-		public String upgradeType;
-	}
-
-	private void upgradeTrain(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		UpgradeTrainData data = gson.fromJson(requestText,
-				UpgradeTrainData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (!data.upgradeType.equals("Capacity") && !data.upgradeType.equals("Speed"))
-			throw new GameException(GameException.INVALID_UPGRADE);
-		game.upgradeTrain(data.pid,
-				data.upgradeType.equals("Capacity") ? UpgradeType.CAPACITY
-						: UpgradeType.SPEED);
-	}
-
-	class StartTrainData {
-		public String gid;
-		public String pid;
-		public String city;
-	}
-
-	private void startTrain(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		StartTrainData data = gson.fromJson(requestText, StartTrainData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.startTrain(data.pid, data.city);
-	}
-
-	class MoveTrainData {
-		public String gid;
-		public String pid;
-		public MilePostId[] mileposts;
-	}
-
-	private void moveTrain(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.moveTrain(data.pid, data.mileposts);
-	}
-
-	class PickupLoadData {
-		public String gid;
-		public String pid;
-		public String city;
-		public String load;
-	}
-
-	private void pickupLoad(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		PickupLoadData data = gson.fromJson(requestText, PickupLoadData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.pickupLoad(data.pid, data.city, data.load);
-	}
-
-	class DeliverLoadData {
-		public String gid;
-		public String pid;
-		public String city;
-		public String load;
-	}
-
-	private void deliverLoad(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		DeliverLoadData data = gson
-				.fromJson(requestText, DeliverLoadData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.deliverLoad(data.pid, data.city, data.load);
-	}
-
-	class DumpLoadData {
-		public String gid;
-		public String pid;
-		public String load;
-	}
-
-	private void dumpLoad(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		DumpLoadData data = gson.fromJson(requestText, DumpLoadData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.dumpLoad(data.pid, data.load);
-	}
-
-	class EndTurnData {
-		public String gid;
-		public String pid;
-	}
-
-	private void endTurn(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		EndTurnData data = gson.fromJson(requestText, EndTurnData.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.endTurn(data.pid);
-	}
-
-	class EndGame {
-		public String gid;
-		public String pid;
-	}
-
-	private void endGame(String requestText) throws GameException {
-		Gson gson = new GsonBuilder().create();
-		EndGame data = gson.fromJson(requestText, EndGame.class);
-		Game game = games.get(data.gid);
-		if (game == null)
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.endGame(data.pid);
 	}
 
 	private static int findNthExprInString(String s, String expr, int n)

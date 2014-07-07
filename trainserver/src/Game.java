@@ -1,19 +1,33 @@
+import java.util.ArrayList;
+import java.util.List;
+
+import map.MilePostId;
+import map.TrainMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import player.Player;
+import reference.Card;
 
 
 // Train game implementation class.
 public class Game implements AbstractGame {
 
+	private final TrainMap map;
+	private List<Card> deck;
+	private List<Card> discard;
+	private List<Player> players;
+	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 
-	@Override
-	public void newGame(String host, String color, String ruleSet,
-			String gameType) throws GameException {
-		log.info("newGame(pid={}, color={}, ruleSet={}, gameType={})", host, color,
-			ruleSet, gameType);
+	public Game(String gameType, String ruleSet){
+		map = new TrainMap("");
+		//deck = Card.init();
+		discard = new ArrayList<Card>();
+		//players = Player.init();
 	}
-
+	
 	@Override
 	public void joinGame(String pid, String color)
 			throws GameException {

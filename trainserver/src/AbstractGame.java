@@ -1,13 +1,9 @@
+import map.MilePostId;
+
 
 
 
 interface AbstractGame {
-	
-	// Create a new game. Returns the ID of the new game. 
-	// Error values:
-	// RULESET_NOT_FOUND
-	// GAMETYPE_NOT_FOUND
-	void newGame(String host, String color, String ruleSet, String gameType) throws GameException;
 	
 	// New player joins an existing game, requesting a color for drawing track.
 	// Error values:

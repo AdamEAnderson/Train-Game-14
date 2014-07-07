@@ -1,7 +1,8 @@
+package map;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-class MilePostId {
+public class MilePostId {
 	static Gson gson = new GsonBuilder().create();
 	public int x;
 	public int y;

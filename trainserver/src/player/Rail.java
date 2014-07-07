@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Queue;
 
 import map.Edge;
-import map.Map;
+import map.TrainMap;
 import map.Milepost;
 
 public class Rail {

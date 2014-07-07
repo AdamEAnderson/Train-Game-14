@@ -7,13 +7,25 @@ public class Milepost {
 	public final int y;
 	public Edge[] edges; //has length 6: first entry is the NE edge, clockwise 
 		//and ending on NW
-	public final City hasCity; //null if no city
+	public final City city; //null if no city
 	public final Type type; 
 		//type: only City or MajorCity if hasCity not null
 	
-	Milepost(int x, int y, Edge[] edges, City hasCity, Type type){
+	public enum Type {
+		CITY, MAJORCITY, NORMAL, BLANK, DESERT, MOUNTAIN, ALPINE, JUNGLE, FOREST
+	}
+
+	Milepost(int x, int y, Type type){
 		this.edges = edges;
-		this.hasCity = hasCity;
+		this.city = null;
+		this.type = type;
+		this.x = x;
+		this.y = y;
+	}
+	
+	Milepost(int x, int y, City city, Type type){
+		this.edges = edges;
+		this.city = city;
 		this.type = type;
 		this.x = x;
 		this.y = y;
@@ -39,7 +51,4 @@ public class Milepost {
 		}
 	}
 		
-	enum Type {
-		CITY, MAJORCITY, NORMAL, BLANK, DESERT, MOUNTAIN, ALPINE, JUNGLE, FOREST
-	}
 }

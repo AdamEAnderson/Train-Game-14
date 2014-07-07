@@ -66,9 +66,9 @@ public class Train {
 	 *  room for an additional load).
 	 */
 	public boolean addLoad(Load load){
-		if(loc.hasCity == null) return false;
+		if(loc.city == null) return false;
 		else{
-			if(loc.hasCity.hasLoad(load)) {
+			if(loc.city.hasLoad(load)) {
 				for(int i = 0; i < loads.length; i++){
 					if(loads[i] == null){
 						loads[i] = load;
