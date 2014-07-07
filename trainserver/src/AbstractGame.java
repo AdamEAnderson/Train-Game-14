@@ -1,8 +1,6 @@
 import map.MilePostId;
 
 
-
-
 interface AbstractGame {
 	
 	// New player joins an existing game, requesting a color for drawing track.
@@ -38,7 +36,7 @@ interface AbstractGame {
 	// CITY_NOT_FOUND
 	// PLAYER_NOT_FOUND
 	// GAME_NOT_FOUND
-	void startTrain(String player, String city);
+	void startTrain(String player, String city); //should change City to MilePostId
 	
 	// Player moves their train
 	// Error values:
