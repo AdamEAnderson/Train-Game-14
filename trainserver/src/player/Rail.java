@@ -1,28 +1,38 @@
 package player;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Queue;
 
-import map.Edge;
-import map.TrainMap;
+import train.GameException;
+
 import map.Milepost;
 
 public class Rail {
-	HashMap<Milepost, HashMap<Milepost, Track>> tracks;
+	private HashMap<Milepost, HashMap<Milepost, Track>> tracks;
 	
 	Rail(){
 		tracks = new HashMap<Milepost, HashMap<Milepost, Track>>();
+	}
+	
+	/**
+	 * @return whether this player has a track between these two mileposts
+	 */
+	public boolean connects(Milepost one, Milepost two){
+		if(tracks.containsKey(one)){
+			return tracks.get(one).containsKey(two);
+		} return false;
 	}
 	
 	/** Adds the given track to the player's rails. 
 	 * @param origin: the milepost already attached to the rail; next is where
 	 * you build towards.
 	 * @return the cost of the build
+	 * Does NOT check that another player did not build this track already
 	 */
-	int build(Milepost origin, Milepost next) /*throws GameException*/{
-		assert tracks.containsKey(origin) && origin.isNeighbor(next); 
-			//written as an assertion, never checked
-		assert !(tracks.get(origin).containsKey(next)); //track not already built
+	int build(Milepost origin, Milepost next) throws GameException {
+		if((! tracks.containsKey(origin)) || ! origin.isNeighbor(next)) 
+			throw new GameException("InvalidTrack"); 
+		if(connects(origin, next)) throw new GameException("InvalidTrack"); 
+		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) 
+			throw new GameException("InvalidTrack");
 		Track t = new Track(origin, next);
 		HashMap<Milepost, Track> inner = tracks.get(origin);
 		inner.put(next, t);
@@ -36,5 +46,14 @@ public class Rail {
 		}
 		int cost = t.getEdge().cost;
 		return cost;
+	}
+	
+	/** Erases the track between these neighboring mileposts
+	 */
+	void erase(Milepost one, Milepost two){
+		HashMap<Milepost, Track> h = tracks.get(one);
+		if(h != null) h.remove(two);
+		h = tracks.get(two);
+		if(h != null) h.remove(one);
 	}
 }

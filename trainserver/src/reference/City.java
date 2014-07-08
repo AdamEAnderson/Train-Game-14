@@ -4,16 +4,16 @@ import java.util.List;
 
 public final class City {
 	public final String name;
-	public final List<Load> loads;
+	public final List<String> loads;
 	public final boolean isMajor;
 	
-	public City(String name, List<Load> loads, boolean isMajor){
+	public City(String name, List<String> loads, boolean isMajor){
 		this.name = name;
 		this.loads = loads;
 		this.isMajor = isMajor;
 	}
 	
-	public boolean hasLoad(Load load){
+	public boolean hasLoad(String load){
 		return loads.contains(load);
 	}
 	
@@ -21,7 +21,7 @@ public final class City {
 		return name;
 	}
 	
-	public List<Load> getLoads(){
+	public List<String> getLoads(){
 		return loads;
 	}
 	

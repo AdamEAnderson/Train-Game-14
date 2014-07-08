@@ -1,6 +1,6 @@
 package train;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 import map.MilepostId;
 import map.TrainMap;
@@ -17,23 +17,46 @@ import reference.UpgradeType;
 public class Game implements AbstractGame {
 
 	private final TrainMap map;
-	private List<Card> deck;
-	private List<Card> discard;
+	private final int handSize; //the number of cards in a hand
+	private final int startingMoney; //the money each player starts with
+	private Queue<Card> deck;
 	private List<Player> players;
+	private Player active;
+	private Player last;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
+	
+	private Player getPlayer(String pid) throws GameException {
+		for(Player p : players){
+			if(p.getPid() == pid) return p;
+		}
+		throw new GameException("PlayerNotFound");
+	}
 
 	public Game(TrainMap map, String ruleSet){
 		this.map = map;
 		//deck = Card.init();
-		discard = new ArrayList<Card>();
 		//players = Player.init();
+		handSize = 4; 
+		startingMoney = 70; //Arbitrary values, can be changed as needed
 	}
 	
 	@Override
 	public void joinGame(String pid, String color)
 			throws GameException {
 		log.info("joinGame(pid={}, color={})", pid, color);
+		Player p = null;
+		try { 
+			p = getPlayer(pid);
+		} catch(GameException e){ }
+		if(p != null) throw new GameException("PlayerAlreadyJoined");
+		Card [] hand = new Card[handSize];
+		for(int i = 0; i < hand.length; i++){
+			hand[i] = deck.poll();
+		}
+		p = new Player(startingMoney, hand, pid, color, players.get(players.size() - 1));
+		players.add(p);
+		players.get(0).resetNextPlayer(p);
 	}
 
 	@Override
@@ -55,6 +78,9 @@ public class Game implements AbstractGame {
 	public void upgradeTrain(String pid, UpgradeType upgrade)
 			throws GameException {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
+		Player p = getPlayer(pid);
+		if(p == active) p.upgradeTrain(upgrade);
+		else throw new GameException("PlayerNotActive");
 	}
 
 	@Override
@@ -84,18 +110,22 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void dumpLoad(String pid, String load) {
+	public void dumpLoad(String pid, String load) throws GameException {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
+		if(!(getPlayer(pid) == active)) throw new GameException("PlayerNotActive");
+		active.dropLoad(load);
 	}
 
 	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={})", pid);
+		active = active.endTurn();
 	}
 
 	@Override
 	public void endGame(String pid) throws GameException {
 		log.info("endGame(pid={})", pid);
+		if(!(active == last)) throw new GameException("PlayerNotActive");
 	}
 
 }

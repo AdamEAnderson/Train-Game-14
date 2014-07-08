@@ -70,7 +70,7 @@ interface AbstractGame {
 	// INVALID LOAD
 	// PLAYER_NOT_FOUND
 	// GAME_NOT_FOUND
-	void dumpLoad(String player, String load);
+	void dumpLoad(String player, String load) throws GameException;
 	
 	// Player declares their turn is over.
 	// Error values:
