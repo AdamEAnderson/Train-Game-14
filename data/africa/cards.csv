@@ -1,0 +1,150 @@
+City,Load,Price,City,Load,Price,City,Load,Price
+Monrovia,Movies,26,Addis Ababa,Cloves,15,Luanda,Books,45
+Makkah,Cloves,26,Dakar,Terrorists,31,Zanzibar,Soccer,30
+Kinshasa,Arms,28,Addis Ababa,Vanilla,33,Kisinggani,Cotton,18
+Port Elizabeth,Peanuts,53,Durban,Pilgrims,32,Lagos,Copper,32
+Khartoum,Tobacco,28,Casablanca,Diamonds,26,Maputo,Tapioca,15
+Maputo,Cloves,15,Mahajanga,Terrorists,76,Kano,Ecotourists,47
+Kinshasa,Sheep,26,Luxor,Movies,38,Mombasa,Chocolate,32
+Kano,Tobacco,37,Maputo,Rubber,27,Port Harcourt,Movies,33
+Makkah,Wine,30,Tunis,Uranium,18,Harare,Rubber,20
+Monrovia,Pilgrims,13,Windhoek,Arms,11,Dar es Salaam,Soccer,30
+Port Harcourt,Copper,28,Cairo,Ecotourists,59,Muqdisho,Arms,34
+Alexandria,Peanuts,25,Oran,Coffee,32,Luanda,Coal,22
+Lagos,Terrorists,32,Ndjamena,Artifacts,24,Oran,Books,26
+Kampala,Books,29,Port Elizabeth,Iron,33,Cairo,Coal,33
+Luxor,Wine,23,Kananga,Gold,13,Capetown,Tobacco,22
+Tombouctou,Rubber,31,Makkah,Bauxite,62,Addis Ababa,Tapioca,26
+Monrovia,Artifacts,56,Douala,Vanilla,43,Oran,Rubber,47
+Maputo,Books,58,Lubumbashi,Gold,15,Luxor,Cobalt,35
+Nairobi,Bauxite,54,Lagos,Sugar,46,Ouagadougou,Cloves,42
+Douala,Cloves,31,Kimberley,Peanuts,51,Asmera,Vanilla,39
+Maputo,Pilgrims,27,Kimberley,Tapioca,25,Tripoli,Artifacts,43
+Alger,Ecotourists,82,Casablanca,Cotton,29,Mahajanga,Cobalt,24
+Harare,Books,46,Kananga,Ecotourists,29,Bangui,Corn,40
+Addis Ababa,Corn,42,Kano,Bauxite,22,Bingazi,Cobalt,42
+Tenerife,Coffee,45,Nairobi,Uranium,32,Maputo,Cotton,39
+Air of Azbine,Tobacco,42,Luanda,Movies,54,Tombouctou,Gold,11
+Port Elizabeth,Rubber,31,Dar es Salaam,Cotton,25,Addis Ababa,Camels,32
+Nairobi,Arms,28,Zanzibar,Terrorists,47,Kimberley,Vanilla,29
+Lilongwe,Ecotourists,15,Zanzibar,Sugar,25,Djibouti,Tobacco,28
+Tenerife,Movies,17,Muqdisho,Ecotourists,36,Ouagadougou,Coffee,16
+Dodoma,Cotton,24,Makkah,Peanuts,32,Tunis,Cattle,23
+Alexandria,Ecotourists,59,Kampala,Cloves,10,Kimberley,Soccer,38
+Monrovia,Cattle,11,Asmera,Chocolate,29,Tombouctou,Tapioca,11
+Maputo,Wine,13,Windhoek,Cloves,25,Lubumashi,Oil,26
+Nairobi,Iron,24,Tripoli,Ecotourists,67,Casablanca,Books,37
+Zanzibar,Tobacco,11,Asmera,Tapioca,32,Tripoli,Cloves,55
+Mahajanga,Iron,38,Asmera,Peanuts,30,Ndola,Corn,15
+Tenerife,Soccer,38,Djibouti,Oil,29,Tunis,Diamonds,33
+Huambo,Gold,18,Tanger,Chocolate,28,Port Harcourt,Ecotourists,41
+Dakar,Tapioca,15,Lubumbashi,Camels,37,Tombouctou,Vanilla,71
+Freetown,Coal,17,Harare,Pilgrims,21,Alger,Copper,47
+Port Elizabeth,Soccer,40,Nairobi,Diamonds,15,Tunis,Corn,79
+Ouagadougou,Iron,11,Makkah,Camels,32,Luxor,Copper,24
+Antananarivo,Coffee,31,Tenerife,Gold,34,Alexandria,Soccer,36
+Lagos,Camels,12,Mahajanga,Tobacco,21,Nairobi,Cobalt,14
+Djibouti,Iron,38,Tombouctou,Cloves,46,Mombasa,Coal,41
+Kisangani,Chocolate,16,Asmera,Cloves,21,Tunis,Bauxite,39
+Air of Azbine,Pilgrims,15,Dakar,Iron,11,Nairobi,Coal,35
+Bangui,Vanilla,38,Dakar,Soccer,18,Asmera,Camels,28
+Lagos,Movies,29,Tanger,Rubber,49,Asmera,Arms,18
+Djibouti,Arms,23,Abidjan,Cotton,20,Alger,Tea,53
+Douala,Cotton,11,Mombasa,Arms,29,Abidjan,Rubber,31
+Kano,Tea,30,Maputo,Coffee,23,Asmera,Diamonds,28
+Freetown,Camels,12,Kimberley,Oil,40,Bingazi,Pilgrims,33
+Makkah,Iron,35,Djibouti,Cobalt,32,Lilongwe,Cattle,14
+Huambo,Uranium,20,Zanzibar,Peanuts,35,Casablanca,Ecotourists,86
+Tanger,Camels,16,Dakar,Corn,72,Muqdisho,Gold,12
+Asmera,Soccer,28,Tunis,Ecotourists,72,Muqdisho,Tobacco,22
+Lilongwe,Soccer,29,Dar es Salaam,Sheep,16,Kananga,Tea,12
+Port Elizabeth,Pilgrims,31,Ndola,Cotton,30,Durban,Peanuts,56
+Kampala,Bauxite,51,Douala,Gold,15,Kinshasa,Books,38
+Makkah,Coal,38,Harare,Chocolate,31,Djibouti,Terrorists,31
+Dakar,Uranium,28,Capetown,Terrorists,66,Accra,Arms,43
+Tombouctou,Pilgrims,12,Khartoum,Artifacts,18,Yerushalayim,Coffee,23
+Ndola,Camels,39,Maputo,Oil,42,Harare,Cloves,15
+Freetown,Arms,51,Lagos,Artifacts,37,Kinshasa,Peanuts,21
+Oran,Oil,19,Freetown,Cloves,62,Windhoek,Cobalt,12
+Oran,Terrorists,11,Douala,Bauxite,25,Mahajanga,Pilgrims,41
+Asmera,Bauxite,60,Tripoli,Cotton,16,Accra,Corn,53
+Tenerife,Tea,68,Kano,Cobalt,35,Kimberley,Tobacco,14
+Mombasa,Corn,28,Ndola,Iron,13,Muqdisho,Chocolate,38
+Oran,Diamonds,30,Tombouctou,Coal,11,Mahajanga,Arms,25
+Kano,Books,27,Bamako,Copper,45,Kigali,Vanilla,27
+Zanzibar,Coal,41,Luanda,Coal,41,Oran,Corn,80
+Mahajanga,Soccer,43,Casablanca,Coal,28,Alger,Tapioca,33
+Cairo,Corn,54,Tanger,Coffee,39,Dodoma,Uranium,28
+Muqdisho,Soccer,35,Huambo,Vanilla,37,Luanda,Sugar,26
+Windhoek,Artifacts,29,Dar es Salaam,Arms,26,Addis Ababa,Tobacco,27
+Makkah,Arms,11,Huambo,Cattle,23,Kinshasa,Movies,51
+Bangui,Bauxite,33,Tenerife,Sheep,73,Johannesburg,Tea,14
+Johannesburg,Coal,43,Bingazi,Corn,64,Ndjamena,Sugar,50
+Cairo,Peanuts,27,Yerushalayim,Coal,42,Luanda,Sheep,26
+Tanger,Uranium,22,Kigali,Soccer,19,Alexandria,Chocolate,34
+Tanger,Cobalt,63,Khartoum,Copper,14,Kinshasa,Bauxite,29
+Kano,Wine,24,Windhoek,Coal,31,Tombouctou,Uranium,12
+Durban,Coal,49,Antananarivo,Books,69,Lilongwe,Camels,45
+Harare,Vanilla,23,Cairo,Sugar,55,Kinshasa,Rubber,11
+Bangui,Ecotourists,33,Casablanca,Sheep,51,Asmera,Pilgrims,32
+Makkah,Sheep,11,Ndola,Uranium,16,Nairobi,Cotton,19
+Monrovia,Cloves,55,Muqdisho,Cobalt,23,Alger,Coffee,33
+Tombouctou,Iron,15,Port Harcourt,Cotton,11,Kampala,Wine,42
+Dar es Salaam,Uranium,28,Monrovia,Cobalt,40,Nairobi,Tobacco,13
+Lilongwe,Bauxite,55,Huambo,Ecotourists,19,Luanda,Corn,27
+Lilongwe,Coffee,13,Bamako,Artifacts,50,Huambo,Wine,19
+Kinshasa,Tea,20,Port Elizabeth,Cattle,39,Alger,Pilgrims,31
+Bamako,Cobalt,43,Lilongwe,Sugar,12,Tunis,Sheep,40
+Bamako,Chocolate,10,Luxor,Bauxite,51,Dakar,Artifacts,62
+Tripoli,Arms,20,Alexandria,Sheep,24,Djibouti,Coal,42
+Lubumbashi,Terrorists,47,Nairobi,Tapioca,23,Oran,Gold,31
+Air of Azbine,Tea,33,Maputo,Cattle,28,Harare,Gold,14
+Tunis,Camels,19,Lilongwe,Sheep,24,Mombasa,Coffee,11
+Kananga,Corn,26,Cairo,Wine,20,Luxor,Cloves,35
+Yerushalayim,Camels,24,Kampala,Uranium,28,Tanger,Terrorists,18
+Huambo,Movies,56,Nairobi,Peanuts,29,Muqdisho,Pilgrims,32
+Abidjan,Cattle,13,Lubumbashi,Artifacts,14,Ndola,Pilgrims,15
+Lusaka,Iron,11,Dakar,Sugar,69,Port Harcourt,Corn,42
+Bamako,Vanilla,71,Zanzibar,Books,41,Yerushalayim,Ecotourists,58
+Ouagadougou,Arms,37,Mombasa,Pilgrims,25,Freetown,Tea,47
+Kinshasa,Sugar,28,Ndjamena,Vanilla,50,Kisinggani,Movies,54
+Kimberley,Chocolate,34,Douala,Tapioca,10,Windhoek,Gold,11
+Tenerife,Sugar,97,Port Harcourt,Wine,29,Lubumashi,Cloves,11
+Bangui,Artifacts,20,Capetown,Cloves,35,Tenerife,Cotton,39
+Tenerife,Chocolate,36,Tripoli,Cattle,20,Luanda,Tobacco,18
+Luanda,Peanuts,25,Dakar,Books,51,Air of Azbine,Copper,27
+Lubumbashi,Chocolate,24,Tripoli,Pilgrims,30,Mahajanga,Ecotourists,25
+Lusaka,Books,45,Casablanca,Iron,13,Dar es Salaam,Oil,35
+Dodoma,Soccer,28,Casablanca,Uranium,21,Tombouctou,Corn,62
+Johannesburg,Oil,40,Tombouctou,Ecotourists,63,Air of Azbine,Arms,27
+Asmera,Ecotourists,43,Kampala,Tobacco,14,Makkah,Vanilla,49
+Kananga,Vanilla,31,Monrovia,Terrorists,38,Alexandria,Cattle,24
+Antananarivo,Cattle,27,Oran,Bauxite,31,Tripoli,Chocolate,30
+Zanzibar,Wine,37,Ndjamena,Bauxite,31,Capetown,Rubber,35
+Ouagadougou,Oil,11,Dodoma,Diamonds,16,Djibouti,Movies,59
+Abidjan,Terrorists,33,Maputo,Movies,92,Dodoma,Chocolate,28
+Bamako,Ecotourists,64,Lubumbashi,Wine,26,Kano,Tapioca,14
+Kimberley,Cotton,47,Kampala,Vanilla,27,Abidjan,Tea,41
+Djibouti,Camels,35,Capetown,Cattle,40,Kananga,Movies,56
+Capetown,Pilgrims,29,Lubumbashi,Books,41,Oran,Camels,20
+Bangui,Peanuts,13,Ouagadougou,Ecotourists,59,Djibouti,Pilgrims,30
+Luxor,Rubber,26,Kampala,Peanuts,26,Dakar,Chocolate,16
+Kigali,Movies,54,Freetown,Copper,43,Alger,Sugar,77
+Tenerife,Rubber,56,Tombouctou,Tobacco,47,Kisinggani,Sugar,27
+Lagos,Corn,50,Kananga,Peanuts,24,Djibouti,Gold,15
+Tunis,Tapioca,36,Lubumbashi,Ecotourists,14,Freetown,Cotton,32
+Douala,Terrorists,27,Khartoum,Vanilla,40,Tripoli,Peanuts,19
+Air of Azbine,Soccer,13,Capetown,Tea,27,Tripoli,Copper,38
+Casablanca,Terrorists,21,Cairo,Tobacco,42,Addis Ababa,Soccer,32
+Yerushalayim,Cattle,24,Port Elizabeth,Tea,23,Port Harcourt,Terrorists,28
+Casablanca,Camels,17,Yerushalayim,Pilgrims,39,Harare,Coal,36
+Tanger,Arms,38,Durban,Soccer,40,Lusaka,Movies,67
+Ouagadougou,Wine,24,Windhoek,Cattle,28,Kano,Iron,20
+Kinshasa,Coal,17,Kananga,Arms,21,Tripoli,Sheep,32
+Ndjamena,Books,24,Lilongwe,Terrorists,54,Port Elizabeth,Cotton,49
+Asmera,Sugar,41,Johannesburg,Cobalt,13,Kigali,Iron,17
+Bamako,Cloves,53,Douala,Tea,29,Johannesburg,Terrorists,64
+Alexandria,Uranium,21,Kigali,Terrorists,39,Lagos,Rubber,25
+Bingazi,Artifacts,40,Bangui,Iron,18,Muqdisho,Tapioca,23
+Kinshasa,Corn,31,Freetown,Sugar,67,Windhoek,Cotton,31
+Makkah,Terrorists,26,Douala,Tobacco,29,Mahajanga,Chocolate,41

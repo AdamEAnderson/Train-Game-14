@@ -27,16 +27,18 @@ public class Game implements AbstractGame {
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
-	private Player getPlayer(String pid) throws GameException {
-		for(Player p : players){
-			if(p.getPid() == pid) return p;
-		}
-		throw new GameException("PlayerNotFound");
-	}
-
-	public Game(TrainMap map, String ruleSet){
-		this.map = map;
-		//deck = Card.init();
+	/** Constuctor. 
+	 * Ruleset includes:
+	 * - Use event cards (how to enforce these???)
+	 * - Amount of money to start
+	 * - Number of trains
+	 * - Number of cards to deal
+	 * @param map
+	 * @param ruleSet
+	 */
+	public Game(GameData gameData, String ruleSet){
+		this.map = gameData.map;
+		this.deck = gameData.deck;
 		players = new ArrayList<Player>();
 		handSize = 4; 
 		startingMoney = 70; //Arbitrary values, can be changed as needed
@@ -55,7 +57,8 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < hand.length; i++){
 			hand[i] = deck.poll();
 		}
-		p = new Player(startingMoney, hand, pid, color, players.get(players.size() - 1));
+		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
+		p = new Player(startingMoney, hand, pid, color, nextPlayer);
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 	}
@@ -113,20 +116,29 @@ public class Game implements AbstractGame {
 	@Override
 	public void dumpLoad(String pid, String load) throws GameException {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
-		if(!(getPlayer(pid) == active)) throw new GameException("PlayerNotActive");
-		active.dropLoad(load);
+	//	if (!(getPlayer(pid) == active)) 
+	//		throw new GameException("PlayerNotActive");
+	//	active.dropLoad(load);
 	}
 
 	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={})", pid);
-		active = active.endTurn();
+	//	active = active.endTurn();
 	}
 
 	@Override
 	public void endGame(String pid) throws GameException {
 		log.info("endGame(pid={})", pid);
-		if(!(active == last)) throw new GameException("PlayerNotActive");
+	//	if(!(active == last)) throw new GameException("PlayerNotActive");
 	}
+
+	private Player getPlayer(String pid) throws GameException {
+		for(Player p : players){
+			if (p.getPid().equals(pid)) return p;
+		}
+		throw new GameException("PlayerNotFound");
+	}
+
 
 }

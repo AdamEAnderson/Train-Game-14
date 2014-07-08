@@ -1,17 +1,10 @@
 package train;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import map.MilepostId;
-import map.TrainMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +37,6 @@ public class TrainServer {
 
 	static Map<String, Game> games = new HashMap<String, Game>(); // games currently in progress;
 	
-	static private final String dataDirectoryPath = "../data";
-
-
 	static class NewGameData {
 		//public String messageType;
 		public String pid; // host playerId
@@ -67,7 +57,7 @@ public class TrainServer {
 		Gson gson = new GsonBuilder().create();
 		NewGameData data = gson.fromJson(requestText, NewGameData.class);
 		
-		Game game = new Game(getMapData(data.gameType), data.ruleSet);
+		Game game = new Game(new GameData(data.gameType), data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
 		game.joinGame(data.pid, data.color);
@@ -252,62 +242,4 @@ public class TrainServer {
 		game.endGame(data.pid);
 	}
 	
-	/** Returns a list of the supported game types. All game types must have a folder
-	 * in the data directory that contains all the data for the game. Name of the type 
-	 * is the name of the folder.
-	 * @return List of game types
-	 */
-	static public List<String> getGameTypes() {
-		List<String> gameTypes = new ArrayList<String>();
-		File dataDir = new File(dataDirectoryPath);
-		File dataChildren[] = dataDir.listFiles(new DirectoryFileFilter());
-		for (File child: dataChildren)
-			gameTypes.add(child.getName());
-		return gameTypes;
-	}
-	
-	static private TrainMap getMapData(String gameType) throws GameException {
-	    log.info("Working Directory = " + System.getProperty("user.dir"));
-		String mapDataFolderPath = dataDirectoryPath + File.separator + gameType;
-		File mapDataDir = new File(mapDataFolderPath);
-		if (!mapDataDir.isDirectory())
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		
-		// Get the map data file
-		String mapDataPath = mapDataFolderPath + File.separator + "map.csv";
-		File mapDataFile = new File(mapDataPath);
-		if (!mapDataFile.isFile())
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		
-		// Get the river data
-		String riverDataPath = mapDataFolderPath + File.separator + "rivers.csv";
-		File riverDataFile = new File(riverDataPath);
-		if (!riverDataFile.isFile())
-			throw new GameException(GameException.GAME_NOT_FOUND);
-
-		// Get the sea crossings data
-		String seaDataPath = mapDataFolderPath + File.separator + "seas.csv";
-		File seaDataFile = new File(seaDataPath);
-		if (!seaDataFile.isFile())
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		
-		TrainMap map = null;
-		try {
-			BufferedReader mapDataReader = new BufferedReader(new FileReader(mapDataFile));
-			BufferedReader riverDataReader = new BufferedReader(new FileReader(riverDataFile));
-			BufferedReader seaDataReader = new BufferedReader(new FileReader(seaDataFile));
-			map = new TrainMap(mapDataReader, riverDataReader, seaDataReader);
-			mapDataReader.close();
-			riverDataReader.close();
-			seaDataReader.close();
-		} catch (FileNotFoundException e) {
-			log.error("FileNotFoundException reading game map {}", e);
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		} catch (IOException e) {
-			log.error("IOException reading game map {}", e);
-			throw new GameException(GameException.GAME_NOT_FOUND);
-		}
-		return map;
-	}
-
 }

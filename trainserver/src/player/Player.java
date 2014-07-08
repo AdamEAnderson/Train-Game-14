@@ -3,7 +3,7 @@ package player;
 import java.util.Queue;
 
 import reference.*;
-import reference.Card.Trip;
+import reference.Trip;
 import train.GameException;
 import map.Milepost;
 
