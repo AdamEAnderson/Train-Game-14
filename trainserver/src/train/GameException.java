@@ -16,6 +16,7 @@ public class GameException extends Exception {
 	public static String INVALID_DELIVERY = "InvalidDelivery";		// delivering a load with no card
 	public static String INVALID_MESSAGE_TYPE = "InvalidMessageType";// message type not recognised
 	public static String INVALID_MOVE = "InvalidMove";
+	public static String BAD_MAP_DATA = "BadMapData";
 	
 	public static final long serialVersionUID = 1;
 	

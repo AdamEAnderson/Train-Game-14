@@ -147,8 +147,7 @@ public class HttpTest {
     }
 
 	private static String newGame(String pid, String color) throws IOException, InterruptedException {
-		//String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"ruleSet\":\"anythingGoes\", \"gameType\":\"Africa\"}";
-		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"ruleSet\":\"anythingGoes\", \"gameType\":\"Africa\"}", pid, color);
+		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"ruleSet\":\"anythingGoes\", \"gameType\":\"africa\"}", pid, color);
 		log.info("jsonPayload {}", jsonPayload);
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
         String responseMessage = sendMessage(connection, jsonPayload);
@@ -206,8 +205,8 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void startTrain(String gid, String pid, String city) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"startTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"city\":%s}", gid, pid, city);
+	private static void startTrain(String gid, String pid, String where) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"startTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"where\":%s}", gid, pid, where);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -383,7 +382,7 @@ public class HttpTest {
         String mileposts = "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1},{\"x\":2,\"y\":2}]";
         buildTrack(gid, "Sandy", mileposts);
         
-        startTrain(gid, "Sandy", "Dakar");
+        startTrain(gid, "Sandy", "{\"x\":1, \"y\":1}");
         moveTrain(gid, "Sandy", mileposts);
         pickupLoad(gid, "Sandy", "Abidjan", "turnips");
         moveTrain(gid, "Sandy", mileposts);

@@ -2,7 +2,7 @@ package train;
 import java.util.ArrayList;
 import java.util.List;
 
-import map.MilePostId;
+import map.MilepostId;
 import map.TrainMap;
 
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class Game implements AbstractGame {
 
 	@Override
 	public void buildTrack(String pid,
-			MilePostId[] mileposts) throws GameException {
+			MilepostId[] mileposts) throws GameException {
 		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
@@ -58,12 +58,12 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void startTrain(String pid, String city) {
-		log.info("startTrain(pid={}, city={})", pid, city);
+	public void startTrain(String pid, MilepostId where) {
+		log.info("startTrain(pid={}, city={})", pid, where);
 	}
 
 	@Override
-	public void moveTrain(String pid, MilePostId[] mileposts)
+	public void moveTrain(String pid, MilepostId[] mileposts)
 			throws GameException {
 		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)

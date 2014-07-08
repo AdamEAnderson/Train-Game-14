@@ -2,12 +2,12 @@ package map;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class MilePostId {
+public class MilepostId {
 	static Gson gson = new GsonBuilder().create();
 	public int x;
 	public int y;
 	
-	MilePostId(int x, int y) {
+	MilepostId(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}

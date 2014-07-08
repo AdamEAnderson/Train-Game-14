@@ -16,7 +16,7 @@ public class Milepost {
 	}
 
 	Milepost(int x, int y, Type type){
-		this.edges = edges;
+		this.edges = null;
 		this.city = null;
 		this.type = type;
 		this.x = x;
@@ -24,7 +24,7 @@ public class Milepost {
 	}
 	
 	Milepost(int x, int y, City city, Type type){
-		this.edges = edges;
+		this.edges = null;
 		this.city = city;
 		this.type = type;
 		this.x = x;

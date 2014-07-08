@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import map.MilePostId;
+import map.MilepostId;
 import map.TrainMap;
 
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ class DirectoryFileFilter implements FileFilter {
  * of in progress games.
  */
 public class TrainServer {
-	private static Logger log = LoggerFactory.getLogger(HttpTrainServerHandler.class);
+	private static Logger log = LoggerFactory.getLogger(TrainServer.class);
 
 	private static RandomString gameNamer = new RandomString(8); // use for
 																	// generating
@@ -44,7 +44,7 @@ public class TrainServer {
 
 	static Map<String, Game> games = new HashMap<String, Game>(); // games currently in progress;
 	
-	static private final String dataDirectoryPath = "../../data";
+	static private final String dataDirectoryPath = "../data";
 
 
 	static class NewGameData {
@@ -114,7 +114,7 @@ public class TrainServer {
 	static class BuildTrackData {
 		public String gid;
 		public String pid;
-		public MilePostId[] mileposts;
+		public MilepostId[] mileposts;
 	}
 
 	static public void buildTrack(String requestText) throws GameException {
@@ -149,7 +149,7 @@ public class TrainServer {
 	static class StartTrainData {
 		public String gid;
 		public String pid;
-		public String city;
+		public MilepostId where;
 	}
 
 	static public void startTrain(String requestText) throws GameException {
@@ -158,13 +158,13 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.startTrain(data.pid, data.city);
+		game.startTrain(data.pid, data.where);
 	}
 
 	static class MoveTrainData {
 		public String gid;
 		public String pid;
-		public MilePostId[] mileposts;
+		public MilepostId[] mileposts;
 	}
 
 	static public void moveTrain(String requestText) throws GameException {
@@ -267,19 +267,39 @@ public class TrainServer {
 	}
 	
 	static private TrainMap getMapData(String gameType) throws GameException {
+	    log.info("Working Directory = " + System.getProperty("user.dir"));
 		String mapDataFolderPath = dataDirectoryPath + File.separator + gameType;
 		File mapDataDir = new File(mapDataFolderPath);
 		if (!mapDataDir.isDirectory())
 			throw new GameException(GameException.GAME_NOT_FOUND);
+		
+		// Get the map data file
 		String mapDataPath = mapDataFolderPath + File.separator + "map.csv";
 		File mapDataFile = new File(mapDataPath);
 		if (!mapDataFile.isFile())
 			throw new GameException(GameException.GAME_NOT_FOUND);
+		
+		// Get the river data
+		String riverDataPath = mapDataFolderPath + File.separator + "rivers.csv";
+		File riverDataFile = new File(riverDataPath);
+		if (!riverDataFile.isFile())
+			throw new GameException(GameException.GAME_NOT_FOUND);
+
+		// Get the sea crossings data
+		String seaDataPath = mapDataFolderPath + File.separator + "seas.csv";
+		File seaDataFile = new File(seaDataPath);
+		if (!seaDataFile.isFile())
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		
 		TrainMap map = null;
 		try {
 			BufferedReader mapDataReader = new BufferedReader(new FileReader(mapDataFile));
-			map = new TrainMap(mapDataReader);
+			BufferedReader riverDataReader = new BufferedReader(new FileReader(riverDataFile));
+			BufferedReader seaDataReader = new BufferedReader(new FileReader(seaDataFile));
+			map = new TrainMap(mapDataReader, riverDataReader, seaDataReader);
 			mapDataReader.close();
+			riverDataReader.close();
+			seaDataReader.close();
 		} catch (FileNotFoundException e) {
 			log.error("FileNotFoundException reading game map {}", e);
 			throw new GameException(GameException.GAME_NOT_FOUND);
