@@ -1,63 +1,58 @@
 package player;
-import reference.City;
-import reference.Load;
+
+import train.GameException;
 import map.Milepost;
 
 
 public class Train {
 	private int speed; //12, 16, or 20
 	private int capacity; //2 or 3
-	private Load[] loads; //length the same as the capacity
+	private String[] loads; //length the same as the capacity
 	private Milepost loc;
 	
 	public Train(Milepost location){
 		speed = 12;
 		capacity = 2;
-		loads = new Load[2];
+		loads = new String[2];
 		loc = location;
 	}
 	
 	/** Moves the train to the given location.
-	 * Does a check for whether the locations have an edge between
-	 * them, but NOT if that edge has been built.
+	 * Does no checks for the legality of the move.
 	 */
-	boolean moveTrain(Milepost location){
-		if (location.isNeighbor(loc)){
-			loc = location;
-			return true;
-		}
-		return false;
+	void moveTrain(Milepost location){
+		loc = location;
 	}
 	
-	public void upgradeSpeed() /*throws GameException*/{
+	public void upgradeSpeed() throws GameException {
 		if(speed < 20){
 			speed += 4;
-		} //else throw gameException
+		} else throw new GameException("InvalidUpgrade");
 	}
 	
-	public void upgradeLoads() /*throws GameException*/ {
+	public void upgradeLoads() throws GameException {
 		if(capacity < 3){
-			Load[] temp = new Load[capacity + 1];
+			String[] temp = new String[capacity + 1];
 			for(int i = 0; i < capacity; i++){
 				temp[i] = loads[i];
 			}
 			loads = temp;
 			capacity ++;
-		} //else throw gameException
+		} else throw new GameException("InvalidUpgrade");
 	}
 	
 	/** Returns true if the load was successfully dropped, false 
 	 *  otherwise (f'rex, the load was not on the train)
 	 * @param load to be dropped
 	 */
-	public boolean dropLoad(Load load){
+	public void dropLoad(String load) throws GameException {
 		for(int i = 0; i < loads.length; i++){
 			if(loads[i].equals(load)){
 				loads[i] = null;
-				return true;
+				return;
 			}
 		}
-		return false;
+		throw new GameException("InvalidLoad");
 	}
 	
 	/** Returns true if the given load was successfully added
@@ -65,19 +60,19 @@ public class Train {
 	 *  a city with that load available, or the train has no 
 	 *  room for an additional load).
 	 */
-	public boolean addLoad(Load load){
-		if(loc.city == null) return false;
+	public void addLoad(String load) throws GameException {
+		if(loc.city == null) throw new GameException("CityNotFound");
 		else{
 			if(loc.city.hasLoad(load)) {
 				for(int i = 0; i < loads.length; i++){
 					if(loads[i] == null){
 						loads[i] = load;
-						return true;
+						return;
 					}
 				}
 			}
 		}
-		return false;
+		throw new GameException("TrainFull");
 	}
 	
 	public int getSpeed(){
@@ -88,11 +83,11 @@ public class Train {
 		return capacity;
 	}
 	
-	public Load[] getLoads(){
+	public String[] getLoads(){
 		return loads;
 	}
 	
-	public boolean containsLoad(Load l){
+	public boolean containsLoad(String l){
 		for(int i = 0; i < loads.length; i++){
 			if(loads[i].equals(l)) return true;
 		}
