@@ -1,4 +1,5 @@
 package train;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
@@ -36,7 +37,7 @@ public class Game implements AbstractGame {
 	public Game(TrainMap map, String ruleSet){
 		this.map = map;
 		//deck = Card.init();
-		//players = Player.init();
+		players = new ArrayList<Player>();
 		handSize = 4; 
 		startingMoney = 70; //Arbitrary values, can be changed as needed
 	}

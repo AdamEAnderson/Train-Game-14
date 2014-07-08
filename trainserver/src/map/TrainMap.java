@@ -124,11 +124,11 @@ public final class TrainMap {
 		boolean isRiverCrossing = isCrossing(sourceId, destinationId, riverCrossings);
 		boolean isSeaCrossing = isCrossing(sourceId, destinationId, seaCrossings);
 		
-		if (destination.type != Milepost.Type.BLANK) {
+		if (destination != null && destination.type != Milepost.Type.BLANK) {
 			edge = new Edge(source, destination, isRiverCrossing, isSeaCrossing);
+			log.info("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
+					destination.y, destination.x);
 		}
-		log.info("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
-			destination.y, destination.x);
 		return edge;
 	}
 	
@@ -147,14 +147,15 @@ public final class TrainMap {
 			int xSource = Integer.parseInt(mpsSource[1]);
 			
 			String[] mpsDestination = fields[1].split(";");
-			int yDestination = Integer.parseInt(mpsDestination[0]);
-			int xDestination = Integer.parseInt(mpsDestination[1]);
+			int yDestination = Integer.parseInt(mpsDestination[0].trim());
+			int xDestination = Integer.parseInt(mpsDestination[1].trim());
 			MilepostId mpSource = new MilepostId(xSource, ySource);
 			MilepostId mpDestination = new MilepostId(xDestination, yDestination);
 			Set<MilepostId> dests = crossings.get(mpSource);
 			if (dests == null) 	// add the first mapping for the milepost
 				dests = new HashSet<MilepostId>();
 			dests.add(mpDestination);
+			log.info("Adding river crossing [{},{}] to [{},{}]", ySource, xSource, yDestination, xDestination);
 			crossings.put(mpSource, dests);
 			//crossings.put(new MilepostId(xSource, ySource), new MilepostId(xDestination, yDestination));
 		}
