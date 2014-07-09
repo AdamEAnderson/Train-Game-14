@@ -64,7 +64,7 @@ public class Rail {
 	/** Erases the track between these neighboring mileposts
 	 */
 	void erase(Milepost one, Milepost two){
-		Set s = tracks.get(one);
+		Set<Milepost> s = tracks.get(one);
 		s.remove(two);
 		s = tracks.get(two);
 		s.remove(one);

@@ -14,6 +14,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +78,11 @@ public class GameData {
 		}
 		loads = new HashMap<String, Set<City>>();
 		cities = getCityData(gameType);
-		deck = getCardData(gameType);
+		List<Card> list = getCardData(gameType);
+		Collections.shuffle(list);
+		ArrayDeque<Card> queue = new ArrayDeque<Card>();
+		queue.addAll(list);
+		deck = queue;
 		map = getMapData(gameType);
 	}
 	
@@ -134,8 +139,8 @@ public class GameData {
 	
 	/** Read in the data for the deck of cards used for the game. 
 	 * @throws IOException */
-	private Queue<Card> getCardData(String gameType) throws GameException {
-		Queue<Card> deck = new ArrayDeque<Card>();
+	private List<Card> getCardData(String gameType) throws GameException {
+		List<Card> deck = new ArrayList<Card>();
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(getDataFile(gameType, "cards.csv")));
