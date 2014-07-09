@@ -1,8 +1,12 @@
 package train;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
+import java.util.Map;
+import java.util.Set;
 
+import map.Milepost;
 import map.MilepostId;
 import map.TrainMap;
 
@@ -24,6 +28,7 @@ public class Game implements AbstractGame {
 	private List<Player> players;
 	private Player active;
 	private Player last;
+	private Map<Milepost, Set<Milepost>> globalRail;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -42,6 +47,7 @@ public class Game implements AbstractGame {
 		players = new ArrayList<Player>();
 		handSize = 4; 
 		startingMoney = 70; //Arbitrary values, can be changed as needed
+		globalRail = new HashMap<Milepost, Set<Milepost>>();
 	}
 	
 	@Override
@@ -58,7 +64,7 @@ public class Game implements AbstractGame {
 			hand[i] = deck.poll();
 		}
 		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
-		p = new Player(startingMoney, hand, pid, color, nextPlayer);
+		p = new Player(startingMoney, hand, pid, color, nextPlayer, globalRail);
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 	}

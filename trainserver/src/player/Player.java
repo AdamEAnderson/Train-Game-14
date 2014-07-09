@@ -1,9 +1,10 @@
 package player;
 
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import reference.*;
-import reference.Trip;
 import train.GameException;
 import map.Milepost;
 
@@ -18,10 +19,11 @@ public class Player {
 	private Card[] cards;
 	private int spendings;
 	
-	public Player(int startMoney, Card[] hand, String name, String color, Player next){
+	public Player(int startMoney, Card[] hand, String name, String color, 
+			Player next, Map<Milepost, Set<Milepost>> globalRail){
 		train = null;
 		money = startMoney;
-		rail = new Rail();
+		rail = new Rail(globalRail);
 		cards = hand;
 		this.name = name;
 		this.color = color;
