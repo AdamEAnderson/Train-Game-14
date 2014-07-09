@@ -6,12 +6,20 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +47,10 @@ public class GameData {
 	Queue<Card> deck;	/** Cards holding delivery possibilities */
 	TrainMap map;		/** Mileposts, cities, building costs */
 	Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
+	Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
 	
 	/** Directory where data for all games is stored */
-	static private final String dataDirectoryPath = "../data";
+	static private String dataDirectoryPath = null;
 
 	private static Logger log = LoggerFactory.getLogger(GameData.class);
 
@@ -60,6 +69,13 @@ public class GameData {
 	}
 	
 	public GameData(String gameType) throws GameException {
+		try {
+			setDataFolder();
+		} catch (IOException e) {
+			log.error("Cannot find data folder");
+			throw new GameException(GameException.BAD_MAP_DATA);
+		}
+		loads = new HashMap<String, Set<City>>();
 		cities = getCityData(gameType);
 		deck = getCardData(gameType);
 		map = getMapData(gameType);
@@ -69,9 +85,36 @@ public class GameData {
 	public Map<String,City> getCities() { return cities; }
 	public TrainMap getMap() { return map; }
 	
+	/** Looks for the game's data directory starting at the current working directory,
+	 * and looking at all children of the directory for a child named "data". If not 
+	 * found, go up a level and try again.
+	 * @return
+	 * @throws IOException 
+	 */
+	static private void setDataFolder() throws IOException {
+	    Path start = Paths.get(System.getProperty("user.dir"));
+	    while (start != null && dataDirectoryPath == null) {
+    		File logFile = start.toFile();
+    		Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+		        @Override
+		        public FileVisitResult preVisitDirectory(Path dir,  BasicFileAttributes attrs)
+		            throws IOException
+		        {
+	            	if (dir.getFileName().endsWith("data")) {
+	            		File dataFile = dir.toFile();
+	            		dataDirectoryPath = dataFile.getAbsolutePath();
+	            		return FileVisitResult.TERMINATE;
+	            	}
+	            	else
+	            		return FileVisitResult.CONTINUE;
+		        }
+		    });
+    	    start = start.getParent();
+	    }
+	}
+	
 	/** Return the path name of the directory containing data files for the game */
 	static private String getDataPath(String gameType) throws GameException {
-	    log.info("Working Directory = " + System.getProperty("user.dir"));
 		String mapDataFolderPath = dataDirectoryPath + File.separator + gameType;
 		File mapDataDir = new File(mapDataFolderPath);
 		if (!mapDataDir.isDirectory())
@@ -106,16 +149,24 @@ public class GameData {
 					throw new GameException(GameException.BAD_CARD_DATA);
 				}
 				
+				// Check that the cities on the card all exist in the city list
+				// Check that each load is available in some city
 				if (!cities.containsKey(fields[0]))
 					log.info("Card delivers to {}, which is not in the city list", fields[0]);
+				if (!loads.containsKey(fields[1]))
+					log.info("Card uses load {}, which is not available in any city from the city list", fields[1]);
 				cardData[0] = new Trip(cities.get(fields[0]), fields[1], Integer.parseInt(fields[2]));			
 				if (!cities.containsKey(fields[3]))
 					log.info("Card delivers to {}, which is not in the city list", fields[3]);
+				if (!loads.containsKey(fields[4]))
+					log.info("Card uses load {}, which is not available in any city from the city list", fields[4]);
 				cardData[1] = new Trip(cities.get(fields[3]), fields[4], Integer.parseInt(fields[5]));			
 				if (!cities.containsKey(fields[6]))
 					log.info("Card delivers to {}, which is not in the city list", fields[6]);
+				if (!loads.containsKey(fields[7]))
+					log.info("Card uses load {}, which is not available in any city from the city list", fields[7]);
 				cardData[2] = new Trip(cities.get(fields[6]), fields[7], Integer.parseInt(fields[8]));
-				log.info("Card for delivering {} to {} for {}, {} to {} for {}, or {} to {} for {}",
+				log.debug("Card for delivering {} to {} for {}, {} to {} for {}, or {} to {} for {}",
 						cardData[0].load, cardData[0].dest.name, cardData[0].cost,
 						cardData[1].load, cardData[1].dest.name, cardData[1].cost,
 						cardData[2].load, cardData[2].dest.name, cardData[2].cost);
@@ -169,7 +220,7 @@ public class GameData {
 		return map;
 	}
 	
-	static private Map<String, City> getCityData(String gameType) throws GameException {
+	private Map<String, City> getCityData(String gameType) throws GameException {
 		Map<String, City> cities = new HashMap<String, City>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(getDataFile(gameType, "city.csv")));
@@ -180,13 +231,21 @@ public class GameData {
 				boolean majorCity = cityName.startsWith("m");
 				if (majorCity)
 					cityName = cityName.substring(1);
-				List<String> loads = new ArrayList<String>();
+				List<String> cityloads = new ArrayList<String>();
 				for (int i = 1; i < fields.length && fields[i].length() > 0; ++i)
-					loads.add(fields[i]);
+					cityloads.add(fields[i]);
 				log.info("{} city {}", majorCity ? "Major" : "Minor", cityName);
-				for (String load: loads)
+				City city = new City(cityName, cityloads, majorCity);
+				for (String load: cityloads) {
+					// Add it to the loads index
+					Set<City> loadLocations = loads.get(load);
+					if (loadLocations == null)
+						loadLocations = new HashSet<City>();
+					loadLocations.add(city);
+					loads.put(load, loadLocations);
 					log.info("{}", load);
-				cities.put(cityName, new City(cityName, loads, majorCity));
+				}
+				cities.put(cityName, city);
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
