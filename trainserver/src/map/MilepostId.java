@@ -7,7 +7,7 @@ public class MilepostId {
 	public int x;
 	public int y;
 	
-	MilepostId(int x, int y) {
+	public MilepostId(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
