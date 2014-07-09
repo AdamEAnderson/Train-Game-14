@@ -2,6 +2,7 @@ package train;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,12 +21,26 @@ import reference.Card;
 import reference.City;
 import reference.Trip;
 
+class DirectoryFileFilter implements FileFilter {
+
+	@Override
+	public boolean accept(File pathname) {
+		return pathname.isDirectory();
+	}
+	
+}
+
+
+/** Holds the static description of the game -- the map, the cards. Does not include
+ * any data specific to an instance of a game.
+ */
 public class GameData {
 
-	Queue<Card> deck;
-	TrainMap map;
-	Map<String, City> cities;
+	Queue<Card> deck;	/** Cards holding delivery possibilities */
+	TrainMap map;		/** Mileposts, cities, building costs */
+	Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
 	
+	/** Directory where data for all games is stored */
 	static private final String dataDirectoryPath = "../data";
 
 	private static Logger log = LoggerFactory.getLogger(GameData.class);
@@ -91,9 +106,19 @@ public class GameData {
 					throw new GameException(GameException.BAD_CARD_DATA);
 				}
 				
+				if (!cities.containsKey(fields[0]))
+					log.info("Card delivers to {}, which is not in the city list", fields[0]);
 				cardData[0] = new Trip(cities.get(fields[0]), fields[1], Integer.parseInt(fields[2]));			
+				if (!cities.containsKey(fields[3]))
+					log.info("Card delivers to {}, which is not in the city list", fields[3]);
 				cardData[1] = new Trip(cities.get(fields[3]), fields[4], Integer.parseInt(fields[5]));			
+				if (!cities.containsKey(fields[6]))
+					log.info("Card delivers to {}, which is not in the city list", fields[6]);
 				cardData[2] = new Trip(cities.get(fields[6]), fields[7], Integer.parseInt(fields[8]));
+				log.info("Card for delivering {} to {} for {}, {} to {} for {}, or {} to {} for {}",
+						cardData[0].load, cardData[0].dest.name, cardData[0].cost,
+						cardData[1].load, cardData[1].dest.name, cardData[1].cost,
+						cardData[2].load, cardData[2].dest.name, cardData[2].cost);
 				deck.add(new Card(cardData));
 			}
 		} catch (FileNotFoundException e) {
@@ -156,8 +181,11 @@ public class GameData {
 				if (majorCity)
 					cityName = cityName.substring(1);
 				List<String> loads = new ArrayList<String>();
-				for (int i = 0; i < fields.length && fields[i].length() > 0; ++i)
+				for (int i = 1; i < fields.length && fields[i].length() > 0; ++i)
 					loads.add(fields[i]);
+				log.info("{} city {}", majorCity ? "Major" : "Minor", cityName);
+				for (String load: loads)
+					log.info("{}", load);
 				cities.put(cityName, new City(cityName, loads, majorCity));
 			}
 			reader.close();

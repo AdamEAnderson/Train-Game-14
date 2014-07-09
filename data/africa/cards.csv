@@ -1,7 +1,7 @@
 City,Load,Price,City,Load,Price,City,Load,Price
 Monrovia,Movies,26,Addis Ababa,Cloves,15,Luanda,Books,45
 Makkah,Cloves,26,Dakar,Terrorists,31,Zanzibar,Soccer,30
-Kinshasa,Arms,28,Addis Ababa,Vanilla,33,Kisinggani,Cotton,18
+Kinshasa,Arms,28,Addis Ababa,Vanilla,33,Kisangani,Cotton,18
 Port Elizabeth,Peanuts,53,Durban,Pilgrims,32,Lagos,Copper,32
 Khartoum,Tobacco,28,Casablanca,Diamonds,26,Maputo,Tapioca,15
 Maputo,Cloves,15,Mahajanga,Terrorists,76,Kano,Ecotourists,47
@@ -32,7 +32,7 @@ Tenerife,Movies,17,Muqdisho,Ecotourists,36,Ouagadougou,Coffee,16
 Dodoma,Cotton,24,Makkah,Peanuts,32,Tunis,Cattle,23
 Alexandria,Ecotourists,59,Kampala,Cloves,10,Kimberley,Soccer,38
 Monrovia,Cattle,11,Asmera,Chocolate,29,Tombouctou,Tapioca,11
-Maputo,Wine,13,Windhoek,Cloves,25,Lubumashi,Oil,26
+Maputo,Wine,13,Windhoek,Cloves,25,Lubumbashi,Oil,26
 Nairobi,Iron,24,Tripoli,Ecotourists,67,Casablanca,Books,37
 Zanzibar,Tobacco,11,Asmera,Tapioca,32,Tripoli,Cloves,55
 Mahajanga,Iron,38,Asmera,Peanuts,30,Ndola,Corn,15
@@ -107,9 +107,9 @@ Abidjan,Cattle,13,Lubumbashi,Artifacts,14,Ndola,Pilgrims,15
 Lusaka,Iron,11,Dakar,Sugar,69,Port Harcourt,Corn,42
 Bamako,Vanilla,71,Zanzibar,Books,41,Yerushalayim,Ecotourists,58
 Ouagadougou,Arms,37,Mombasa,Pilgrims,25,Freetown,Tea,47
-Kinshasa,Sugar,28,Ndjamena,Vanilla,50,Kisinggani,Movies,54
+Kinshasa,Sugar,28,Ndjamena,Vanilla,50,Kisangani,Movies,54
 Kimberley,Chocolate,34,Douala,Tapioca,10,Windhoek,Gold,11
-Tenerife,Sugar,97,Port Harcourt,Wine,29,Lubumashi,Cloves,11
+Tenerife,Sugar,97,Port Harcourt,Wine,29,Lubumbashi,Cloves,11
 Bangui,Artifacts,20,Capetown,Cloves,35,Tenerife,Cotton,39
 Tenerife,Chocolate,36,Tripoli,Cattle,20,Luanda,Tobacco,18
 Luanda,Peanuts,25,Dakar,Books,51,Air of Azbine,Copper,27
@@ -130,7 +130,7 @@ Capetown,Pilgrims,29,Lubumbashi,Books,41,Oran,Camels,20
 Bangui,Peanuts,13,Ouagadougou,Ecotourists,59,Djibouti,Pilgrims,30
 Luxor,Rubber,26,Kampala,Peanuts,26,Dakar,Chocolate,16
 Kigali,Movies,54,Freetown,Copper,43,Alger,Sugar,77
-Tenerife,Rubber,56,Tombouctou,Tobacco,47,Kisinggani,Sugar,27
+Tenerife,Rubber,56,Tombouctou,Tobacco,47,Kisangani,Sugar,27
 Lagos,Corn,50,Kananga,Peanuts,24,Djibouti,Gold,15
 Tunis,Tapioca,36,Lubumbashi,Ecotourists,14,Freetown,Cotton,32
 Douala,Terrorists,27,Khartoum,Vanilla,40,Tripoli,Peanuts,19

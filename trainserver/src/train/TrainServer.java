@@ -1,6 +1,4 @@
 package train;
-import java.io.File;
-import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,16 +11,6 @@ import reference.UpgradeType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-class DirectoryFileFilter implements FileFilter {
-
-	@Override
-	public boolean accept(File pathname) {
-		return pathname.isDirectory();
-	}
-	
-}
-
 
 /** Maps incoming data from JSON strings into calls on a specific game. Maintains the list 
  * of in progress games.
