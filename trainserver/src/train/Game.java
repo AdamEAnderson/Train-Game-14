@@ -1,4 +1,5 @@
 package train;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,6 +92,12 @@ public class Game implements AbstractGame {
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
 		log.info("])");
+		checkActive(pid);
+		Queue<Milepost> queue = new ArrayDeque<Milepost>();
+		for(int i = 0; i < mileposts.length; i++){
+			queue.add(map.getMilepost(mileposts[i]));
+		}
+		active.buildTrack(queue);
 		
 	}
 
@@ -98,14 +105,15 @@ public class Game implements AbstractGame {
 	public void upgradeTrain(String pid, UpgradeType upgrade)
 			throws GameException {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
-		Player p = getPlayer(pid);
-		if(p == active) p.upgradeTrain(upgrade);
-		else throw new GameException("PlayerNotActive");
+		checkActive(pid);
+		active.upgradeTrain(upgrade);
 	}
 
 	@Override
-	public void startTrain(String pid, MilepostId where) {
+	public void startTrain(String pid, MilepostId where) throws GameException {
 		log.info("startTrain(pid={}, city={})", pid, where);
+		checkActive(pid);
+		active.startTrain(map.getMilepost(where));
 	}
 
 	@Override
@@ -115,38 +123,49 @@ public class Game implements AbstractGame {
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
 		log.info("])");
+		checkActive(pid);
+		Queue<Milepost> moves = new ArrayDeque<Milepost>();
+		for(int i = 0; i < mileposts.length; i++){
+			moves.add(map.getMilepost(mileposts[i]));
+		}
+		active.moveTrain(moves);
 	}
-
+	
+	//City is an unneeded parameter
 	@Override
 	public void pickupLoad(String pid, String city,
-			String load) {
+			String load) throws GameException {
 		log.info("pickupLoad(pid={}, city={}, load={})", pid, city, load);
+		checkActive(pid);
+		active.pickupLoad(load);
 	}
 
 	@Override
 	public void deliverLoad(String pid, String city,
-			String load) {
+			String load) throws GameException {
 		log.info("deliverLoad(pid={}, city={}, load={})", pid, city, load);
+		checkActive(pid);
+	//	int index = -1; //will throw ArrayIndexOutOfBounds; we need a good way of testing
+	//	active.deliverLoad(index, deck.poll());
 	}
 
 	@Override
 	public void dumpLoad(String pid, String load) throws GameException {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
-		if (!(getPlayer(pid) == active)) 
-			throw new GameException("PlayerNotActive");
+		checkActive(pid);
 		active.dropLoad(load);
 	}
 
 	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={})", pid);
-	//	active = active.endTurn();
+		active = active.endTurn();
 	}
 
 	@Override
 	public void endGame(String pid) throws GameException {
 		log.info("endGame(pid={})", pid);
-	//	if(!(active == last)) throw new GameException("PlayerNotActive");
+		if(!(active == last)) throw new GameException("PlayerNotActive");
 	}
 
 	private Player getPlayer(String pid) throws GameException {
@@ -156,5 +175,9 @@ public class Game implements AbstractGame {
 		throw new GameException("PlayerNotFound");
 	}
 
+	private void checkActive(String pid) throws GameException {
+		if (!(getPlayer(pid) == active)) 
+			throw new GameException("PlayerNotActive");
+	}
 
 }

@@ -38,7 +38,7 @@ interface AbstractGame {
 	// INVALID_TRACK (train must start on a city milepost)
 	// PLAYER_NOT_FOUND
 	// GAME_NOT_FOUND
-	void startTrain(String player, MilepostId where); 
+	void startTrain(String player, MilepostId where) throws GameException; 
 	
 	// Player moves their train
 	// Error values:
@@ -54,7 +54,7 @@ interface AbstractGame {
 	// CITY_NOT_FOUND
 	// PLAYER_NOT_FOUND
 	// GAME_NOT_FOUND
-	void pickupLoad(String player, String city, String load);
+	void pickupLoad(String player, String city, String load) throws GameException;
 	
 	// Player delivers a load, turning in a card
 	// Error values:
@@ -63,7 +63,7 @@ interface AbstractGame {
 	// CITY_NOT_FOUND
 	// PLAYER_NOT_FOUND
 	// GAME_NOT_FOUND
-	void deliverLoad(String player, String city, String load);
+	void deliverLoad(String player, String city, String load) throws GameException;
 	
 	// Player releases a load, making room for more cargo
 	// Error values:

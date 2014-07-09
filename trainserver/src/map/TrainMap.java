@@ -178,4 +178,8 @@ public final class TrainMap {
 			mp.updateEdges(edges);
 		}
 	}
+	
+	public Milepost getMilepost(MilepostId id){
+		return milepostIndex.get(id);
+	}
 }

@@ -37,6 +37,7 @@ public class GameTest {
         game.startTrain(activePlayer, new MilepostId(0, 0));
         game.moveTrain(activePlayer, mileposts);
         game.pickupLoad(activePlayer, "Abidjan", "turnips");
+        game.pickupLoad(activePlayer, "Abidjan", "iron");
         game.moveTrain(activePlayer, mileposts);
         game.deliverLoad(activePlayer, "Port Harcourt", "turnips");
         game.dumpLoad(activePlayer, "iron");

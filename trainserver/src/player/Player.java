@@ -31,14 +31,16 @@ public class Player {
 		nextPlayer = next;
 	}
 	
-	public void placeTrain(Milepost m){
+	public void startTrain(Milepost m){
 		train = new Train(m);
 	}
 	
-	public void moveTrain(Milepost m) throws GameException {
+	public void moveTrain(Queue<Milepost> moves) throws GameException {
 		Milepost l = train.getLocation();
-		if(l.isNeighbor(m) && rail.connects(l, m)) train.moveTrain(m);
+		Milepost next = moves.poll();
+		if(l.isNeighbor(next) && rail.connects(l, next)) train.moveTrain(next);
 		else throw new GameException("InvalidMove");
+		moveTrain(moves);
 	}
 	
 	public void upgradeTrain(UpgradeType u) throws GameException {
@@ -68,6 +70,10 @@ public class Player {
 			throw new GameException("ExceededAllowance");
 		}
 		buildTrack(mileposts);
+	}
+	
+	public void pickupLoad(String load) throws GameException{
+		train.addLoad(load);
 	}
 	
 	public void dropLoad(String load) throws GameException{
