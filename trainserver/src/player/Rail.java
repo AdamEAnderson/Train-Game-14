@@ -8,6 +8,9 @@ import map.Milepost;
 public class Rail {
 	private HashMap<Milepost, HashMap<Milepost, Track>> tracks;
 	
+	//private HashMap<Milepost, Set<Milepost> tracks;
+	//private HashMap<Milepost, Set<Milepost> allTracks; //same object per game; holds everyone's tracks
+	
 	Rail(){
 		tracks = new HashMap<Milepost, HashMap<Milepost, Track>>();
 	}

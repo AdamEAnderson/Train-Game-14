@@ -66,6 +66,14 @@ public class Game implements AbstractGame {
 	@Override
 	public void startGame(String pid) throws GameException {
 		log.info("startGame(pid={})", pid);
+		Player first = players.get(0);
+		for(int i = 1; i < players.size(); i++){
+			if(first.getMaxTrip() < players.get(i).getMaxTrip()) first = players.get(i);
+		}
+		active = first;
+		for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
+			last = temp;
+		}
 	}
 
 	@Override

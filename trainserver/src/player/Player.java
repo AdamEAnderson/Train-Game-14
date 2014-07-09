@@ -109,4 +109,23 @@ public class Player {
 	public String getPid(){
 		return name;
 	}
+	
+	public Player getNextPlayer(){
+		return nextPlayer;
+	}
+	
+	/** Returns the money offered for the highest-paying trip in this players
+	 * hand of cards.
+	 */
+	public int getMaxTrip(){
+		int max = 0;
+		for(int i = 0; i < cards.length; i++){
+			Card c = cards[i];
+			for(int j = 0; j < c.trips.length; j++){
+				int temp = c.trips[j].cost;
+				if(temp > max) max = temp;
+			}
+		}
+		return max;
+	}
 }
