@@ -37,7 +37,7 @@ public class HttpTest {
 	private static void connectToServer(HttpURLConnection connection) throws IOException, InterruptedException
 	{
         // give it 15 seconds to respond
-        connection.setReadTimeout(15*1000);
+        connection.setReadTimeout(1500*1000);
         
         // wait for the server to come up
         for (int tryCount = 50; tryCount > 0; --tryCount) {
