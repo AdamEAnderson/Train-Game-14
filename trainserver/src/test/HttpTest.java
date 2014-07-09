@@ -275,6 +275,7 @@ public class HttpTest {
         deliverLoad(gid, "Sandy", "Port Harcourt", "turnips");
         dumpLoad(gid, "Sandy", "Port Harcourt", "iron");
         endTurn(gid, "Sandy");
+        upgradeTrain(gid, "Adam", "Speed");
         endGame(gid, "Sandra");
         
         //join game
