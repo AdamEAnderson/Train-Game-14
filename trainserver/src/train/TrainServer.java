@@ -25,6 +25,10 @@ public class TrainServer {
 
 	static Map<String, Game> games = new HashMap<String, Game>(); // games currently in progress;
 	
+	static public Game getGame(String gid) {
+		return games.get(gid);		
+	}
+	
 	static class NewGameData {
 		//public String messageType;
 		public String pid; // host playerId

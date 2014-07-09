@@ -50,6 +50,8 @@ public class Game implements AbstractGame {
 		globalRail = new HashMap<Milepost, Set<Milepost>>();
 	}
 	
+	public Player getActivePlayer() { return active; }
+	
 	@Override
 	public void joinGame(String pid, String color)
 			throws GameException {
@@ -130,9 +132,9 @@ public class Game implements AbstractGame {
 	@Override
 	public void dumpLoad(String pid, String load) throws GameException {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
-	//	if (!(getPlayer(pid) == active)) 
-	//		throw new GameException("PlayerNotActive");
-	//	active.dropLoad(load);
+		if (!(getPlayer(pid) == active)) 
+			throw new GameException("PlayerNotActive");
+		active.dropLoad(load);
 	}
 
 	@Override
