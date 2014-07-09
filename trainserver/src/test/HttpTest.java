@@ -1,4 +1,4 @@
-package train;
+package test;
 
 import static org.junit.Assert.*;
 
@@ -11,6 +11,8 @@ import java.net.HttpURLConnection;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import train.HttpTrainServer;
 
 
 public class HttpTest {
@@ -37,7 +39,7 @@ public class HttpTest {
 	private static void connectToServer(HttpURLConnection connection) throws IOException, InterruptedException
 	{
         // give it 15 seconds to respond
-        connection.setReadTimeout(15*1000);
+        connection.setReadTimeout(1500*1000);
         
         // wait for the server to come up
         for (int tryCount = 50; tryCount > 0; --tryCount) {
@@ -79,40 +81,6 @@ public class HttpTest {
         {
           stringBuilder.append(line + "\n");
         }
-        System.out.println(stringBuilder.toString());
-
-        int code = connection.getResponseCode();
-        System.out.println("Got response code " + code);
-
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
-	// Send a simple POST request to the server with some JSON as content and check the result
-	@Test
-	public void testPost() throws Exception {
-		Thread serverThread = startServer();
-		
-		String jsonPayload = "{\"foo\":\"bar\"}";
-
-        HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        connection.setRequestMethod("GET");
-        String charset = "UTF-8";
-        connection.setRequestProperty("Accept-Charset", charset);
-        connection.setDoOutput(true);
-        connectToServer(connection);
-        connection.getOutputStream().write(jsonPayload.getBytes());
-        // give it 15 seconds to respond
-        connection.setReadTimeout(15*1000);
-        
-        
-        // read the output from the server
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder stringBuilder = new StringBuilder();
-   
-        String line = null;
-        while ((line = reader.readLine()) != null)
-          stringBuilder.append(line + "\n");
         System.out.println(stringBuilder.toString());
 
         int code = connection.getResponseCode();
@@ -285,92 +253,10 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	// Send a newGame request to the server check the result
+
+	// Send a stream of requests to the server check the results
 	@Test
-	public void testNewGame() throws Exception {
-		Thread serverThread = startServer();
-		
-		String responseMessage = newGame("Adam", "black");
-
-        log.info("Got response message {}", responseMessage);
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
-	// Send a newGame request to the server check the result
-	@Test
-	public void testJoinGame() throws Exception {
-		Thread serverThread = startServer();
-		
-        String gid = newGame("Adam", "red");
-        joinGame(gid, "Sandra", "green");
-        
-        //join game
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
-	// Send a newGame request to the server check the result
-	@Test
-	public void testStartGame() throws Exception {
-		Thread serverThread = startServer();
-		
-        String gid = newGame("Adam", "red");
-        joinGame(gid, "Sandra", "green");
-        joinGame(gid, "Sandy", "red");
-        joinGame(gid, "Robin", "purple");
-        startGame(gid, "Adam");
-        
-        //join game
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
-	// Send a buildTrack request to the server check the result
-	@Test
-	public void testBuildTrack() throws Exception {
-		Thread serverThread = startServer();
-		
-        String gid = newGame("Adam", "red");
-        joinGame(gid, "Sandra", "green");
-        joinGame(gid, "Sandy", "red");
-        joinGame(gid, "Robin", "purple");
-        startGame(gid, "Adam");
-        
-        String mileposts = "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1},{\"x\":2,\"y\":2}]";
-        buildTrack(gid, "Sandy", mileposts);
-        
-        //join game
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
-
-	// Send a upgradeTrain request to the server check the result
-	@Test
-	public void testUpgradeTrain() throws Exception {
-		Thread serverThread = startServer();
-		
-        String gid = newGame("Adam", "red");
-        joinGame(gid, "Sandra", "green");
-        joinGame(gid, "Sandy", "red");
-        joinGame(gid, "Robin", "purple");
-        startGame(gid, "Adam");
-        
-        upgradeTrain(gid, "Robin", "Speed");
-        
-        String mileposts = "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1},{\"x\":2,\"y\":2}]";
-        buildTrack(gid, "Sandy", mileposts);
-        upgradeTrain(gid, "Sandy", "Capacity");
-        
-        //join game
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
-	// Send a buildTrack request to the server check the result
-	@Test
-	public void testMoveTrain() throws Exception {
+	public void testTrain() throws Exception {
 		Thread serverThread = startServer();
 		
         String gid = newGame("Adam", "red");

@@ -99,7 +99,6 @@ public class GameData {
 	static private void setDataFolder() throws IOException {
 	    Path start = Paths.get(System.getProperty("user.dir"));
 	    while (start != null && dataDirectoryPath == null) {
-    		File logFile = start.toFile();
     		Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
 		        @Override
 		        public FileVisitResult preVisitDirectory(Path dir,  BasicFileAttributes attrs)
