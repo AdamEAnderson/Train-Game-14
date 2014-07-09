@@ -30,6 +30,7 @@ public class GameTest {
         game.startGame("Adam");
         
         String activePlayer = game.getActivePlayer().name;
+        log.info("Active player is {}", activePlayer);
         MilepostId[] mileposts;
         mileposts = new MilepostId[]{ new MilepostId(0, 0), new MilepostId(1, 1), new MilepostId(2, 2)};
         game.buildTrack(activePlayer, mileposts);
