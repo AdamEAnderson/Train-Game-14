@@ -79,12 +79,12 @@ public final class TrainMap {
 				default:
 					String cityName;
 					if (field.startsWith("cc")) {
-						mpType = Milepost.Type.CITY;
-						cityName = field.substring(1);
-					} 
-					else if (field.startsWith("c")) {
 						mpType = Milepost.Type.MAJORCITY;
 						cityName = field.substring(2);
+					} 
+					else if (field.startsWith("c")) {
+						mpType = Milepost.Type.CITY;
+						cityName = field.substring(1);
 					}
 					else {
 						log.warn("Unknown milepost type {}", field);
