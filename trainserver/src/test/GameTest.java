@@ -32,15 +32,16 @@ public class GameTest {
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
         MilepostId[] mileposts;
-        mileposts = new MilepostId[]{ new MilepostId(0, 0), new MilepostId(1, 1), new MilepostId(2, 2)};
+        mileposts = new MilepostId[]{ new MilepostId(2, 20), new MilepostId(3, 20), new MilepostId(4, 20),
+        	new MilepostId(4, 21), new MilepostId(4, 22), new MilepostId(4, 23), new MilepostId(4, 24)};
         game.buildTrack(activePlayer, mileposts);
         
         game.startTrain(activePlayer, new MilepostId(0, 0));
         game.moveTrain(activePlayer, mileposts);
-        game.pickupLoad(activePlayer, "Abidjan", "turnips");
-        game.pickupLoad(activePlayer, "Abidjan", "iron");
+        game.pickupLoad(activePlayer, "Dakar", "turnips");
+        game.pickupLoad(activePlayer, "Dakar", "iron");
         game.moveTrain(activePlayer, mileposts);
-        game.deliverLoad(activePlayer, "Port Harcourt", "turnips");
+        game.deliverLoad(activePlayer, "Freetown", "turnips");
         game.dumpLoad(activePlayer, "iron");
         game.endTurn(activePlayer);
         game.endGame(activePlayer);

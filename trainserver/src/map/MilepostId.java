@@ -15,4 +15,13 @@ public class MilepostId {
 	public String toString() {
 		return gson.toJson(this);
 	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj instanceof MilepostId){
+			MilepostId id = (MilepostId) obj;
+			return id.x == this.x && id.y == this.y;
+		}
+		return false;
+	}
 }

@@ -94,6 +94,7 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		Queue<Milepost> queue = new ArrayDeque<Milepost>();
+		Milepost orig = map.getMilepost(mileposts[0]);
 		for(int i = 0; i < mileposts.length; i++){
 			queue.add(map.getMilepost(mileposts[i]));
 		}
