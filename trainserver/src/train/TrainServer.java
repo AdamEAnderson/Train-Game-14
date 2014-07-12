@@ -150,6 +150,11 @@ public class TrainServer {
 		public String gid;
 		public String pid;
 		public String upgradeType;
+		public int train;
+		
+		public UpgradeTrainData() {
+			train = 0;
+		}
 	}
 
 	static public void upgradeTrain(String requestText) throws GameException {
@@ -161,7 +166,7 @@ public class TrainServer {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		if (!data.upgradeType.equals("Capacity") && !data.upgradeType.equals("Speed"))
 			throw new GameException(GameException.INVALID_UPGRADE);
-		game.upgradeTrain(data.pid,
+		game.upgradeTrain(data.pid, data.train,
 				data.upgradeType.equals("Capacity") ? UpgradeType.CAPACITY
 						: UpgradeType.SPEED);
 	}
@@ -169,6 +174,7 @@ public class TrainServer {
 	static class StartTrainData {
 		public String gid;
 		public String pid;
+		public int train;
 		public MilepostId where;
 	}
 
@@ -178,12 +184,13 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.startTrain(data.pid, data.where);
+		game.startTrain(data.pid, data.train, data.where);
 	}
 
 	static class MoveTrainData {
 		public String gid;
 		public String pid;
+		public int train;
 		public MilepostId[] mileposts;
 	}
 
@@ -193,12 +200,13 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.moveTrain(data.pid, data.mileposts);
+		game.moveTrain(data.pid, data.train, data.mileposts);
 	}
 
 	static class PickupLoadData {
 		public String gid;
 		public String pid;
+		public int train;
 		public String city;
 		public String load;
 	}
@@ -209,14 +217,16 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.pickupLoad(data.pid, data.city, data.load);
+		game.pickupLoad(data.pid, data.train, data.load);
 	}
 
 	static class DeliverLoadData {
 		public String gid;
 		public String pid;
+		public int train;
 		public String city;
 		public String load;
+		public int card;
 	}
 
 	static public void deliverLoad(String requestText) throws GameException {
@@ -226,12 +236,13 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.deliverLoad(data.pid, data.city, data.load);
+		game.deliverLoad(data.pid, data.train, data.load, data.card);
 	}
 
 	static class DumpLoadData {
 		public String gid;
 		public String pid;
+		public int train;
 		public String load;
 	}
 
@@ -241,7 +252,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.dumpLoad(data.pid, data.load);
+		game.dumpLoad(data.pid, data.train, data.load);
 	}
 
 	static class EndTurnData {

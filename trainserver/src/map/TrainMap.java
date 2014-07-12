@@ -48,12 +48,13 @@ public final class TrainMap {
 	 * @throws IOException  
 	 * @throws GameException 
 	 */
-	public TrainMap(BufferedReader mapReader, BufferedReader riverReader, BufferedReader seaReader) throws IOException, GameException {
+	public TrainMap(BufferedReader mapReader, BufferedReader riverReader, 
+			BufferedReader seaReader, Map<String, City> cities) throws IOException, GameException {
 		milepostIndex = new HashMap<MilepostId, Milepost>();
 		cityLocations = new HashMap<String, MilepostId>();
 		serializeData = new SerializeData();
 
-		generateMileposts(mapReader);
+		generateMileposts(mapReader, cities);
 		generateEdges(riverReader, seaReader);
 	}
 	
@@ -63,7 +64,8 @@ public final class TrainMap {
 		return data;
 	}
 	
-	public void generateMileposts(BufferedReader mapDataReader) throws IOException, GameException {
+	public void generateMileposts(BufferedReader mapDataReader, Map<String, City> cities) 
+			throws IOException, GameException {
 		int y = 0;
 		String line = mapDataReader.readLine();	// skip over the row header
 		while ((line = mapDataReader.readLine()) != null) {
@@ -110,6 +112,7 @@ public final class TrainMap {
 						log.warn("Unknown milepost type {}", field);
 						throw new GameException(GameException.BAD_MAP_DATA);
 					}
+					city = cities.get(cityName);
 					cityLocations.put(cityName, new MilepostId(x,y));
 					break;
 				}

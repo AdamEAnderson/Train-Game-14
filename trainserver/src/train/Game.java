@@ -33,11 +33,6 @@ public class Game implements AbstractGame {
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
 	/** Constuctor. 
-	 * Ruleset includes:
-	 * - Use event cards (how to enforce these???)
-	 * - Amount of money to start
-	 * - Number of trains
-	 * - Number of cards to deal
 	 * @param map
 	 * @param ruleSet
 	 */
@@ -49,11 +44,11 @@ public class Game implements AbstractGame {
 		globalRail = new HashMap<Milepost, Set<Milepost>>();
 	}
 	
+	/** Returns player whose turn it is */
 	public Player getActivePlayer() { return active; }
 	
 	@Override
-	public void joinGame(String pid, String color)
-			throws GameException {
+	public void joinGame(String pid, String color) throws GameException {
 		log.info("joinGame(pid={}, color={})", pid, color);
 		Player p = null;
 		try { 
@@ -84,8 +79,7 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void buildTrack(String pid,
-			MilepostId[] mileposts) throws GameException {
+	public void buildTrack(String pid, MilepostId[] mileposts) throws GameException {
 		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
@@ -95,12 +89,11 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < mileposts.length; i++){
 			queue.add(map.getMilepost(mileposts[i]));
 		}
-		active.buildTrack(queue);
-		
+		active.buildTrack(queue);	
 	}
 
 	@Override
-	public void upgradeTrain(String pid, UpgradeType upgrade)
+	public void upgradeTrain(String pid, int train, UpgradeType upgrade)
 			throws GameException {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
 		checkActive(pid);
@@ -108,14 +101,14 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void startTrain(String pid, MilepostId where) throws GameException {
+	public void startTrain(String pid, int train, MilepostId where) throws GameException {
 		log.info("startTrain(pid={}, city={})", pid, where);
 		checkActive(pid);
 		active.startTrain(map.getMilepost(where));
 	}
 
 	@Override
-	public void moveTrain(String pid, MilepostId[] mileposts)
+	public void moveTrain(String pid, int train, MilepostId[] mileposts)
 			throws GameException {
 		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
@@ -129,26 +122,24 @@ public class Game implements AbstractGame {
 		active.moveTrain(moves);
 	}
 	
-	//City is an unneeded parameter
 	@Override
-	public void pickupLoad(String pid, String city,
-			String load) throws GameException {
-		log.info("pickupLoad(pid={}, city={}, load={})", pid, city, load);
+	public void pickupLoad(String pid, int train, String load) throws GameException {
+		log.info("pickupLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
 		active.pickupLoad(load);
 	}
 
 	@Override
-	public void deliverLoad(String pid, String city,
-			String load) throws GameException {
-		log.info("deliverLoad(pid={}, city={}, load={})", pid, city, load);
+	public void deliverLoad(String pid, int train,
+			String load, int card) throws GameException {
+		log.info("deliverLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
 	//	int index = -1; //will throw ArrayIndexOutOfBounds; we need a good way of testing
 	//	active.deliverLoad(index, deck.poll());
 	}
 
 	@Override
-	public void dumpLoad(String pid, String load) throws GameException {
+	public void dumpLoad(String pid, int train, String load) throws GameException {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
 		checkActive(pid);
 		active.dropLoad(load);

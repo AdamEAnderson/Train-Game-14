@@ -83,7 +83,7 @@ public class GameData {
 		ArrayDeque<Card> queue = new ArrayDeque<Card>();
 		queue.addAll(list);
 		deck = queue;
-		map = getMapData(gameType);
+		map = getMapData(gameType, cities);
 	}
 	
 	public Queue<Card> getDeck() { return deck; }
@@ -203,14 +203,14 @@ public class GameData {
 	 * @return
 	 * @throws GameException
 	 */
-	static private TrainMap getMapData(String gameType) throws GameException {
-
+	static private TrainMap getMapData(String gameType, Map<String, City> cities) 
+			throws GameException {
 		TrainMap map = null;
 		try {
 			BufferedReader mapDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "map.csv")));
 			BufferedReader riverDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "rivers.csv")));
 			BufferedReader seaDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "seas.csv")));
-			map = new TrainMap(mapDataReader, riverDataReader, seaDataReader);
+			map = new TrainMap(mapDataReader, riverDataReader, seaDataReader, cities);
 			mapDataReader.close();
 			riverDataReader.close();
 			seaDataReader.close();

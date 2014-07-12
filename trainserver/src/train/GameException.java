@@ -20,6 +20,7 @@ public class GameException extends Exception {
 	public static String BAD_MAP_DATA = "BadMapData";
 	public static String BAD_CARD_DATA = "BadCardData";
 	public static String EXCEEDED_ALLOWANCE = "ExceededAllowance";
+	public static String INVALID_CARD = "InvalidCard";
 	
 	public static final long serialVersionUID = 1;
 	

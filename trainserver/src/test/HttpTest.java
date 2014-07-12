@@ -115,7 +115,7 @@ public class HttpTest {
     }
 
 	private static String newGame(String pid, String color) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"ruleSet\":\"anythingGoes\", \"gameType\":\"africa\"}", pid, color);
+		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"gameType\":\"africa\"}", pid, color);
 		log.info("jsonPayload {}", jsonPayload);
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
         String responseMessage = sendMessage(connection, jsonPayload);
