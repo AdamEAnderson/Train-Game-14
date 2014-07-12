@@ -155,7 +155,7 @@ public final class TrainMap {
 		
 		if (destination != null && destination.type != Milepost.Type.BLANK) {
 			edge = new Edge(source, destination, isRiverCrossing, isSeaCrossing);
-			log.debug("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
+			log.info("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
 					destination.y, destination.x);
 		}
 		return edge;
@@ -194,15 +194,17 @@ public final class TrainMap {
 		Map<MilepostId, Set<MilepostId>> riverCrossings = readCrossings(riverReader);
 		Map<MilepostId, Set<MilepostId>> seaInletCrossings = readCrossings(seaReader);
 		
-		Edge[] edges = new Edge[6];
 		for (MilepostId mpId: milepostIndex.keySet())  {
 			Milepost mp = milepostIndex.get(mpId);
-			edges[0] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y - 1), riverCrossings, seaInletCrossings);	// NE
-			edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings);		// E
-			edges[2] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y + 1), riverCrossings, seaInletCrossings);	// SE
-			edges[3] = generateEdge(mp, new MilepostId(mp.x, mp.y + 1), riverCrossings, seaInletCrossings);		// SW
-			edges[4] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y), riverCrossings, seaInletCrossings);		// W
-			edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings);		// NW
+			Edge[] edges = new Edge[6];
+			if (mp.type != Milepost.Type.BLANK) {
+				edges[0] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y - 1), riverCrossings, seaInletCrossings);	// NE
+				edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings);		// E
+				edges[2] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y + 1), riverCrossings, seaInletCrossings);	// SE
+				edges[3] = generateEdge(mp, new MilepostId(mp.x, mp.y + 1), riverCrossings, seaInletCrossings);		// SW
+				edges[4] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y), riverCrossings, seaInletCrossings);		// W
+				edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings);		// NW
+				}
 			mp.updateEdges(edges);
 		}
 	}

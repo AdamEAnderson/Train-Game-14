@@ -51,4 +51,17 @@ public class Milepost {
 		}
 	}
 		
+	public String toString() {
+		StringBuilder builder = new StringBuilder(128);
+		builder.append("{" + "\"x\":" + x + "," + "\"y\":" + y + "," + "\"type\":\"" + type.name() + "\",");
+		if (city != null)
+			builder.append("\"city\":" + city.name + ",\"edges\":[");
+		for (Edge edge: edges) {
+			if (edge != null)
+				builder.append("{" + "\"x\":" + edge.destination.x + "," + "\"y\":" + edge.destination.y + "\"cost\":" + edge.cost + "}");
+		}
+		builder.append("]}");
+		return builder.toString();
+	}
+	
 }

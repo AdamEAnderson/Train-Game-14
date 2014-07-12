@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import map.Milepost;
 import map.MilepostId;
 import map.TrainMap;
-import map.Edge;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +56,8 @@ public class TrainServer {
 		NewGameResponse() {}
 	}
 	
-	private static class EdgeSerializer implements JsonSerializer<Edge> {
-		  public JsonElement serialize(Edge src, Type typeOfSrc, JsonSerializationContext context) {
+	private static class MilepostSerializer implements JsonSerializer<Milepost> {
+		  public JsonElement serialize(Milepost src, Type typeOfSrc, JsonSerializationContext context) {
 		    return new JsonPrimitive(src.toString());
 		  }		
 	}
@@ -76,7 +76,7 @@ public class TrainServer {
 
 		// Send a JSON response that has gid, serialized map data, list of cities and loads
 		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Edge.class, new EdgeSerializer());
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
 		NewGameResponse response = new NewGameResponse();
 		response.mapData = gameData.map.getSerializeData();
 		response.cities = gameData.cities;
