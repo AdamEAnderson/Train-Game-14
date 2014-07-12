@@ -21,7 +21,8 @@ public class GameTest {
 	public void testTrain() throws Exception {
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"ruleSet\":\"anythingGoes\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
-        String gid = responseMessage.substring(8, responseMessage.length() - 2);
+        log.info("newGame response {}", responseMessage);
+        String gid = responseMessage.substring(8, 16);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Sandra", "green");

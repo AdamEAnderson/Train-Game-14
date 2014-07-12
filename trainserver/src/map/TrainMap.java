@@ -2,8 +2,10 @@ package map;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +18,17 @@ import train.GameException;
 public final class TrainMap {
 	private final Map<MilepostId, Milepost> milepostIndex;
 	private final Map<String, MilepostId> cityLocations;
+
+	public class SerializeData {
+		public List<Milepost> orderedMileposts;	// used for map serialization
+		public int mpWidth = 0;	// used for map serialization
+		public int mpHeight = 0;	// used for map serialization
+		
+		public SerializeData() {
+			orderedMileposts = new ArrayList<Milepost>();
+		}
+	}
+	private SerializeData serializeData;
 	
 	private static Logger log = LoggerFactory.getLogger(TrainMap.class);
 
@@ -38,9 +51,16 @@ public final class TrainMap {
 	public TrainMap(BufferedReader mapReader, BufferedReader riverReader, BufferedReader seaReader) throws IOException, GameException {
 		milepostIndex = new HashMap<MilepostId, Milepost>();
 		cityLocations = new HashMap<String, MilepostId>();
+		serializeData = new SerializeData();
 
 		generateMileposts(mapReader);
 		generateEdges(riverReader, seaReader);
+	}
+	
+	public SerializeData getSerializeData() {
+		SerializeData data = serializeData;
+		serializeData = null;
+		return data;
 	}
 	
 	public void generateMileposts(BufferedReader mapDataReader) throws IOException, GameException {
@@ -93,12 +113,21 @@ public final class TrainMap {
 					cityLocations.put(cityName, new MilepostId(x,y));
 					break;
 				}
-				log.info("Found milepost type {} at [{}, {}]", mpType, x, y);
+				log.debug("Found milepost type {} at [{}, {}]", mpType, x, y);
 				Milepost mp = new Milepost(x, y, city, mpType);
 				milepostIndex.put(new MilepostId(x,y), mp);
+				serializeData.orderedMileposts.add(mp);
 				++x;
 			}
+			serializeData.mpWidth = x;
 			++y;
+		}
+		serializeData.mpHeight = y;
+		
+		for (MilepostId mpID: milepostIndex.keySet())  {
+			Milepost mp = milepostIndex.get(mpID);
+			if (mp == null)
+				log.info("What?");
 		}
 	}
 	
@@ -126,7 +155,7 @@ public final class TrainMap {
 		
 		if (destination != null && destination.type != Milepost.Type.BLANK) {
 			edge = new Edge(source, destination, isRiverCrossing, isSeaCrossing);
-			log.info("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
+			log.debug("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
 					destination.y, destination.x);
 		}
 		return edge;
@@ -155,9 +184,8 @@ public final class TrainMap {
 			if (dests == null) 	// add the first mapping for the milepost
 				dests = new HashSet<MilepostId>();
 			dests.add(mpDestination);
-			log.info("Adding river crossing [{},{}] to [{},{}]", ySource, xSource, yDestination, xDestination);
+			log.debug("Adding crossing [{},{}] to [{},{}]", ySource, xSource, yDestination, xDestination);
 			crossings.put(mpSource, dests);
-			//crossings.put(new MilepostId(xSource, ySource), new MilepostId(xDestination, yDestination));
 		}
 		return crossings;
 	}

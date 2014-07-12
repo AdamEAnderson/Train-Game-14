@@ -1,16 +1,25 @@
 package train;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import map.MilepostId;
+import map.TrainMap;
+import map.Edge;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import reference.City;
 import reference.UpgradeType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 /** Maps incoming data from JSON strings into calls on a specific game. Maintains the list 
  * of in progress games.
@@ -41,7 +50,16 @@ public class TrainServer {
 	
 	static class NewGameResponse {
 		public String gid;
+		public TrainMap.SerializeData mapData;
+		public Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
+		public Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
 		NewGameResponse() {}
+	}
+	
+	private static class EdgeSerializer implements JsonSerializer<Edge> {
+		  public JsonElement serialize(Edge src, Type typeOfSrc, JsonSerializationContext context) {
+		    return new JsonPrimitive(src.toString());
+		  }		
 	}
 	
 	static public String newGame(String requestText) throws GameException {			
@@ -49,13 +67,22 @@ public class TrainServer {
 		Gson gson = new GsonBuilder().create();
 		NewGameData data = gson.fromJson(requestText, NewGameData.class);
 		
-		Game game = new Game(new GameData(data.gameType), data.ruleSet);
+		
+		GameData gameData = new GameData(data.gameType);
+		Game game = new Game(gameData, data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
 		game.joinGame(data.pid, data.color);
+
+		// Send a JSON response that has gid, serialized map data, list of cities and loads
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Edge.class, new EdgeSerializer());
 		NewGameResponse response = new NewGameResponse();
+		response.mapData = gameData.map.getSerializeData();
+		response.cities = gameData.cities;
+		response.loads = gameData.loads;
 		response.gid = gameId;
-		return gson.toJson(response);
+		return gsonBuilder.create().toJson(response);
 	}
 
 	static class JoinGameData {

@@ -44,4 +44,13 @@ public final class Edge {
 		}
 		return false;
 	}*/
+
+	// Serialize as a set of json-encoded milepostIds
+	public String toString() {
+		MilepostId sourceId = new MilepostId(source.x, source.y);
+		MilepostId destinationId = new MilepostId(destination.x, destination.y);
+		System.out.println("Edge " + "{" + "\"source\":" + sourceId.toString() + "," + "\"destination\":" + destinationId.toString() + "}");
+		return "{" + "\"source\":" + sourceId.toString() + "," + "\"destination\":" + destinationId.toString() + "}";
+	}
+	
 }
