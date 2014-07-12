@@ -47,7 +47,7 @@ public class Train {
 	 */
 	public void dropLoad(String load) throws GameException {
 		for(int i = 0; i < loads.length; i++){
-			if(loads[i].equals(load)){
+			if(loads[i] == null ? false : loads[i].equals(load)){
 				loads[i] = null;
 				return;
 			}

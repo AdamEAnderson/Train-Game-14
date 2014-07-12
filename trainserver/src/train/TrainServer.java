@@ -72,7 +72,7 @@ public class TrainServer {
 		
 		GameData gameData = new GameData(data.gameType);
 		if (data.ruleSet == null)
-			data.ruleSet = new RuleSet(4, 70);
+			data.ruleSet = new RuleSet(4, 70, 1);
 		Game game = new Game(gameData, data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);

@@ -64,8 +64,7 @@ public class Game implements AbstractGame {
 			hand[i] = deck.poll();
 		}
 		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
-		p = new Player(ruleSet.startingMoney, 1, hand, pid, color, nextPlayer, globalRail); 
-			//1: number of trains per player: eventually in RuleSet
+		p = new Player(ruleSet.startingMoney, ruleSet.numTrains, hand, pid, color, nextPlayer, globalRail); 
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 	}
@@ -139,8 +138,7 @@ public class Game implements AbstractGame {
 			String load, int card) throws GameException {
 		log.info("deliverLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
-	//	int index = -1; //will throw ArrayIndexOutOfBounds; we need a good way of testing
-	//	active.deliverLoad(index, deck.poll());
+		active.deliverLoad(card, train, deck.poll());
 	}
 
 	@Override
