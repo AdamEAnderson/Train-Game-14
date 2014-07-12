@@ -61,14 +61,39 @@ public class GameTest {
         TrainMap map = game.map;
         Milepost test = map.getMilepost(new MilepostId(2, 20));
         Edge[] edges = test.edges;
-        for(Edge e : edges){
+        for(int i = 0; i < edges.length; i++){
+        	Edge e = edges[i];
+        	Milepost dest = map.getMilepost(new MilepostId(test.x + Direction.values()[i].dRow, 
+        			test.y + Direction.values()[i].dCol));
         	if(e != null){
-        		assertEquals(e.source, test);
-        		assertTrue(e.source.isNeighbor(e.destination));
+        		assertEquals(e.destination, dest);
+        	} else {
+        		if(dest != null){
+        			assertEquals(dest.type, Milepost.Type.BLANK);
+        		}
         	}
         }
 	}
 
+	enum Direction{
+	    NE (+1, -1),
+	    E  (+1, +0),
+	    SE (+1, +1),
+	    SW (+0, +1),
+	    W  (-1, +0),
+	    NW (+0, -1);
+
+	    public final int dRow;
+
+	    public final int dCol;
+
+	    /** Constructor: an instance with direction (dRow, dCol).*/
+	    Direction(int dRow, int dCol) {
+	        this.dRow= dRow;
+	        this.dCol= dCol;
+	    }
+
+	}
 
 
 
