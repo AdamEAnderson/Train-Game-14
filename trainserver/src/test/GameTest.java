@@ -2,7 +2,10 @@ package test;
 
 import static org.junit.Assert.*;
 
+import map.Edge;
+import map.Milepost;
 import map.MilepostId;
+import map.TrainMap;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -47,6 +50,22 @@ public class GameTest {
         game.endTurn(activePlayer);
         game.endGame(activePlayer);
     }
+	
+	@Test
+	public void testEdges() throws Exception{
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"ruleSet\":\"anythingGoes\", \"gameType\":\"africa\"}";
+        String responseMessage = TrainServer.newGame(jsonPayload);
+        log.info("newGame response {}", responseMessage);
+        String gid = responseMessage.substring(8, 16);
+        Game game = TrainServer.getGame(gid);
+        TrainMap map = game.map;
+        Milepost test = map.getMilepost(new MilepostId(2, 20));
+        Edge[] edges = test.edges;
+        for(Edge e : edges){
+        	assertEquals(e.source, test);
+        	assertTrue(e.source.isNeighbor(e.destination));
+        }
+	}
 
 
 

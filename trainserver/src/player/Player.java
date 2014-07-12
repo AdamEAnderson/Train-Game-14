@@ -36,6 +36,7 @@ public class Player {
 	}
 	
 	public void moveTrain(Queue<Milepost> moves) throws GameException {
+		if(moves.isEmpty()) return;
 		Milepost l = train.getLocation();
 		Milepost next = moves.poll();
 		if(l.isNeighbor(next) && rail.connects(l, next)) train.moveTrain(next);

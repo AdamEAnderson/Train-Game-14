@@ -22,7 +22,7 @@ import reference.UpgradeType;
 // Train game implementation class.
 public class Game implements AbstractGame {
 
-	private final TrainMap map;
+	public final TrainMap map;
 	private final int handSize; //the number of cards in a hand
 	private final int startingMoney; //the money each player starts with
 	private Queue<Card> deck;
@@ -95,6 +95,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		Queue<Milepost> queue = new ArrayDeque<Milepost>();
 		Milepost orig = map.getMilepost(mileposts[0]);
+		Milepost two = map.getMilepost(mileposts[1]);
 		for(int i = 0; i < mileposts.length; i++){
 			queue.add(map.getMilepost(mileposts[i]));
 		}
