@@ -53,12 +53,18 @@ public class Milepost {
 		
 	public String toString() {
 		StringBuilder builder = new StringBuilder(128);
-		builder.append("{" + "\"x\":" + x + "," + "\"y\":" + y + "," + "\"type\":\"" + type.name() + "\",");
+		builder.append("{" + "\"x\":" + x + "," + "\"y\":" + y + "," + "\"type\":\"" + type.name() + "\"");
 		if (city != null)
-			builder.append("\"city\":" + city.name + ",\"edges\":[");
+			builder.append(",\"city\":\"" + city.name + "\"");
+		builder.append(",\"edges\":[");
+		boolean firstEdge = true;
 		for (Edge edge: edges) {
-			if (edge != null)
-				builder.append("{" + "\"x\":" + edge.destination.x + "," + "\"y\":" + edge.destination.y + "\"cost\":" + edge.cost + "}");
+			if (edge != null) {
+				if (!firstEdge)	// prevent trailing comma. yuck. don't see a better way to do this right now
+					builder.append(",");
+				firstEdge = false;
+				builder.append("{" + "\"x\":" + edge.destination.x + "," + "\"y\":" + edge.destination.y + ",\"cost\":" + edge.cost + "}");
+			}
 		}
 		builder.append("]}");
 		return builder.toString();

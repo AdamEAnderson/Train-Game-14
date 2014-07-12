@@ -1,6 +1,8 @@
 package train;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,8 +53,8 @@ public class TrainServer {
 	static class NewGameResponse {
 		public String gid;
 		public TrainMap.SerializeData mapData;
-		public Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
-		public Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
+		public Collection<City> cities;	/** Cities indexed by city name, contains loads found in each city */
+		public Map<String, Set<String>> loadset; /** Key=load, Value= cities where loads can be obtained */
 		NewGameResponse() {}
 	}
 	
@@ -79,8 +81,15 @@ public class TrainServer {
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
 		NewGameResponse response = new NewGameResponse();
 		response.mapData = gameData.map.getSerializeData();
-		response.cities = gameData.cities;
-		response.loads = gameData.loads;
+		response.cities = gameData.cities.values();
+		// Convert from loads to set of cities to loads to set of city names
+		response.loadset = new HashMap<String, Set<String>>();
+		for (String load: gameData.loads.keySet()) {
+			Set<String> cities = new HashSet<String>();
+			for (City city:gameData.loads.get(load))
+				cities.add(city.name);
+			response.loadset.put(load, cities);
+		}
 		response.gid = gameId;
 		return gsonBuilder.create().toJson(response);
 	}
