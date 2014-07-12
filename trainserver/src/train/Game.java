@@ -22,6 +22,7 @@ import reference.UpgradeType;
 // Train game implementation class.
 public class Game implements AbstractGame {
 
+	public final GameData gameData;
 	public final TrainMap map;
 	private final RuleSet ruleSet;
 	private Queue<Card> deck;
@@ -37,6 +38,7 @@ public class Game implements AbstractGame {
 	 * @param ruleSet
 	 */
 	public Game(GameData gameData, RuleSet ruleSet){
+		this.gameData = gameData;
 		this.map = gameData.map;
 		this.deck = gameData.deck;
 		this.ruleSet = ruleSet;
@@ -46,6 +48,8 @@ public class Game implements AbstractGame {
 	
 	/** Returns player whose turn it is */
 	public Player getActivePlayer() { return active; }
+	
+	public RuleSet getRuleSet() { return ruleSet; }
 	
 	@Override
 	public void joinGame(String pid, String color) throws GameException {

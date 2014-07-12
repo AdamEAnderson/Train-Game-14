@@ -151,4 +151,9 @@ public class Player {
 		}
 		return max;
 	}
+	
+	/** Call this from test code only!! Just here for debugging */
+	public void testReplaceCards(Card[] cards)  {
+		this.cards = cards;
+	}
 }
