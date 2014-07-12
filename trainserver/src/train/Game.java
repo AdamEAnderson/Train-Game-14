@@ -60,7 +60,8 @@ public class Game implements AbstractGame {
 			hand[i] = deck.poll();
 		}
 		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
-		p = new Player(ruleSet.startingMoney, hand, pid, color, nextPlayer, globalRail);
+		p = new Player(ruleSet.startingMoney, 1, hand, pid, color, nextPlayer, globalRail); 
+			//1: number of trains per player: eventually in RuleSet
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 	}
@@ -97,14 +98,14 @@ public class Game implements AbstractGame {
 			throws GameException {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
 		checkActive(pid);
-		active.upgradeTrain(upgrade);
+		active.upgradeTrain(train, upgrade);
 	}
 
 	@Override
 	public void startTrain(String pid, int train, MilepostId where) throws GameException {
 		log.info("startTrain(pid={}, city={})", pid, where);
 		checkActive(pid);
-		active.startTrain(map.getMilepost(where));
+		active.startTrain(map.getMilepost(where), train);
 	}
 
 	@Override
@@ -119,14 +120,14 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < mileposts.length; i++){
 			moves.add(map.getMilepost(mileposts[i]));
 		}
-		active.moveTrain(moves);
+		active.moveTrain(train, moves);
 	}
 	
 	@Override
 	public void pickupLoad(String pid, int train, String load) throws GameException {
 		log.info("pickupLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
-		active.pickupLoad(load);
+		active.pickupLoad(train, load);
 	}
 
 	@Override
@@ -142,7 +143,7 @@ public class Game implements AbstractGame {
 	public void dumpLoad(String pid, int train, String load) throws GameException {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
 		checkActive(pid);
-		active.dropLoad(load);
+		active.dropLoad(train, load);
 	}
 
 	@Override

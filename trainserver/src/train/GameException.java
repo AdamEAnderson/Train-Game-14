@@ -21,6 +21,7 @@ public class GameException extends Exception {
 	public static String BAD_CARD_DATA = "BadCardData";
 	public static String EXCEEDED_ALLOWANCE = "ExceededAllowance";
 	public static String INVALID_CARD = "InvalidCard";
+	public static String TRAIN_ALREADY_STARTED = "TrainAlreadyStarted";
 	
 	public static final long serialVersionUID = 1;
 	

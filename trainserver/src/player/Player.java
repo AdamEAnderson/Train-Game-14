@@ -13,15 +13,15 @@ public class Player {
 	public final String name;
 	public final String color;
 	private Player nextPlayer;
-	private Train train;
+	private Train[] trains;
 	private int money;
 	private Rail rail;
 	private Card[] cards;
 	private int spendings;
 	
-	public Player(int startMoney, Card[] hand, String name, String color, 
+	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
 			Player next, Map<Milepost, Set<Milepost>> globalRail){
-		train = null;
+		trains = new Train[numTrain];
 		money = startMoney;
 		rail = new Rail(globalRail);
 		cards = hand;
@@ -31,27 +31,28 @@ public class Player {
 		nextPlayer = next;
 	}
 	
-	public void startTrain(Milepost m){
-		train = new Train(m);
+	public void startTrain(Milepost m, int t) throws GameException{
+		if(trains[t] == null) trains[t] = new Train(m);
+		else throw new GameException("TrainAlreadyStarted");
 	}
 	
-	public void moveTrain(Queue<Milepost> moves) throws GameException {
+	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {
 		if(moves.isEmpty()) return;
-		Milepost l = train.getLocation();
+		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
-		if(l.isNeighbor(next) && rail.connects(l, next)) train.moveTrain(next);
+		if(l.isNeighbor(next) && rail.connects(l, next)) trains[t].moveTrain(next);
 		else throw new GameException("InvalidMove");
-		moveTrain(moves);
+		moveTrain(t, moves);
 	}
 	
-	public void upgradeTrain(UpgradeType u) throws GameException {
+	public void upgradeTrain(int t, UpgradeType u) throws GameException {
 		if(spendings > 0) throw new GameException("ExceededAllowance");
 		switch (u) {
 			case SPEED:
-				train.upgradeSpeed();
+				trains[t].upgradeSpeed();
 				break;
 			case CAPACITY:
-				train.upgradeLoads();
+				trains[t].upgradeLoads();
 				break;
 		}
 		spendings -= 20;
@@ -82,34 +83,34 @@ public class Player {
 		buildTrack(mileposts);
 	}
 	
-	public void pickupLoad(String load) throws GameException{
-		train.addLoad(load);
+	public void pickupLoad(int t, String load) throws GameException{
+		trains[t].addLoad(load);
 	}
 	
-	public void dropLoad(String load) throws GameException{
-		train.dropLoad(load);
+	public void dropLoad(int t, String load) throws GameException{
+		trains[t].dropLoad(load);
 	}
 	
 	/** Delivers a load on the given card.
 	 * @param index is the location of the card in the player's hand, array-wise
 	 * @param next is the card drawn to replace that one
 	 */
-	public void deliverLoad(int index, Card next) throws GameException {
-		Card c = cards[index];
-		Trip t = canDeliver(c);
+	public void deliverLoad(int cIndex, int tIndex, Card next) throws GameException {
+		Card c = cards[cIndex];
+		Trip t = canDeliver(tIndex, c);
 		if(t == null) throw new GameException("InvalidDelivery");
-		train.dropLoad(t.load);
-		cards[index] = next; 
+		trains[tIndex].dropLoad(t.load);
+		cards[cIndex] = next; 
 		money += t.cost;
 	}
 	
-	private Trip canDeliver(Card c){
-		if(train == null) return null;
-		City city = train.getLocation().city;
+	private Trip canDeliver(int ti, Card c){
+		if(trains[ti] == null) return null;
+		City city = trains[ti].getLocation().city;
 		if(city == null) return null;
 		for(int i = 0; i < c.trips.length; i ++){
 			Trip t = c.trips[i];
-			if(train.containsLoad(t.load) && t.dest == city) return t;
+			if(trains[ti].containsLoad(t.load) && t.dest == city) return t;
 		}
 		return null;
 	}

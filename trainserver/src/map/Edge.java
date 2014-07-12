@@ -46,15 +46,6 @@ public final class Edge {
 		
 		cost = temp;
 	}
-	
-	/*
-	public @Override boolean equals(Object obj){
-		if(obj instanceof Edge){
-			Edge temp = (Edge) obj;
-			if(temp.source)
-		}
-		return false;
-	}*/
 
 	// Serialize as a set of json-encoded milepostIds
 	public String toString() {
