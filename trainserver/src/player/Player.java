@@ -123,6 +123,10 @@ public class Player {
 		return nextPlayer;
 	}
 	
+	public int getMoney() {
+		return money;
+	}
+	
 	/** Returns the money offered for the highest-paying trip in this players
 	 * hand of cards.
 	 */

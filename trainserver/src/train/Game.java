@@ -23,8 +23,7 @@ import reference.UpgradeType;
 public class Game implements AbstractGame {
 
 	public final TrainMap map;
-	private final int handSize; //the number of cards in a hand
-	private final int startingMoney; //the money each player starts with
+	private final RuleSet ruleSet;
 	private Queue<Card> deck;
 	private List<Player> players;
 	private Player active;
@@ -42,12 +41,11 @@ public class Game implements AbstractGame {
 	 * @param map
 	 * @param ruleSet
 	 */
-	public Game(GameData gameData, String ruleSet){
+	public Game(GameData gameData, RuleSet ruleSet){
 		this.map = gameData.map;
 		this.deck = gameData.deck;
+		this.ruleSet = ruleSet;
 		players = new ArrayList<Player>();
-		handSize = 4; 
-		startingMoney = 70; //Arbitrary values, can be changed as needed
 		globalRail = new HashMap<Milepost, Set<Milepost>>();
 	}
 	
@@ -62,12 +60,12 @@ public class Game implements AbstractGame {
 			p = getPlayer(pid);
 		} catch(GameException e){ }
 		if(p != null) throw new GameException("PlayerAlreadyJoined");
-		Card [] hand = new Card[handSize];
+		Card [] hand = new Card[ruleSet.handSize];
 		for(int i = 0; i < hand.length; i++){
 			hand[i] = deck.poll();
 		}
 		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
-		p = new Player(startingMoney, hand, pid, color, nextPlayer, globalRail);
+		p = new Player(ruleSet.startingMoney, hand, pid, color, nextPlayer, globalRail);
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 	}
@@ -94,8 +92,6 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		Queue<Milepost> queue = new ArrayDeque<Milepost>();
-		Milepost orig = map.getMilepost(mileposts[0]);
-		Milepost two = map.getMilepost(mileposts[1]);
 		for(int i = 0; i < mileposts.length; i++){
 			queue.add(map.getMilepost(mileposts[i]));
 		}

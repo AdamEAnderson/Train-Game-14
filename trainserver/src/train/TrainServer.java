@@ -44,7 +44,7 @@ public class TrainServer {
 		//public String messageType;
 		public String pid; // host playerId
 		public String color; // color for track building
-		public String ruleSet; // name for rules of the game
+		public RuleSet ruleSet; // name for rules of the game
 		public String gameType; // which game (Africa, Eurasia, etc.)
 		
 		NewGameData() {}
@@ -71,6 +71,8 @@ public class TrainServer {
 		
 		
 		GameData gameData = new GameData(data.gameType);
+		if (data.ruleSet == null)
+			data.ruleSet = new RuleSet(4, 70);
 		Game game = new Game(gameData, data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
