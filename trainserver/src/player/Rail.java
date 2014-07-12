@@ -20,6 +20,10 @@ public class Rail {
 		tracks = new HashMap<Milepost, Set<Milepost>>();
 	}
 	
+	boolean contains(Milepost m){
+		return tracks.containsKey(m);
+	}
+	
 	/** Returns whether this rail connects these two mileposts.
 	 *  When the two mileposts are not neighbors, the answer is always false.
 	 */
@@ -28,7 +32,8 @@ public class Rail {
 	}
 	
 	boolean anyConnects(Milepost one, Milepost two){
-		return allTracks.get(one).contains(two);
+		Set<Milepost> dests = allTracks.get(one);
+		return dests != null && allTracks.get(one).contains(two);
 	}
 	
 	/** Adds the given track to the player's rails, if and only if the track can be legally built.
@@ -37,11 +42,9 @@ public class Rail {
 	 * @return the cost of the build
 	 */
 	int build(Milepost origin, Milepost next) throws GameException {
-		if((! tracks.containsKey(origin)) || ! origin.isNeighbor(next)) 
-			throw new GameException("InvalidTrack"); 
-		if(anyConnects(origin, next)) throw new GameException("InvalidTrack"); 
-		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) 
-			throw new GameException("InvalidTrack");
+		if(!tracks.containsKey(origin)){
+			tracks.put(origin, new HashSet<Milepost>());
+		}
 		tracks.get(origin).add(next);
 		if(!tracks.containsKey(next)){
 			tracks.put(next, new HashSet<Milepost>());

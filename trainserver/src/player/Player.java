@@ -63,6 +63,15 @@ public class Player {
 		Milepost origin = mileposts.poll();
 		if(mileposts.isEmpty()) return;
 		Milepost next = mileposts.peek();
+		
+		if(!rail.contains(origin) && origin.type != Milepost.Type.MAJORCITY){
+			throw new GameException("InvalidTrack");
+		}
+		if(rail.anyConnects(origin, next)) throw new GameException("InvalidTrack"); 
+		if(!origin.isNeighbor(next)) throw new GameException("InvalidTrack");
+		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) 
+			throw new GameException("InvalidTrack");
+		
 		int cost = rail.build(origin, next);
 		if(spendings + cost <= 20){
 			spendings += cost;
