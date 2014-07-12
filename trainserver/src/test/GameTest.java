@@ -62,8 +62,10 @@ public class GameTest {
         Milepost test = map.getMilepost(new MilepostId(2, 20));
         Edge[] edges = test.edges;
         for(Edge e : edges){
-        	assertEquals(e.source, test);
-        	assertTrue(e.source.isNeighbor(e.destination));
+        	if(e != null){
+        		assertEquals(e.source, test);
+        		assertTrue(e.source.isNeighbor(e.destination));
+        	}
         }
 	}
 
