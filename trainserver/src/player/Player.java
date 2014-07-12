@@ -18,6 +18,7 @@ public class Player {
 	private Rail rail;
 	private Card[] cards;
 	private int spendings;
+	private int movesMade;
 	
 	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
 			Player next, Map<Milepost, Set<Milepost>> globalRail){
@@ -38,10 +39,12 @@ public class Player {
 	
 	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {
 		if(moves.isEmpty()) return;
+		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
 		if(l.isNeighbor(next) && rail.connects(l, next)) trains[t].moveTrain(next);
 		else throw new GameException("InvalidMove");
+		movesMade++;
 		moveTrain(t, moves);
 	}
 	
@@ -118,6 +121,7 @@ public class Player {
 	public Player endTurn(){
 		money -= spendings;
 		spendings = 0;
+		movesMade = 0;
 		return nextPlayer;
 	}
 	
@@ -135,6 +139,26 @@ public class Player {
 	
 	public int getMoney() {
 		return money;
+	}
+	
+	public int getSpending(){
+		return spendings;
+	}
+	
+	public int getMovesMade(){
+		return movesMade;
+	}
+	
+	public Card[] getCards(){
+		return cards;
+	}
+	
+	public Train[] getTrains(){
+		return trains;
+	}
+	
+	public Rail getRail(){
+		return rail;
 	}
 	
 	/** Returns the money offered for the highest-paying trip in this players

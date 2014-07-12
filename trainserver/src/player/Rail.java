@@ -20,6 +20,10 @@ public class Rail {
 		tracks = new HashMap<Milepost, Set<Milepost>>();
 	}
 	
+	public Map<Milepost, Set<Milepost>> getRail(){
+		return tracks;
+	}
+	
 	boolean contains(Milepost m){
 		return tracks.containsKey(m);
 	}

@@ -1,8 +1,10 @@
 package train;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +15,11 @@ import map.TrainMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import player.Player;
+import player.Rail;
+import player.Train;
+
+import reference.Card;
 import reference.City;
 import reference.UpgradeType;
 
@@ -58,10 +65,55 @@ public class TrainServer {
 		NewGameResponse() {}
 	}
 	
+	static class PlayerStatus {
+		public String pid;
+		public String color;
+		public Train[] trains;
+		public int money;
+		public Map<Milepost, Set<Milepost>> rail;
+		public Card[] hand;
+		public int spendings;
+		public int movesMade;
+		PlayerStatus() {}
+	}
+	
+	static class GameStatus {
+		public String gid;
+		public String activeid;
+		public String lastid;
+		public List<PlayerStatus> players; //in turn order beginning with the active player
+		GameStatus() {}
+	}
+	
 	private static class MilepostSerializer implements JsonSerializer<Milepost> {
 		  public JsonElement serialize(Milepost src, Type typeOfSrc, JsonSerializationContext context) {
 		    return new JsonPrimitive(src.toString());
 		  }		
+	}
+	
+	static public String statusMsg(String gid) throws GameException {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		GameStatus status = new GameStatus();
+		Game game = getGame(gid);
+		status.gid = gid;
+		status.players = new ArrayList<PlayerStatus>();
+		Player p = game.getActivePlayer();
+		do {
+			PlayerStatus pstatus = new PlayerStatus();
+			pstatus.pid = p.name;
+			pstatus.color = p.color;
+			pstatus.trains = p.getTrains();
+			pstatus.hand = p.getCards();
+			pstatus.money = p.getMoney();
+			pstatus.spendings = p.getSpending();
+			pstatus.movesMade = p.getMovesMade();
+			pstatus.rail = p.getRail().getRail();
+			status.players.add(pstatus);
+			p = p.getNextPlayer();
+		}while(p != game.getActivePlayer());
+		status.activeid = game.getActivePlayer().name;
+		status.lastid = game.getLastPlayer().name;
+		return gsonBuilder.create().toJson(status);
 	}
 	
 	static public String newGame(String requestText) throws GameException {			

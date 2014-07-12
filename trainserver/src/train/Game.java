@@ -158,6 +158,7 @@ public class Game implements AbstractGame {
 	public void endGame(String pid) throws GameException {
 		log.info("endGame(pid={})", pid);
 		if(!(active == last)) throw new GameException("PlayerNotActive");
+		active.endTurn();
 	}
 
 	private Player getPlayer(String pid) throws GameException {
@@ -165,6 +166,10 @@ public class Game implements AbstractGame {
 			if (p.getPid().equals(pid)) return p;
 		}
 		throw new GameException("PlayerNotFound");
+	}
+	
+	Player getLastPlayer(){
+		return last;
 	}
 
 	private void checkActive(String pid) throws GameException {
