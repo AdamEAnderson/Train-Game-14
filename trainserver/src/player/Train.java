@@ -89,7 +89,7 @@ public class Train {
 	
 	public boolean containsLoad(String l){
 		for(int i = 0; i < loads.length; i++){
-			if(loads[i].equals(l)) return true;
+			if(loads[i] != null && loads[i].equals(l)) return true;
 		}
 		return false;
 	}

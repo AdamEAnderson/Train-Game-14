@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import player.Player;
 import reference.Card;
 import reference.Trip;
 import train.Game;
@@ -63,6 +64,65 @@ public class GameTest {
         game.endGame(lastPlayer);
     }
 	
+	// Play a short game with two trains
+	@Test
+	public void testTwoTrain() throws Exception {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"ruleSet\":{\"handSize\":4, \"startingMoney\":100, \"numTrains\":2}, \"gameType\":\"africa\"}";
+        String responseMessage = TrainServer.newGame(jsonPayload);
+        log.info("newGame response {}", responseMessage);
+        String gid = responseMessage.substring(8, 16);
+        Game game = TrainServer.getGame(gid);
+        assertTrue(game != null);
+        game.joinGame("Sandra", "green");
+        game.joinGame("Sandy", "red");
+        game.joinGame("Robin", "purple");
+        game.startGame("Adam");
+        
+        String activePlayer = game.getActivePlayer().name;
+        log.info("Active player is {}", activePlayer);
+        MilepostId[] mileposts;
+        mileposts = new MilepostId[]{ new MilepostId(34, 58), new MilepostId(33, 58), new MilepostId(32, 58),
+            	new MilepostId(31, 59) };
+        game.buildTrack(activePlayer, mileposts);
+        assertTrue(game.getActivePlayer().getSpending() == 5);
+        
+        game.startTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
+        game.startTrain(activePlayer, 1, new MilepostId(31, 59));	// Kimberley!
+        
+        // Stack the player's hand with cards we can deliver
+        Trip[] trips = new Trip[3];
+        trips[0] = new Trip(game.gameData.getCities().get("Kimberley"), "Diamonds", 12);
+        trips[1] = new Trip(game.gameData.getCities().get("Johannesburg"), "Gold", 6);
+        trips[2] = new Trip(game.gameData.getCities().get("Johannesburg"), "Uranium", 8);
+        int handSize = game.getRuleSet().handSize;
+        Card cards[] = new Card[handSize];
+        for (int i = 0; i < handSize; ++i)
+        	cards[i] = new Card(trips);
+        game.getActivePlayer().testReplaceCards(cards);
+        game.pickupLoad(activePlayer, 0, "Diamonds");
+        game.pickupLoad(activePlayer, 0, "Arms");
+        game.pickupLoad(activePlayer, 1, "Gold");
+        game.pickupLoad(activePlayer, 1, "Uranium");
+        mileposts = new MilepostId[]{ new MilepostId(33, 58), new MilepostId(32, 58),
+            	new MilepostId(31, 59) };
+        game.moveTrain(activePlayer, 0, mileposts);				// arrive in Kimberley
+        game.deliverLoad(activePlayer, 0, "Diamonds", 0);
+        game.dumpLoad(activePlayer, 0, "Arms");
+        mileposts = new MilepostId[]{ new MilepostId(32, 58), new MilepostId(33, 58), 
+        		new MilepostId(34,58) };
+        game.moveTrain(activePlayer, 1, mileposts);				// arrive in Johannesburg
+        game.deliverLoad(activePlayer, 1, "Gold", 1);
+        game.deliverLoad(activePlayer, 1, "Uranium", 2);
+        Player movingPlayer = game.getActivePlayer();
+        game.endTurn(activePlayer);
+        assertTrue(movingPlayer.getMoney() == 121);	// total should includes deliveries - building
+        game.endTurn(game.getActivePlayer().name);
+        game.endTurn(game.getActivePlayer().name);
+        String lastPlayer = game.getActivePlayer().name;
+        game.endGame(lastPlayer);
+    }
+	
+
 
 
 
