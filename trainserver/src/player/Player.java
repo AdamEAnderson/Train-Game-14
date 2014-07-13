@@ -115,7 +115,7 @@ public class Player {
 		if(city == null) return null;
 		for(int i = 0; i < c.trips.length; i ++){
 			Trip t = c.trips[i];
-			if(trains[ti].containsLoad(t.load) && t.dest == city) return t;
+			if(trains[ti].containsLoad(t.load) && t.dest.equals(city.name)) return t;
 		}
 		return null;
 	}

@@ -159,21 +159,21 @@ public class GameData {
 					log.info("Card delivers to {}, which is not in the city list", fields[0]);
 				if (!loads.containsKey(fields[1]))
 					log.info("Card uses load {}, which is not available in any city from the city list", fields[1]);
-				cardData[0] = new Trip(cities.get(fields[0]), fields[1], Integer.parseInt(fields[2]));			
+				cardData[0] = new Trip(fields[0], fields[1], Integer.parseInt(fields[2]));			
 				if (!cities.containsKey(fields[3]))
 					log.info("Card delivers to {}, which is not in the city list", fields[3]);
 				if (!loads.containsKey(fields[4]))
 					log.info("Card uses load {}, which is not available in any city from the city list", fields[4]);
-				cardData[1] = new Trip(cities.get(fields[3]), fields[4], Integer.parseInt(fields[5]));			
+				cardData[1] = new Trip(fields[3], fields[4], Integer.parseInt(fields[5]));			
 				if (!cities.containsKey(fields[6]))
 					log.info("Card delivers to {}, which is not in the city list", fields[6]);
 				if (!loads.containsKey(fields[7]))
 					log.info("Card uses load {}, which is not available in any city from the city list", fields[7]);
-				cardData[2] = new Trip(cities.get(fields[6]), fields[7], Integer.parseInt(fields[8]));
+				cardData[2] = new Trip(fields[6], fields[7], Integer.parseInt(fields[8]));
 				log.debug("Card for delivering {} to {} for {}, {} to {} for {}, or {} to {} for {}",
-						cardData[0].load, cardData[0].dest.name, cardData[0].cost,
-						cardData[1].load, cardData[1].dest.name, cardData[1].cost,
-						cardData[2].load, cardData[2].dest.name, cardData[2].cost);
+						cardData[0].load, cardData[0].dest, cardData[0].cost,
+						cardData[1].load, cardData[1].dest, cardData[1].cost,
+						cardData[2].load, cardData[2].dest, cardData[2].cost);
 				deck.add(new Card(cardData));
 			}
 		} catch (FileNotFoundException e) {

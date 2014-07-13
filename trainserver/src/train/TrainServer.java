@@ -20,6 +20,7 @@ import player.Train;
 
 import reference.Card;
 import reference.City;
+import reference.Trip;
 import reference.UpgradeType;
 
 import com.google.gson.Gson;
@@ -64,12 +65,25 @@ public class TrainServer {
 		NewGameResponse() {}
 	}
 	
+	static class CardStatus {
+		public CardTripStatus[] trips;
+		CardStatus() {}
+	}
+	
+	static class CardTripStatus {
+		public String dest;
+		public String load;
+		public int cost;
+		CardTripStatus() {}
+	}
+	
 	static class PlayerStatus {
 		public String pid;
 		public String color;
 		public Train[] trains;
 		public int money;
-		public Map<Milepost, Set<Milepost>> rail;
+		public Map<MilepostId, Set<MilepostId>> rail;
+		//public CardStatus[] hand;
 		public Card[] hand;
 		public int spendings;
 		public int movesMade;
@@ -97,16 +111,47 @@ public class TrainServer {
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
 		Player p = game.getActivePlayer();
+		if(p == null) {
+			status.activeid = "";
+			status.lastid = "";
+			return gsonBuilder.create().toJson(status);
+		}
 		do {
 			PlayerStatus pstatus = new PlayerStatus();
 			pstatus.pid = p.name;
 			pstatus.color = p.color;
 			pstatus.trains = p.getTrains();
-			pstatus.hand = p.getCards();
 			pstatus.money = p.getMoney();
 			pstatus.spendings = p.getSpending();
 			pstatus.movesMade = p.getMovesMade();
-			pstatus.rail = p.getRail().getRail();
+			
+			Map<Milepost, Set<Milepost>> railMileposts = p.getRail().getRail();
+			Map<MilepostId, Set<MilepostId>> railIds = new HashMap<MilepostId, Set<MilepostId>>();
+			for(Milepost outer : railMileposts.keySet()){
+				Set<MilepostId> inner = new HashSet<MilepostId>();
+				railIds.put(new MilepostId(outer.x, outer.y), inner);
+				for(Milepost m : railMileposts.get(outer)){
+					inner.add(new MilepostId(m.x, m.y));
+				}
+			}
+			pstatus.rail = railIds;
+			
+			/*pstatus.hand = new CardStatus[p.getCards().length];
+			for(int i = 0; i < p.getCards().length; i++){
+				Card c = p.getCards()[i];
+				CardStatus s = new CardStatus();
+				s.trips = new CardTripStatus[c.trips.length];
+				for(int j = 0; j < c.trips.length; j++){
+					Trip t = c.trips[j];
+					CardTripStatus ct = new CardTripStatus();
+					ct.dest = t.dest.name;
+					ct.cost = t.cost;
+					ct.load = t.load;
+					s.trips[j] = ct;
+				}
+				pstatus.hand[i] = s;
+			}*/
+			pstatus.hand = p.getCards();
 			status.players.add(pstatus);
 			p = p.getNextPlayer();
 		}while(p != game.getActivePlayer());
