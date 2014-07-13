@@ -10,11 +10,11 @@ public class Train {
 	private String[] loads; //length the same as the capacity
 	private Milepost loc;
 	
-	public Train(Milepost location){
+	public Train(){
 		speed = 12;
 		capacity = 2;
 		loads = new String[2];
-		loc = location;
+		loc = null;
 	}
 	
 	/** Moves the train to the given location.

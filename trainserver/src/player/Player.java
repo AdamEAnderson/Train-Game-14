@@ -23,6 +23,8 @@ public class Player {
 	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
 			Player next, Map<Milepost, Set<Milepost>> globalRail){
 		trains = new Train[numTrain];
+		for (int i = 0; i < numTrain; ++i)
+			trains[i] = new Train();
 		money = startMoney;
 		rail = new Rail(globalRail);
 		cards = hand;
@@ -33,7 +35,7 @@ public class Player {
 	}
 	
 	public void startTrain(Milepost m, int t) throws GameException{
-		if(trains[t] == null) trains[t] = new Train(m);
+		if (trains[t].getLocation() == null) trains[t].moveTrain(m);
 		else throw new GameException("TrainAlreadyStarted");
 	}
 	
@@ -58,7 +60,7 @@ public class Player {
 				trains[t].upgradeLoads();
 				break;
 		}
-		spendings -= 20;
+		spendings += 20;
 		
 	}
 	
