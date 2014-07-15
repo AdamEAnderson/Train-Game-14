@@ -67,6 +67,7 @@ public class Game implements AbstractGame {
 		p = new Player(ruleSet.startingMoney, ruleSet.numTrains, hand, pid, color, nextPlayer, globalRail); 
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
+		active = p;
 	}
 
 	@Override
@@ -170,6 +171,10 @@ public class Game implements AbstractGame {
 	
 	Player getLastPlayer(){
 		return last;
+	}
+	
+	List<Player> getPlayers(){
+		return players;
 	}
 
 	private void checkActive(String pid) throws GameException {

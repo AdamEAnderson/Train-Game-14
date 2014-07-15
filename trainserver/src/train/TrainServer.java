@@ -65,18 +65,6 @@ public class TrainServer {
 		NewGameResponse() {}
 	}
 	
-	static class CardStatus {
-		public CardTripStatus[] trips;
-		CardStatus() {}
-	}
-	
-	static class CardTripStatus {
-		public String dest;
-		public String load;
-		public int cost;
-		CardTripStatus() {}
-	}
-	
 	static class PlayerStatus {
 		public String pid;
 		public String color;
@@ -111,10 +99,15 @@ public class TrainServer {
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
 		Player p = game.getActivePlayer();
-		if(p == null) {
+		if(game.getLastPlayer() == null) {
 			status.activeid = "";
 			status.lastid = "";
-			return gsonBuilder.create().toJson(status);
+			List<Player> ps = game.getPlayers();
+			if(!ps.isEmpty()) p = ps.get(0);
+			else return gsonBuilder.create().toJson(status);
+		} else {
+			status.activeid = game.getActivePlayer().name;
+			status.lastid = game.getLastPlayer().name;
 		}
 		do {
 			PlayerStatus pstatus = new PlayerStatus();
@@ -135,28 +128,11 @@ public class TrainServer {
 				}
 			}
 			pstatus.rail = railIds;
-			
-			/*pstatus.hand = new CardStatus[p.getCards().length];
-			for(int i = 0; i < p.getCards().length; i++){
-				Card c = p.getCards()[i];
-				CardStatus s = new CardStatus();
-				s.trips = new CardTripStatus[c.trips.length];
-				for(int j = 0; j < c.trips.length; j++){
-					Trip t = c.trips[j];
-					CardTripStatus ct = new CardTripStatus();
-					ct.dest = t.dest.name;
-					ct.cost = t.cost;
-					ct.load = t.load;
-					s.trips[j] = ct;
-				}
-				pstatus.hand[i] = s;
-			}*/
 			pstatus.hand = p.getCards();
 			status.players.add(pstatus);
 			p = p.getNextPlayer();
 		}while(p != game.getActivePlayer());
-		status.activeid = game.getActivePlayer().name;
-		status.lastid = game.getLastPlayer().name;
+		
 		return gsonBuilder.create().toJson(status);
 	}
 	
