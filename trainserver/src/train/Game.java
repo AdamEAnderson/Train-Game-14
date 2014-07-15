@@ -30,6 +30,7 @@ public class Game implements AbstractGame {
 	private Player active;
 	private Player last;
 	private Map<Milepost, Set<Milepost>> globalRail;
+	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -44,6 +45,7 @@ public class Game implements AbstractGame {
 		this.ruleSet = ruleSet;
 		players = new ArrayList<Player>();
 		globalRail = new HashMap<Milepost, Set<Milepost>>();
+		turns = 0;
 	}
 	
 	/** Returns player whose turn it is */
@@ -102,6 +104,7 @@ public class Game implements AbstractGame {
 			throws GameException {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
 		checkActive(pid);
+		checkBuilding();
 		active.upgradeTrain(train, upgrade);
 	}
 
@@ -120,6 +123,7 @@ public class Game implements AbstractGame {
 			log.info("{}, ", mileposts[i]);
 		log.info("])");
 		checkActive(pid);
+		checkBuilding();
 		Queue<Milepost> moves = new ArrayDeque<Milepost>();
 		for(int i = 0; i < mileposts.length; i++){
 			moves.add(map.getMilepost(mileposts[i]));
@@ -131,6 +135,7 @@ public class Game implements AbstractGame {
 	public void pickupLoad(String pid, int train, String load) throws GameException {
 		log.info("pickupLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
+		checkBuilding();
 		active.pickupLoad(train, load);
 	}
 
@@ -139,6 +144,7 @@ public class Game implements AbstractGame {
 			String load, int card) throws GameException {
 		log.info("deliverLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
+		checkBuilding();
 		active.deliverLoad(card, train, deck.poll());
 	}
 
@@ -152,7 +158,28 @@ public class Game implements AbstractGame {
 	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={})", pid);
-		active = active.endTurn();
+		boolean last = (active == getLastPlayer());
+		Player p = active.endTurn();
+		switch(turns){
+		case 0:
+			if(last){
+				turns++;
+			}else{
+				active = p;
+			}
+			break;
+		case 1:
+			if(p.getNextPlayer() == getLastPlayer()){
+				turns++;
+			}else{
+				active = getPrevPlayer(active);
+			}
+			break;
+		default:
+			active = p;
+			if(last) turns++;
+		}
+			
 	}
 
 	@Override
@@ -173,6 +200,14 @@ public class Game implements AbstractGame {
 		return last;
 	}
 	
+	Player getPrevPlayer(Player p){
+		Player i = p;
+		do{
+			i = p.getNextPlayer();
+		}while (i.getNextPlayer() != p);
+		return i;
+	}
+	
 	List<Player> getPlayers(){
 		return players;
 	}
@@ -182,4 +217,7 @@ public class Game implements AbstractGame {
 			throw new GameException("PlayerNotActive");
 	}
 
+	private void checkBuilding() throws GameException{
+		if(turns < 3) throw new GameException("InvalidMove");
+	}
 }
