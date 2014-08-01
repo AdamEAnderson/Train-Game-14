@@ -31,6 +31,7 @@ public class Game implements AbstractGame {
 	private Player last;
 	private Map<Milepost, Set<Milepost>> globalRail;
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
+	private boolean joinable;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -46,6 +47,7 @@ public class Game implements AbstractGame {
 		players = new ArrayList<Player>();
 		globalRail = new HashMap<Milepost, Set<Milepost>>();
 		turns = 0;
+		joinable = true;
 	}
 	
 	/** Returns player whose turn it is */
@@ -53,20 +55,24 @@ public class Game implements AbstractGame {
 	
 	public RuleSet getRuleSet() { return ruleSet; }
 	
+	public boolean isJoinable() { return joinable; }
+	
 	@Override
 	public void joinGame(String pid, String color) throws GameException {
 		log.info("joinGame(pid={}, color={})", pid, color);
-		Player p = null;
-		try { 
-			p = getPlayer(pid);
-		} catch(GameException e){ }
-		if(p != null) throw new GameException("PlayerAlreadyJoined");
+		// Check that this player is unique, and color is available
+		for (Player p: players) {
+			if (p.name.equals(pid))
+				throw new GameException(GameException.PLAYER_ALREADY_JOINED);
+			else if (p.color.equals(color))
+				throw new GameException(GameException.COLOR_NOT_AVAILABLE);
+		}
 		Card [] hand = new Card[ruleSet.handSize];
 		for(int i = 0; i < hand.length; i++){
 			hand[i] = deck.poll();
 		}
 		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
-		p = new Player(ruleSet.startingMoney, ruleSet.numTrains, hand, pid, color, nextPlayer, globalRail); 
+		Player p = new Player(ruleSet.startingMoney, ruleSet.numTrains, hand, pid, color, nextPlayer, globalRail); 
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 		active = p;
@@ -83,6 +89,7 @@ public class Game implements AbstractGame {
 		for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
 			last = temp;
 		}
+		joinable = false;
 	}
 
 	@Override

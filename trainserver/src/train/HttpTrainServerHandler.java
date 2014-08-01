@@ -1,4 +1,5 @@
 package train;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -45,6 +46,9 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String END_TURN = "endTurn";
 	private final static String END_GAME = "endGame";
 	
+	private final static String LIST = "list";
+	private final static String STATUS = "status";
+	
 	private static Logger log = LoggerFactory.getLogger(HttpTrainServerHandler.class);
 
 	@Override
@@ -54,8 +58,15 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+		String requestText = null;
+		if (msg instanceof HttpContent) {
+			HttpContent httpContent = (HttpContent) msg;
+			ByteBuf content = httpContent.content();
+			if (content.isReadable()) 
+				requestText = content.toString(CharsetUtil.UTF_8);
+		}
+		buf.setLength(0);
 		if (msg instanceof HttpRequest) {
-			buf.setLength(0);
 			HttpRequest request = this.request = (HttpRequest) msg;
 
 			if (is100ContinueExpected(request))
@@ -64,12 +75,38 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 			if (request.getMethod() == HttpMethod.GET)
 			{
 				isPost = false;
-				buf.append(status());
-				if (!writeResponse(request, ctx)) {
-					// If keep-alive is off, close the connection once the
-					// content is fully written.
-					ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(
-							ChannelFutureListener.CLOSE);
+				// Incoming is either a request for games to join, games to resume, 
+				// or status on a particular game
+				try {
+					String query = request.getUri().substring(request.getUri().indexOf("?") + 1);	// get the query part
+					query = query.replaceAll("%22", "\""); // quick and dirty url decode
+					String requestType = parseMessageType(query);
+					switch (requestType) {
+						case LIST:
+							buf.append(TrainServer.list(query));
+							break;
+						case STATUS:
+							buf.append(TrainServer.status(query));
+							break;
+						default:
+							throw new GameException(GameException.INVALID_MESSAGE_TYPE);
+					}
+					if (!writeResponse(request, ctx)) {
+						// If keep-alive is off, close the connection once the
+						// content is fully written.
+						ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(
+								ChannelFutureListener.CLOSE);
+					}
+				} catch (GameException e) {
+					String errorString = e.getMessage();
+					log.error("Game exception {}", errorString);
+					Gson gson = new Gson();
+					String jsonError = gson.toJson(errorString);
+		            FullHttpResponse result = new DefaultFullHttpResponse(HTTP_1_1, 
+		            	BAD_REQUEST, Unpooled.copiedBuffer(jsonError, CharsetUtil.UTF_8));
+		            sendHttpResponse(ctx, result);
+
+					buf.append(jsonError);
 				}
 				return;
 			}
@@ -77,85 +114,76 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 				isPost = true;
 		} 
 		if (isPost) {
-			if (msg instanceof HttpContent) {
-				HttpContent httpContent = (HttpContent) msg;
-
-				ByteBuf content = httpContent.content();
-				if (content.isReadable()) {
-					String requestText = content.toString(CharsetUtil.UTF_8);
-					log.info("requestText: {}", requestText);
-					String requestType = parseMessageType(requestText);
-					try {
-						switch (requestType) {
-						case NEW_GAME:
-							String strResponse = TrainServer.newGame(requestText);
-							buf.append(strResponse);
-							log.info("newGame buf {}", buf);
-							break;
-						case JOIN_GAME:
-							TrainServer.joinGame(requestText);
-							break;
-						case START_GAME:
-							TrainServer.startGame(requestText);
-							break;
-						case BUILD_TRACK:
-							TrainServer.buildTrack(requestText);
-							break;
-						case UPGRADE_TRAIN:
-							TrainServer.upgradeTrain(requestText);
-							break;
-						case START_TRAIN:
-							TrainServer.startTrain(requestText);
-							break;
-						case MOVE_TRAIN:
-							TrainServer.moveTrain(requestText);
-							break;
-						case PICKUP_LOAD:
-							TrainServer.pickupLoad(requestText);
-							break;
-						case DELIVER_LOAD:
-							TrainServer.deliverLoad(requestText);
-							break;
-						case DUMP_LOAD:
-							TrainServer.dumpLoad(requestText);
-							break;
-						case END_TURN:
-							TrainServer.endTurn(requestText);
-							break;
-						case END_GAME:
-							TrainServer.endGame(requestText);
-							break;
-						default:
-							throw new GameException(GameException.INVALID_MESSAGE_TYPE);
-						}
-					} catch (GameException e) {
-						String errorString = e.getMessage();
-						Gson gson = new Gson();
-						String jsonError = gson.toJson(errorString);
-			            FullHttpResponse result = new DefaultFullHttpResponse(HTTP_1_1, 
-			            	BAD_REQUEST, Unpooled.copiedBuffer(jsonError, CharsetUtil.UTF_8));
-			            sendHttpResponse(ctx, result);
-
-						buf.append(jsonError);
+			if (requestText != null) {
+				log.info("requestText: {}", requestText);
+				String requestType = parseMessageType(requestText);
+				try {
+					switch (requestType) {
+					case NEW_GAME:
+						String strResponse = TrainServer.newGame(requestText);
+						buf.append(strResponse);
+						log.info("newGame buf {}", buf);
+						break;
+					case JOIN_GAME:
+						TrainServer.joinGame(requestText);
+						break;
+					case START_GAME:
+						TrainServer.startGame(requestText);
+						break;
+					case BUILD_TRACK:
+						TrainServer.buildTrack(requestText);
+						break;
+					case UPGRADE_TRAIN:
+						TrainServer.upgradeTrain(requestText);
+						break;
+					case START_TRAIN:
+						TrainServer.startTrain(requestText);
+						break;
+					case MOVE_TRAIN:
+						TrainServer.moveTrain(requestText);
+						break;
+					case PICKUP_LOAD:
+						TrainServer.pickupLoad(requestText);
+						break;
+					case DELIVER_LOAD:
+						TrainServer.deliverLoad(requestText);
+						break;
+					case DUMP_LOAD:
+						TrainServer.dumpLoad(requestText);
+						break;
+					case END_TURN:
+						TrainServer.endTurn(requestText);
+						break;
+					case END_GAME:
+						TrainServer.endGame(requestText);
+						break;
+					default:
+						throw new GameException(GameException.INVALID_MESSAGE_TYPE);
 					}
+				} catch (GameException e) {
+					String errorString = e.getMessage();
+					log.error("Game exception {}", errorString);
+					Gson gson = new Gson();
+					String jsonError = gson.toJson(errorString);
+		            FullHttpResponse result = new DefaultFullHttpResponse(HTTP_1_1, 
+		            	BAD_REQUEST, Unpooled.copiedBuffer(jsonError, CharsetUtil.UTF_8));
+		            sendHttpResponse(ctx, result);
+
+					buf.append(jsonError);
 				}
+			}
 
-				if (msg instanceof LastHttpContent) {
+			if (msg instanceof LastHttpContent) {
 
-					LastHttpContent trailer = (LastHttpContent) msg;
-					if (!writeResponse(trailer, ctx)) {
-						// If keep-alive is off, close the connection once the
-						// content is fully written.
-						ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(
-								ChannelFutureListener.CLOSE);
-					}
+				LastHttpContent trailer = (LastHttpContent) msg;
+				if (!writeResponse(trailer, ctx)) {
+					// If keep-alive is off, close the connection once the
+					// content is fully written.
+					ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(
+							ChannelFutureListener.CLOSE);
 				}
 			}
 		}
-	}
-
-	private String status() {
-		return null;
 	}
 
 	private static int findNthExprInString(String s, String expr, int n)
@@ -184,13 +212,20 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 			ChannelHandlerContext ctx) {
 		// Decide whether to close the connection or not.
 		boolean keepAlive = isKeepAlive(request);
+		// If there's no explicit response, send an OK on success
+		if (currentObj.getDecoderResult().isSuccess() && 
+				buf.toString().length() == 0)
+			buf.append("{\"status\":\"OK\"}");
+
 		// Build the response object.
 		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,
-				currentObj.getDecoderResult().isSuccess() ? OK : BAD_REQUEST,
-				Unpooled.copiedBuffer(buf.toString(), CharsetUtil.UTF_8));
+			currentObj.getDecoderResult().isSuccess() ? OK : BAD_REQUEST,
+			Unpooled.copiedBuffer(buf.toString(), CharsetUtil.UTF_8));
 
 		response.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
-
+		response.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+			
+		log.info("Sending response length {}", response.content().readableBytes());
 		if (keepAlive) {
 			// Add 'Content-Length' header only for a keep-alive connection.
 			response.headers().set(CONTENT_LENGTH,

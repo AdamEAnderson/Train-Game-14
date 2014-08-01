@@ -185,16 +185,16 @@ public class GameTest {
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
-        String statusMsg = TrainServer.statusMsg(gid);
+        String statusMsg = TrainServer.status(gid);
         log.info("empty status message {}", statusMsg);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Sandra", "green");
         game.joinGame("Sandy", "red");
         game.joinGame("Robin", "purple");
-        log.info("post-join status message {}", TrainServer.statusMsg(gid));
+        log.info("post-join status message {}", TrainServer.status(gid));
         game.startGame("Adam");
-        log.info("status after starting the game {}", TrainServer.statusMsg(gid));
+        log.info("status after starting the game {}", TrainServer.status(gid));
         
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
@@ -202,7 +202,7 @@ public class GameTest {
         mileposts = new MilepostId[]{ new MilepostId(34, 58), new MilepostId(33, 58), new MilepostId(32, 58),
             	new MilepostId(31, 59) };
         game.buildTrack(activePlayer, mileposts);
-        log.info("post track building {}", TrainServer.statusMsg(gid));
+        log.info("post track building {}", TrainServer.status(gid));
 	}
 	
 }

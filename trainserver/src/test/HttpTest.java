@@ -57,48 +57,19 @@ public class HttpTest {
 		
 	}
 	
-	// Send a very simple GET request to the server and check the result
-	@Test
-	public void testGet() throws Exception {
-		Thread serverThread = startServer();
-		
-        HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        connection.setRequestMethod("GET");
-        String charset = "UTF-8";
-        connection.setRequestProperty("Accept-Charset", charset);
-
-        // give it 15 seconds to respond
-        connection.setReadTimeout(15*1000);
-        
-        connectToServer(connection);
-        
-        // read the output from the server
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder stringBuilder = new StringBuilder();
-   
-        String line = null;
-        while ((line = reader.readLine()) != null)
-        {
-          stringBuilder.append(line + "\n");
-        }
-        System.out.println(stringBuilder.toString());
-
-        int code = connection.getResponseCode();
-        System.out.println("Got response code " + code);
-
-        HttpTrainServer.stopServer();
-        serverThread.join();
-    }
-
 	// Send a simple POST request to the server with the message as content and return the result code
-	private static String sendMessage(HttpURLConnection connection, String message) throws IOException, InterruptedException {
+	private static String sendMessage(HttpURLConnection connection, String message, boolean isPost) throws IOException, InterruptedException {
 		
         String charset = "UTF-8";
         connection.setRequestProperty("Accept-Charset", charset);
-        connection.setDoOutput(true);
+        if (isPost)
+        	connection.setDoOutput(true);
+        else
+            connection.setRequestMethod("GET");
         connectToServer(connection);
 
-        connection.getOutputStream().write(message.getBytes());
+        if (message != null || message.length() > 0)
+        	connection.getOutputStream().write(message.getBytes());
         // give it 15 seconds to respond
         connection.setReadTimeout(15*1000);
         
@@ -114,23 +85,55 @@ public class HttpTest {
         return stringBuilder.toString();
     }
 
+	// Send a simple POST request to the server with the message as content and return the result code
+	private static String sendGetMessage(HttpURLConnection connection, String message) throws IOException, InterruptedException {
+		return sendMessage(connection, message, false);
+    }
+
+	// Send a simple POST request to the server with the message as content and return the result code
+	private static String sendPostMessage(HttpURLConnection connection, String message) throws IOException, InterruptedException {
+		return sendMessage(connection, message, true);
+    }
+
+	private static String list(String listType, String expectedGid) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"list\", \"listType\":\"%s\"}", listType);
+		log.info("jsonPayload {}", jsonPayload);
+
+		String url = serverURL + "?" + jsonPayload;	// form query string
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        String charset = "UTF-8";
+        connection.setRequestProperty("Accept-Charset", charset);
+        
+        int code = connection.getResponseCode();
+        System.out.println("Got response code " + code);
+
+        String responseMessage = sendGetMessage(connection, null);
+        log.info("Got response message: {}", responseMessage);
+        assertEquals(connection.getResponseCode(), 200);
+        assertTrue(responseMessage.startsWith("{\"gids\":\""));
+        String gid = responseMessage.substring(8, 16);
+        assertEquals(expectedGid, gid);
+        return gid;
+	}
+	
 	private static String newGame(String pid, String color) throws IOException, InterruptedException {
 		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"gameType\":\"africa\"}", pid, color);
 		log.info("jsonPayload {}", jsonPayload);
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
+        log.info("Got response message: {}", responseMessage);
         assertEquals(connection.getResponseCode(), 200);
         assertTrue(responseMessage.startsWith("{\"gid\":\""));
-        String gid = responseMessage.substring(8, responseMessage.length() - 3);
+        String gid = responseMessage.substring(8, 16);
         return gid;
 	}
 	
 	private static void joinGame(String gid, String pid, String color) throws IOException, InterruptedException {
 
-		String jsonPayload = String.format("{\"messageType\":\"joinGame\", \"gid\":\"%s\", \"pid\":\"%s\",\"color\":\"$s\"}", gid, pid);
+		String jsonPayload = String.format("{\"messageType\":\"joinGame\", \"gid\":\"%s\", \"pid\":\"%s\",\"color\":\"%s\"}", gid, pid, color);
 		log.info("payload {}", jsonPayload);;
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -142,7 +145,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -154,7 +157,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -166,7 +169,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -178,7 +181,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -190,7 +193,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -202,7 +205,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -222,7 +225,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -234,7 +237,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -246,7 +249,7 @@ public class HttpTest {
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
-        String responseMessage = sendMessage(connection, jsonPayload);
+        String responseMessage = sendPostMessage(connection, jsonPayload);
         assertEquals(connection.getResponseCode(), 200);
 
         if (responseMessage != null && responseMessage.length() == 0)
@@ -260,11 +263,13 @@ public class HttpTest {
 		Thread serverThread = startServer();
 		
         String gid = newGame("Adam", "red");
+        list("joinable", gid);	// the new game should appear in the list of joinable games
         joinGame(gid, "Sandra", "green");
         joinGame(gid, "Sandy", "red");
         joinGame(gid, "Robin", "purple");
         startGame(gid, "Adam");
-        
+     /*   All of the following requires getting status messages 
+      * so we can use the correct player, etc.
         String mileposts = "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1},{\"x\":2,\"y\":2}]";
         buildTrack(gid, "Sandy", mileposts);
         
@@ -277,6 +282,7 @@ public class HttpTest {
         endTurn(gid, "Sandy");
         upgradeTrain(gid, "Adam", "Speed");
         endGame(gid, "Sandra");
+        */
         
         //join game
         HttpTrainServer.stopServer();

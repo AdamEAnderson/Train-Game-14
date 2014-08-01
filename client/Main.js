@@ -1,6 +1,7 @@
 //Global Variables
 var paper;
-var server = 'http://127.0.0.1:8080';
+//var server = 'http://127.0.0.1:8080';
+var server = 'http://localhost:8080';
 var pid, gid;
 
 //Loaded
@@ -10,23 +11,62 @@ $(document).ready(function(){
 	//paper.circle(0,0,200);
 	
 	//Init main menu
-	$('#mainMenu').append('<h3 id="joinGameText">Join Game</h3>');
-	$('#mainMenu').append('<ul id="mainMenuJUI"/>');
+	$('#mainMenu').append('<h3 id="joinGameText">Train Game</h3>');
+	//$('#mainMenu').append('<ul id="mainMenuJUI"><li>Join</li><li>New</li><li>Resume</li></ul>');
 	//for(var i = 0; i < 10; i++){
 		//$('#mainMenuJUI').append('<li>'+i+'</li>');
 	//}
-	$('#mainMenuJUI').menu();
-	$('#mainMenu').append('<h4 style="margin:10px 0px 5px 25px;">Handle</h4>');
-	$('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:100px;"/>');
-	$('#mainMenu').append('<h4 style="margin:10px 0px 5px 10px;">Game Color</h4>');
+	//$('#mainMenuJUI').menu();
+	$('#mainMenu').append('<select id="actionPicker"><option>New</option><option>Join</option><option>Resume</option></select>');
+	$('#mainMenu').append('<select id="gamePicker"/>');
+	$('#mainMenu').append('<h4 style="margin:10px 0px 5px 75px;">Handle</h4>');
+	$('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:200px;"/>');
+	$('#mainMenu').append('<h4 style="margin:10px 0px 5px 60px;">Game Color</h4>');
 	$('#mainMenu').append('<select id="colorPicker"><option>aqua</option><option>black</option><option>blue</option><option>fuchsia</option><option>gray</option><option>green</option><option>lime</option><option>maroon</option><option>navy</option><option>olive</option><option>orange</option><option>purple</option><option>red</option><option>silver</option><option>teal</option><option>yellow</option></select>');
+	$('#actionPicker').selectmenu({
+		change: function( event, data ) {
+			if (data.item.label == "New") {
+				$('#gamePicker').empty();
+				$('#gamePicker-button').hide();
+			}
+			else {
+				$('#gamePicker-button').show().css('display','block');
+				if (data.item.label == "Join")
+					gameOption = "joinable";
+				else
+					gameOption = "resumeable";
+				//Populate games list menu
+				requestData = {messageType:'list', listType: gameOption};
+				$.ajax({
+					type:"GET",
+					url:server,
+					data: JSON.stringify(requestData),
+					dataType: 'json',
+					success: function(responseData) {
+						processGames(responseData);
+					},
+					error: function(xhr, textStatus, errorThrown) {
+						console.log("error " + textStatus + " " + errorThrown);
+					}
+				});
+			}
+		}
+     });
 	$('#colorPicker').selectmenu();
+	$('#gamePicker').selectmenu();
 	$('#colorPicker').css('font-size','0.8em');
 	$('#mainMenu').append('<br/>');
-	$('#mainMenu').append('<button id="newGameButton">New Game</button>');
+	$('#mainMenu').append('<button id="newGameButton">OK</button>');
 	$('#newGameButton').button().click(function(){
 		if($('#handlePicker').val() && $('#handlePicker').val().length > 0){
-			newGame(document.getElementById("colorPicker").value,$('#handlePicker').val());
+			if (document.getElementById("actionPicker").value == "New") {
+				newGame(document.getElementById("colorPicker").value,$('#handlePicker').val(), 
+					"africa");
+			} else if (document.getElementById("actionPicker").value == "Join") {
+				joinGame(document.getElementById("gamePicker").value,
+					document.getElementById("colorPicker").value, $('#handlePicker').val());
+			} else if (document.getElementById("actionPicker").value == "Resume") {
+			}
 		}
 	});
 	$('#lobby').append('<h3 id="lobbyText">Lobby</h3>');
@@ -34,33 +74,39 @@ $(document).ready(function(){
 	$('#lobbyMenuJUI').menu();
 	$('#mainMenu').show();
 	
-	//for(var i = 0; i < 10; i++){
-		//$('#mainMenuJUI').append('<li>'+i+'</li>');
-	//}
-	//$('#mainMenuJUI').menu('refresh');
-
 	//statusGet();
 });
 
 //Tells server we've joined a game
 var joinGame = function(GID,color,handle) {
-	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
+	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){
+		gid = GID; 
+		$('#mainMenu').hide(); 
+		$('#lobby').show();
+		});
 	pid = handle;
 };
 
-//Tells server to start the game(from host)
-var startGame = function() {
-	post({messageType:'startGame', gid:gid, pid:pid},function(){});
+//Tells server to resume a game
+var resumeGame = function(GID,handle) {
+	post({messageType:'resumeGame', gid:GID, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
+	pid = handle;
 };
 
-var newGame = function(color, handle) {
-	post({messageType:'newGame', color:color, pid:handle}, function(data) {
+var newGame = function(color, handle, gameGeo) {
+	post({messageType:'newGame', color:color, pid:handle, gameType:gameGeo}, function(data) {
 		gid = data.gid;
+		console.log("new game: " + gid);
 		$('#mainMenu').hide();
 		$('#lobby').show();
 	});
 	pid = handle;
 }
+
+//Tells server to start the game(from host)
+var startGame = function() {
+	post({messageType:'startGame', gid:gid, pid:pid},function(){});
+};
 
 //Tells server we've built track
 var builtTrack = function(edges) {
@@ -98,6 +144,7 @@ var statusGet= function() {
 	$.ajax({
 		type:"GET",
 		url:server,
+      	crossDomain: true,
 		success: function(responseData) {
 			processStatus(responseData);
 		}
@@ -135,6 +182,17 @@ var processStatus = function(data) {
 	}
 };
 
+// Process a game list
+var processGames = function(data) {
+	$('#gamePicker').empty();
+	for(var i = 0; i < data.gids.length; i++){
+		$('#gamePicker').append('<option>' + data.gids[i] + '</option>').click(data.gids[i],function(e){
+		});
+	}
+	$('#gamePicker').menu('refresh');
+};
+
+
 //Post
 var post = function(data,callback){
 	$.ajax({
@@ -142,7 +200,9 @@ var post = function(data,callback){
 		url: server,
 		data: JSON.stringify(data),
 		success: callback,
-		error: callback,
+		error: function(xhr, textStatus, errorThrown) {
+			console.log("error " + textStatus + " " + errorThrown);
+		},
 		dataType: 'json'
 	});
 };

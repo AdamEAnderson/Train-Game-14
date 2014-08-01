@@ -20,7 +20,6 @@ import player.Train;
 
 import reference.Card;
 import reference.City;
-import reference.Trip;
 import reference.UpgradeType;
 
 import com.google.gson.Gson;
@@ -47,22 +46,16 @@ public class TrainServer {
 		return games.get(gid);		
 	}
 	
-	static class NewGameData {
-		//public String messageType;
-		public String pid; // host playerId
-		public String color; // color for track building
-		public RuleSet ruleSet; // name for rules of the game
-		public String gameType; // which game (Africa, Eurasia, etc.)
-		
-		NewGameData() {}
+	static class CardStatus {
+		public CardTripStatus[] trips;
+		CardStatus() {}
 	}
 	
-	static class NewGameResponse {
-		public String gid;
-		public TrainMap.SerializeData mapData;
-		public Collection<City> cities;	/** Cities indexed by city name, contains loads found in each city */
-		public Map<String, Set<String>> loadset; /** Key=load, Value= cities where loads can be obtained */
-		NewGameResponse() {}
+	static class CardTripStatus {
+		public String dest;
+		public String load;
+		public int cost;
+		CardTripStatus() {}
 	}
 	
 	static class PlayerStatus {
@@ -92,7 +85,16 @@ public class TrainServer {
 		  }		
 	}
 	
-	static public String statusMsg(String gid) throws GameException {
+	static class StatusRequest {
+		public String gid;
+		StatusRequest() {}
+	}
+	
+	static public String status(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		StatusRequest data = gson.fromJson(requestText, StatusRequest.class);
+		String gid = data.gid;
+		
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		GameStatus status = new GameStatus();
 		Game game = getGame(gid);
@@ -134,6 +136,56 @@ public class TrainServer {
 		}while(p != game.getActivePlayer());
 		
 		return gsonBuilder.create().toJson(status);
+	}
+	
+	static class ListRequest {
+		public String listType;
+		ListRequest() {}
+	}
+	
+	static class ListResponse {
+		public Set<String> gids;
+		ListResponse() { gids = new HashSet<String>(); }
+	}
+	
+	static public String list(String requestText) throws GameException {
+		log.info("list requestText: {}", requestText);
+		Gson gson = new GsonBuilder().create();
+		ListRequest data = gson.fromJson(requestText, ListRequest.class);
+		ListResponse responseData = new ListResponse();
+		if (data.listType.equals("joinable")) {
+			for (String gid : games.keySet())
+				if (games.get(gid).isJoinable())
+					responseData.gids.add(gid);
+		}
+		else if (data.listType.equals("resumeable")) {
+			for (String gid : games.keySet())
+				if (!games.get(gid).isJoinable())
+					responseData.gids.add(gid);
+		}
+		else if (data.listType == "all")
+			responseData.gids = games.keySet();
+		String result = gson.toJson(responseData);
+		log.info("list response {}", result);
+		return gson.toJson(responseData);
+	}
+	
+	static class NewGameData {
+		//public String messageType;
+		public String pid; // host playerId
+		public String color; // color for track building
+		public RuleSet ruleSet; // name for rules of the game
+		public String gameType; // which game (Africa, Eurasia, etc.)
+		
+		NewGameData() {}
+	}
+	
+	static class NewGameResponse {
+		public String gid;
+		public TrainMap.SerializeData mapData;
+		public Collection<City> cities;	/** Cities indexed by city name, contains loads found in each city */
+		public Map<String, Set<String>> loadset; /** Key=load, Value= cities where loads can be obtained */
+		NewGameResponse() {}
 	}
 	
 	static public String newGame(String requestText) throws GameException {			
