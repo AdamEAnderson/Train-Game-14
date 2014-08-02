@@ -74,11 +74,15 @@ $(document).ready(function(){
 			}
 		}
 	});
-	$('#lobby').append('<h3 id="lobbyText">Lobby</h3>');
 	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
 	$('#lobby').append('<div id="players"/>');
-	$('#lobby').append('<div id="hand" class="hand"/>');
+	$('#lobby').append('<div id="map"/>');
+	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
 	$('#lobbyMenuJUI').menu();
+	paper = new Raphael('map',$('#map').width(),$('#map').height());
+	$('#map').resize(function(){
+		paper.setSize($('#map').width(),$('#map').height());
+	});
 	$('#mainMenu').show();
 	
 	lastStatus = 0;
@@ -182,12 +186,28 @@ var refreshCards = function(cards) {
 		$('#hand').append('<div class="card"/>');
 		card = cards[c];
 		for (var t = 0; t < card.trips.length; ++t) {
-			if (t == card.trips.length - 1)
-				$('#hand').children().eq(c).append('<div class="trip-last"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
-			else
-				$('#hand').children().eq(c).append('<div class="trip"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
+			$('#hand').children().eq(c).append('<div class="trip"><table><tr><td style="width:42%">' + card.trips[t].load + '</td><td style="width:42%">' + card.trips[t].dest + '</td><td style="width:6%">' +  card.trips[t].cost + '</td></tr></table></div>');
+			//if (t == card.trips.length - 1)
+			//	$('#hand').children().eq(c).append('<div class="trip-last"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
+			//else
+			//	$('#hand').children().eq(c).append('<div class="trip"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
 		}
 	}
+}
+
+var refreshTrains = function(trains) {
+	$('#trains').empty();
+	for (var t = 0; t < trains.length; ++t) {
+		$('#trains').append('<div class="train"/>');
+		$('#trains').children().eq(t).append('<p><span>' + trains[t].speed + '</span></p>');
+		for (var l = 0; l < trains[t].loads.length; ++l)
+			$('#trains').children().eq(t).append('<p><span>' + trains[t].loads[l] + '</span></p>');
+	}
+}
+
+var refreshMoney = function(money) {
+	$('#money').empty();
+	$('#money').append('<span>' + money + '</span>');
 }
 
 var findPid = function(players, pid) {
@@ -203,6 +223,8 @@ var processStatus = function(data) {
 		refreshPlayers(data.players);
 		me = findPid(data.players, pid);
 		refreshCards(me.hand);
+		refreshTrains(me.trains);
+		refreshMoney(me.money);
 		/*
 		if(data.events) {
 			for(var i = 0; i < data.events.length; i++) {
