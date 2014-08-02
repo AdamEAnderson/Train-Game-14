@@ -74,6 +74,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 
 			if (request.getMethod() == HttpMethod.GET)
 			{
+				//log.info("Incoming GET: {}", request.getUri());
 				isPost = false;
 				// Incoming is either a request for games to join, games to resume, 
 				// or status on a particular game
@@ -225,7 +226,8 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 		response.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
 		response.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
 			
-		log.info("Sending response length {}", response.content().readableBytes());
+		//log.info("Sending response length {}", response.content().readableBytes());
+		//log.info("Sending response text", buf.toString());
 		if (keepAlive) {
 			// Add 'Content-Length' header only for a keep-alive connection.
 			response.headers().set(CONTENT_LENGTH,

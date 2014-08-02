@@ -3,12 +3,17 @@ var paper;
 //var server = 'http://127.0.0.1:8080';
 var server = 'http://localhost:8080';
 var pid, gid;
+var lastStatus;
 
 //Loaded
 $(document).ready(function(){
 	//Init display object
 	//paper = Raphael('display',$('body').width(),$('body').height());
 	//paper.circle(0,0,200);
+	
+	$(function() {
+		$("#radio").buttonset();
+	});
 	
 	//Init main menu
 	$('#mainMenu').append('<h3 id="joinGameText">Train Game</h3>');
@@ -71,9 +76,12 @@ $(document).ready(function(){
 	});
 	$('#lobby').append('<h3 id="lobbyText">Lobby</h3>');
 	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
+	$('#lobby').append('<div id="players"/>');
+	$('#lobby').append('<div id="hand" class="hand"/>');
 	$('#lobbyMenuJUI').menu();
 	$('#mainMenu').show();
 	
+	lastStatus = 0;
 	//statusGet();
 });
 
@@ -81,8 +89,7 @@ $(document).ready(function(){
 var joinGame = function(GID,color,handle) {
 	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){
 		gid = GID; 
-		$('#mainMenu').hide(); 
-		$('#lobby').show();
+		enterLobby();
 		});
 	pid = handle;
 };
@@ -97,10 +104,15 @@ var newGame = function(color, handle, gameGeo) {
 	post({messageType:'newGame', color:color, pid:handle, gameType:gameGeo}, function(data) {
 		gid = data.gid;
 		console.log("new game: " + gid);
-		$('#mainMenu').hide();
-		$('#lobby').show();
+		enterLobby();
 	});
 	pid = handle;
+}
+
+var enterLobby = function() {
+	$('#mainMenu').hide(); 
+	$('#lobby').show();
+	setInterval('statusGet()', 2000);
 }
 
 //Tells server to start the game(from host)
@@ -141,44 +153,65 @@ var statusGet= function() {
 	
 	//Request status from server
 	//requestData = gid ? {messageType:'statusUpdate', pid:pid, gid:gid} : {messageType:'statusUpdate', pid:pid};
+	requestData ={messageType:'status', gid:gid, pid:pid};
 	$.ajax({
 		type:"GET",
 		url:server,
-      	crossDomain: true,
+		data: JSON.stringify(requestData),
+		dataType: 'json',
 		success: function(responseData) {
 			processStatus(responseData);
+		},
+		error: function(xhr, textStatus, errorThrown) {
+			console.log("error " + textStatus + " " + errorThrown);
 		}
 	});
 };
 
+var refreshPlayers = function(players) {
+	$('#players').empty();
+	for(var i = 0; i < players.length; i++){
+		$('#players').append('<input type="radio" id="' + i + '"><label for="' + i + '">' + players[i].pid + '</label></input>');
+	}
+	$('#players').buttonset();
+}
+
+var refreshCards = function(cards) {
+	$('#hand').empty();
+	for(var c = 0; c < cards.length; ++c) {
+		$('#hand').append('<div class="card"/>');
+		card = cards[c];
+		for (var t = 0; t < card.trips.length; ++t) {
+			if (t == card.trips.length - 1)
+				$('#hand').children().eq(c).append('<div class="trip-last"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
+			else
+				$('#hand').children().eq(c).append('<div class="trip"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
+		}
+	}
+}
+
+var findPid = function(players, pid) {
+	for(var i = 0; i < players.length; i++)
+		if (players[i].pid == pid)
+			return players[i];
+	return null;
+}
+
 //Processes a status response from the server
 var processStatus = function(data) {
-	if(data.phase == 'pregame') {
-		$('#mainMenuJUI').clear();
-		for(var i = 0; i < data.games.length; i++){
-			$('#mainMenuJUI').append('<li id="' + data.games[i].gid + '" >' + data.games[i].name + '</li>').click(data.games[i].gid,function(e){
-				if($('#handlePicker').val() && $('#handlePicker').val().length > 0){
-					joinGame(e.eventData, document.getElementById("colorPicker").value,$('#handlePicker').value());
+	if (data.transaction != lastStatus) {
+		refreshPlayers(data.players);
+		me = findPid(data.players, pid);
+		refreshCards(me.hand);
+		/*
+		if(data.events) {
+			for(var i = 0; i < data.events.length; i++) {
+				if(data.events[i].type == 'startGame') {
+					//Init game here
 				}
-			});
-		}
-		$('#mainMenuJUI').menu('refresh');
-	}
-	
-	else if(data.phase == 'lobby') {
-		$('#mainMenuJUI').clear();
-		for(var i = 0; i < data.players.length; i++){
-			$('#mainMenuJUI').append('<li id="' + data.players[i] + '" >' + data.players[i] + '</li>');
-		}
-		$('#mainMenuJUI').menu('refresh');
-	}
-	
-	if(data.events) {
-		for(var i = 0; i < data.events.length; i++) {
-			if(data.events[i].type == 'startGame') {
-				//Init game here
 			}
-		}
+		} */
+		lastStatus = data.transaction;
 	}
 };
 

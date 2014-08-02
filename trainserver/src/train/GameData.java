@@ -144,8 +144,8 @@ public class GameData {
 		try {
 			reader = new BufferedReader(new FileReader(getDataFile(gameType, "cards.csv")));
 			String line = reader.readLine();	// skip header row
-			Trip[] cardData = new Trip[3];
 			while ((line = reader.readLine()) != null) {
+				Trip[] cardData = new Trip[3];
 				String[] fields = line.split(",");
 				if (fields.length != 9) {
 					log.error("Expected 9 fields in card, found only {}", fields.length);

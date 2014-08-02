@@ -32,6 +32,7 @@ public class Game implements AbstractGame {
 	private Map<Milepost, Set<Milepost>> globalRail;
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
 	private boolean joinable;
+	private int transaction;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -44,6 +45,7 @@ public class Game implements AbstractGame {
 		this.map = gameData.map;
 		this.deck = gameData.deck;
 		this.ruleSet = ruleSet;
+		transaction = 1;
 		players = new ArrayList<Player>();
 		globalRail = new HashMap<Milepost, Set<Milepost>>();
 		turns = 0;
@@ -56,6 +58,8 @@ public class Game implements AbstractGame {
 	public RuleSet getRuleSet() { return ruleSet; }
 	
 	public boolean isJoinable() { return joinable; }
+	
+	public int transaction() { return transaction; }
 	
 	@Override
 	public void joinGame(String pid, String color) throws GameException {
@@ -76,6 +80,7 @@ public class Game implements AbstractGame {
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 		active = p;
+		++transaction;
 	}
 
 	@Override
@@ -90,6 +95,7 @@ public class Game implements AbstractGame {
 			last = temp;
 		}
 		joinable = false;
+		++transaction;
 	}
 
 	@Override
@@ -104,6 +110,7 @@ public class Game implements AbstractGame {
 			queue.add(map.getMilepost(mileposts[i]));
 		}
 		active.buildTrack(queue);	
+		++transaction;
 	}
 
 	@Override
@@ -113,6 +120,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		active.upgradeTrain(train, upgrade);
+		++transaction;
 	}
 
 	@Override
@@ -120,6 +128,7 @@ public class Game implements AbstractGame {
 		log.info("startTrain(pid={}, city={})", pid, where);
 		checkActive(pid);
 		active.startTrain(map.getMilepost(where), train);
+		++transaction;
 	}
 
 	@Override
@@ -136,6 +145,7 @@ public class Game implements AbstractGame {
 			moves.add(map.getMilepost(mileposts[i]));
 		}
 		active.moveTrain(train, moves);
+		++transaction;
 	}
 	
 	@Override
@@ -144,6 +154,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		active.pickupLoad(train, load);
+		++transaction;
 	}
 
 	@Override
@@ -153,6 +164,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		active.deliverLoad(card, train, deck.poll());
+		++transaction;
 	}
 
 	@Override
@@ -160,6 +172,7 @@ public class Game implements AbstractGame {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
 		checkActive(pid);
 		active.dropLoad(train, load);
+		++transaction;
 	}
 
 	@Override
@@ -187,6 +200,7 @@ public class Game implements AbstractGame {
 			if(last) turns++;
 		}
 			
+		++transaction;
 	}
 
 	@Override
@@ -194,6 +208,7 @@ public class Game implements AbstractGame {
 		log.info("endGame(pid={})", pid);
 		if(!(active == last)) throw new GameException("PlayerNotActive");
 		active.endTurn();
+		++transaction;
 	}
 
 	private Player getPlayer(String pid) throws GameException {

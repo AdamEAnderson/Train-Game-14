@@ -76,6 +76,7 @@ public class TrainServer {
 		public String activeid;
 		public String lastid;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
+		public int transaction;
 		GameStatus() {}
 	}
 	
@@ -100,13 +101,11 @@ public class TrainServer {
 		Game game = getGame(gid);
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
+		status.transaction = game.transaction();
 		Player p = game.getActivePlayer();
 		if(game.getLastPlayer() == null) {
 			status.activeid = "";
 			status.lastid = "";
-			List<Player> ps = game.getPlayers();
-			if(!ps.isEmpty()) p = ps.get(0);
-			else return gsonBuilder.create().toJson(status);
 		} else {
 			status.activeid = game.getActivePlayer().name;
 			status.lastid = game.getLastPlayer().name;
