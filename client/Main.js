@@ -1,5 +1,5 @@
 //Global Variables
-var paper;
+var paper, panZoom;
 //var server = 'http://127.0.0.1:8080';
 var server = 'http://localhost:8080';
 var pid, gid;
@@ -62,6 +62,7 @@ $(document).ready(function(){
 	$('#colorPicker').css('font-size','0.8em');
 	$('#mainMenu').append('<br/>');
 	$('#mainMenu').append('<button id="newGameButton">OK</button>');
+	$('#newGameButton').css('margin-top','15px');
 	$('#newGameButton').button().click(function(){
 		if($('#handlePicker').val() && $('#handlePicker').val().length > 0){
 			if (document.getElementById("actionPicker").value == "New") {
@@ -73,15 +74,6 @@ $(document).ready(function(){
 			} else if (document.getElementById("actionPicker").value == "Resume") {
 			}
 		}
-	});
-	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
-	$('#lobby').append('<div id="players"/>');
-	$('#lobby').append('<div id="map"/>');
-	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
-	$('#lobbyMenuJUI').menu();
-	paper = new Raphael('map',$('#map').width(),$('#map').height());
-	$('#map').resize(function(){
-		paper.setSize($('#map').width(),$('#map').height());
 	});
 	$('#mainMenu').show();
 	
@@ -113,10 +105,74 @@ var newGame = function(color, handle, gameGeo) {
 	pid = handle;
 }
 
+var join = function(/* path segments */) {
+	// Split the inputs into a list of path commands.
+	var parts = [];
+	for (var i = 0, l = arguments.length; i < l; i++) {
+		parts = parts.concat(arguments[i].split("/"));
+	}
+	// Interpret the path commands to get the new resolved path.
+	var newParts = [];
+	for (i = 0, l = parts.length; i < l; i++) {
+		var part = parts[i];
+		// Remove leading and trailing slashes
+		// Also remove "." segments
+		if (!part || part === ".") continue;
+		// Interpret ".." to pop the last segment
+		if (part === "..") newParts.pop();
+		// Push new path segments.
+		else newParts.push(part);
+	}
+	// Preserve the initial slash if there was one.
+	if (parts[0] === "") newParts.unshift("");
+	// Turn back into a single string path.
+	return newParts.join("/") || (newParts.length ? "/" : ".");
+}
+
 var enterLobby = function() {
-	$('#mainMenu').hide(); 
-	$('#lobby').show();
-	setInterval('statusGet()', 2000);
+	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
+	$('#lobby').append('<div id="players"/>');
+	$('#lobby').append('<div id="map"/>');
+	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
+	$('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
+	$('#lobbyMenuJUI').menu();
+	paper = new Raphael('map',$('#map').width(),$('#map').height());
+	$('#map').resize(function(){
+		paper.setSize($('#map').width(),$('#map').height());
+	});
+	$.ajax({
+		url: location.origin + join(location.pathname, '../../data/africa/map.svg'),
+		method:'GET',
+		type:'text/plain',
+		success: function(d){
+			var groups = $(d).find('g');
+			for(var i = 0; i < groups.length; i++){
+				$(paper.canvas).append($(groups[i]));
+			}
+			var viewBox = $(d).find('svg').attr('viewBox').split(' ');
+			//$('#map > svg').attr('viewBox',$(d).find('svg').attr('viewBox'));
+			paper.setViewBox(viewBox[0],viewBox[1],viewBox[2],viewBox[3]);
+			paper.setSize($('#map').width(),$('#map').height());
+			panZoom = paper.panzoom({ dragModifier:5, initialZoom: 0, initialPosition: { x: 0, y: 0}, width:viewBox[2], height:viewBox[3] });
+			panZoom.enable();
+			$(paper.canvas).on('dblclick',function(){
+				panZoom.zoomIn(1);
+			});
+			$('#up').click(function(){
+				panZoom.zoomIn(1);
+			});
+			$('#down').click(function(){
+				panZoom.zoomOut(1);
+			});
+			$('#mainMenu').hide();
+			$('#lobby').show();
+			panZoom.enable();
+			setInterval('statusGet()', 2000);
+		},
+		error: function(a,b,c){
+			console.log('error:' + arguments.toString());
+		}
+	});
 }
 
 //Tells server to start the game(from host)
