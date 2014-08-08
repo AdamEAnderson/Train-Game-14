@@ -23,6 +23,10 @@ public final class TrainMap {
 		public List<Milepost> orderedMileposts;	// used for map serialization
 		public int mpWidth = 0;	// used for map serialization
 		public int mpHeight = 0;	// used for map serialization
+		public int leftOffset = 0;	// whitespace at left edge of map
+		public int topOffset = 0; 	// whitespace at top edge of map
+		public int mapWidth = 0;	// width of map excluding all whitespace
+		public int mapHeight = 0;	// height of map excluding all whitespace
 		
 		public SerializeData() {
 			orderedMileposts = new ArrayList<Milepost>();
@@ -67,6 +71,12 @@ public final class TrainMap {
 	public void generateMileposts(BufferedReader mapDataReader, Map<String, City> cities) 
 			throws IOException, GameException {
 		int y = 0;
+		String firstline = mapDataReader.readLine(); // left, top, width, height
+		String [] firstFields = firstline.split(",");
+		serializeData.leftOffset = Integer.parseInt(firstFields[0]);
+		serializeData.topOffset = Integer.parseInt(firstFields[1]);
+		serializeData.mapWidth = Integer.parseInt(firstFields[2]);
+		serializeData.mapHeight = Integer.parseInt(firstFields[3]);
 		String line = mapDataReader.readLine();	// skip over the row header
 		while ((line = mapDataReader.readLine()) != null) {
 		   // process the line.

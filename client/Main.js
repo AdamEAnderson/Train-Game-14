@@ -4,6 +4,10 @@ var paper, panZoom;
 var server = 'http://localhost:8080';
 var pid, gid;
 var lastStatus;
+var gameData;
+var mapHeight, mapWidth;
+var mileposts = {};
+var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE'/*, 'FOREST'*/];
 
 //Loaded
 $(document).ready(function(){
@@ -81,30 +85,6 @@ $(document).ready(function(){
 	//statusGet();
 });
 
-//Tells server we've joined a game
-var joinGame = function(GID,color,handle) {
-	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){
-		gid = GID; 
-		enterLobby();
-		});
-	pid = handle;
-};
-
-//Tells server to resume a game
-var resumeGame = function(GID,handle) {
-	post({messageType:'resumeGame', gid:GID, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
-	pid = handle;
-};
-
-var newGame = function(color, handle, gameGeo) {
-	post({messageType:'newGame', color:color, pid:handle, gameType:gameGeo}, function(data) {
-		gid = data.gid;
-		console.log("new game: " + gid);
-		enterLobby();
-	});
-	pid = handle;
-}
-
 var join = function(/* path segments */) {
 	// Split the inputs into a list of path commands.
 	var parts = [];
@@ -129,6 +109,43 @@ var join = function(/* path segments */) {
 	return newParts.join("/") || (newParts.length ? "/" : ".");
 }
 
+milepostsNeeded.forEach(function(e){
+	$.ajax({
+		url:location.origin + join(location.pathname, '../../data/mileposts/' + e.toLowerCase() + '.svg'),
+		success:function(d){
+			mileposts[e] = d;
+		}
+	});
+});
+
+//Tells server we've joined a game
+var joinGame = function(GID,color,handle) {
+	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){
+		gid = GID; 
+		enterLobby();
+		});
+	pid = handle;
+};
+
+//Tells server to resume a game
+var resumeGame = function(GID,handle) {
+	post({messageType:'resumeGame', gid:GID, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
+	pid = handle;
+};
+
+var newGame = function(color, handle, gameGeo) {
+	post({messageType:'newGame', color:color, pid:handle, gameType:gameGeo}, function(data) {
+		gameData = data;
+		for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
+			gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
+		gid = data.gid;
+		console.log("new game: " + gid);
+		enterLobby();
+	});
+	pid = handle;
+}
+
+
 var enterLobby = function() {
 	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
 	$('#lobby').append('<div id="players"/>');
@@ -151,10 +168,12 @@ var enterLobby = function() {
 			}
 			var viewBox = $(d).find('svg').attr('viewBox').split(' ');
 			//$('#map > svg').attr('viewBox',$(d).find('svg').attr('viewBox'));
+			mapWidth = viewBox[2];
+			mapHeight = viewBox[3];
 			paper.setViewBox(viewBox[0],viewBox[1],viewBox[2],viewBox[3]);
 			paper.setSize($('#map').width(),$('#map').height());
 			panZoom = paper.panzoom({ dragModifier:5, initialZoom: 0, initialPosition: { x: 0, y: 0}, width:viewBox[2], height:viewBox[3] });
-			panZoom.enable();
+			//panZoom.enable();
 			$(paper.canvas).on('dblclick',function(){
 				panZoom.zoomIn(1);
 			});
@@ -167,12 +186,53 @@ var enterLobby = function() {
 			$('#mainMenu').hide();
 			$('#lobby').show();
 			panZoom.enable();
+			drawMileposts();
 			setInterval('statusGet()', 2000);
 		},
 		error: function(a,b,c){
 			console.log('error:' + arguments.toString());
 		}
 	});
+}
+
+var drawMileposts = function() {
+	var xDelta = gameData.mapData.mapWidth / gameData.mapData.mpWidth;
+	var yDelta = gameData.mapData.mapHeight / gameData.mapData.mpHeight;
+	console.log("xDelta: " + xDelta + " yDelta: " + yDelta);
+	var mp = 0;
+	var oddRowOffset = xDelta / 2;
+	var milepostsGroup = paper.group(0,[]);
+ 	$('#map > svg > g:last').attr('id','milepostsGroup');
+	for (var h = 0; h < gameData.mapData.mpHeight; ++h) {
+		for (var w = 0; w < gameData.mapData.mpWidth; ++w) {
+			//if(gameData.mapData.orderedMileposts[mp].x != w || gameData.mapData.orderedMileposts[mp].y != h)
+				//console.log('INCORRECT MILEPOST: ' + gameData.mapData.orderedMileposts[mp].x + ',' + gameData.mapData.orderedMileposts[mp].y);
+			var x = w * xDelta + gameData.mapData.leftOffset;
+			var y = h * yDelta + gameData.mapData.topOffset;
+			x = h % 2 == 1 ? x + oddRowOffset : x;
+			switch(gameData.mapData.orderedMileposts[mp].type) {
+				case 'CITY':
+					milepostsGroup.push(paper.circle(x, y, 9).attr({'fill':'#d00','stroke-width':'0px','stroke':'#d00'}));
+					break;
+				case 'MAJORCITY':
+				case 'NORMAL':
+					milepostsGroup.push(paper.circle(x, y, 3).attr({'fill':'#000','stroke-width':'0px'}));
+					break;
+				case 'BLANK':
+					break;
+				default:
+					var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
+					$('#milepostsGroup').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).append(jQ));
+					var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
+					var scale = 0.035;
+					x -= (bbox.width / 2) * scale;
+					y -= (bbox.height / 2) * scale;
+					$('#milepostsGroup').find('g:last').attr('transform','translate(' + x + ',' + y + ') scale(' + scale + ')');
+					break;
+			}
+			++mp;
+		}
+	}
 }
 
 //Tells server to start the game(from host)
