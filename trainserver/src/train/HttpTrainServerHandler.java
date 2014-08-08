@@ -35,6 +35,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	private final static String NEW_GAME = "newGame";
 	private final static String JOIN_GAME = "joinGame";
+	private final static String RESUME_GAME = "resumeGame";
 	private final static String START_GAME = "startGame";
 	private final static String BUILD_TRACK = "buildTrack";
 	private final static String UPGRADE_TRAIN = "upgradeTrain";
@@ -121,12 +122,16 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 				try {
 					switch (requestType) {
 					case NEW_GAME:
-						String strResponse = TrainServer.newGame(requestText);
-						buf.append(strResponse);
+						buf.append(TrainServer.newGame(requestText));
 						log.info("newGame buf {}", buf);
 						break;
 					case JOIN_GAME:
-						TrainServer.joinGame(requestText);
+						buf.append(TrainServer.joinGame(requestText));
+						log.info("joinGame buf {}", buf);
+						break;
+					case RESUME_GAME:
+						buf.append(TrainServer.resumeGame(requestText));
+						log.info("resumeGame buf {}", buf);
 						break;
 					case START_GAME:
 						TrainServer.startGame(requestText);

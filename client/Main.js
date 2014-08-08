@@ -1,13 +1,14 @@
 //Global Variables
 var paper, panZoom;
 //var server = 'http://127.0.0.1:8080';
-var server = 'http://localhost:8080';
+var server = location.origin.replace(/\:[0-9]+/,'') + ':8080';
 var pid, gid;
 var lastStatus;
 var gameData;
 var mapHeight, mapWidth;
 var mileposts = {};
 var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE'/*, 'FOREST'*/];
+var geography;
 
 //Loaded
 $(document).ready(function(){
@@ -32,6 +33,8 @@ $(document).ready(function(){
 	$('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:200px;"/>');
 	$('#mainMenu').append('<h4 style="margin:10px 0px 5px 60px;">Game Color</h4>');
 	$('#mainMenu').append('<select id="colorPicker"><option>aqua</option><option>black</option><option>blue</option><option>fuchsia</option><option>gray</option><option>green</option><option>lime</option><option>maroon</option><option>navy</option><option>olive</option><option>orange</option><option>purple</option><option>red</option><option>silver</option><option>teal</option><option>yellow</option></select>');
+	$('#mainMenu').append('<h4 id="geographyPicker-label" style="margin:10px 0px 5px 60px;">Geography</h4>');
+	$('#mainMenu').append('<select id="geographyPicker"><option>africa</option></select>');
 	$('#actionPicker').selectmenu({
 		change: function( event, data ) {
 			if (data.item.label == "New") {
@@ -40,6 +43,8 @@ $(document).ready(function(){
 			}
 			else {
 				$('#gamePicker-button').show().css('display','block');
+				$('#geographyPicker-label').hide();
+				$('#geographyPicker-button').hide();
 				if (data.item.label == "Join")
 					gameOption = "joinable";
 				else
@@ -62,6 +67,7 @@ $(document).ready(function(){
 		}
      });
 	$('#colorPicker').selectmenu();
+	$('#geographyPicker').selectmenu();
 	$('#gamePicker').selectmenu();
 	$('#colorPicker').css('font-size','0.8em');
 	$('#mainMenu').append('<br/>');
@@ -71,7 +77,7 @@ $(document).ready(function(){
 		if($('#handlePicker').val() && $('#handlePicker').val().length > 0){
 			if (document.getElementById("actionPicker").value == "New") {
 				newGame(document.getElementById("colorPicker").value,$('#handlePicker').val(), 
-					"africa");
+					document.getElementById("geographyPicker").value);
 			} else if (document.getElementById("actionPicker").value == "Join") {
 				joinGame(document.getElementById("gamePicker").value,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
@@ -120,11 +126,16 @@ milepostsNeeded.forEach(function(e){
 
 //Tells server we've joined a game
 var joinGame = function(GID,color,handle) {
-	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data){
+	post({messageType:'joinGame', gid:GID, color:color, pid:handle}, function(data) {
+		gameData = data;
 		gid = GID; 
+		pid = handle;
+		for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
+			gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
+		geography = data.geography;
+		console.log("join game: " + gid);
 		enterLobby();
-		});
-	pid = handle;
+	});
 };
 
 //Tells server to resume a game
@@ -139,26 +150,18 @@ var newGame = function(color, handle, gameGeo) {
 		for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
 			gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
 		gid = data.gid;
+		pid = handle;
+		geography = gameGeo;
 		console.log("new game: " + gid);
 		enterLobby();
 	});
-	pid = handle;
 }
 
 
-var enterLobby = function() {
-	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
-	$('#lobby').append('<div id="players"/>');
-	$('#lobby').append('<div id="map"/>');
-	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
-	$('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
-	$('#lobbyMenuJUI').menu();
-	paper = new Raphael('map',$('#map').width(),$('#map').height());
-	$('#map').resize(function(){
-		paper.setSize($('#map').width(),$('#map').height());
-	});
+var initMap = function(geography) {
+	var mapFile = '../../data/' + geography + '/map.svg';
 	$.ajax({
-		url: location.origin + join(location.pathname, '../../data/africa/map.svg'),
+		url: location.origin + join(location.pathname, mapFile),
 		method:'GET',
 		type:'text/plain',
 		success: function(d){
@@ -193,6 +196,26 @@ var enterLobby = function() {
 			console.log('error:' + arguments.toString());
 		}
 	});
+}
+
+var enterLobby = function() {
+	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
+	$('#lobby').append('<div id="players"/>');
+	$('#lobby').append('<div id="map"/>');
+	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
+	$('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
+	$('#lobbyMenuJUI').menu();
+	paper = new Raphael('map',$('#map').width(),$('#map').height());
+	$('#map').resize(function(){
+		paper.setSize($('#map').width(),$('#map').height());
+	});
+	if (geography) 
+		initMap(geography);
+	else {
+		// join/resume: we'll make the map once we have gotten a status message 
+		// and know the geography
+		setInterval('statusGet()', 2000);
+	}
 }
 
 var drawMileposts = function() {
@@ -336,6 +359,10 @@ var findPid = function(players, pid) {
 //Processes a status response from the server
 var processStatus = function(data) {
 	if (data.transaction != lastStatus) {
+		if (!geography && data.geography) {
+			geography = data.geography;
+			initMap(data.geography);
+		}
 		refreshPlayers(data.players);
 		me = findPid(data.players, pid);
 		refreshCards(me.hand);

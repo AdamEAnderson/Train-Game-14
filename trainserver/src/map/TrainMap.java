@@ -64,7 +64,6 @@ public final class TrainMap {
 	
 	public SerializeData getSerializeData() {
 		SerializeData data = serializeData;
-		serializeData = null;
 		return data;
 	}
 	

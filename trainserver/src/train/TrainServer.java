@@ -75,6 +75,7 @@ public class TrainServer {
 		public String gid;
 		public String activeid;
 		public String lastid;
+		public String geography;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
 		public int transaction;
 		GameStatus() {}
@@ -101,6 +102,7 @@ public class TrainServer {
 		Game game = getGame(gid);
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
+		status.geography = game.gameData.geography;
 		status.transaction = game.transaction();
 		Player p = game.getActivePlayer();
 		if(game.getLastPlayer() == null) {
@@ -181,32 +183,21 @@ public class TrainServer {
 	
 	static class NewGameResponse {
 		public String gid;
+		public String geography;
 		public TrainMap.SerializeData mapData;
 		public Collection<City> cities;	/** Cities indexed by city name, contains loads found in each city */
 		public Map<String, Set<String>> loadset; /** Key=load, Value= cities where loads can be obtained */
 		NewGameResponse() {}
 	}
 	
-	static public String newGame(String requestText) throws GameException {			
-		String gameId = null;
-		Gson gson = new GsonBuilder().create();
-		NewGameData data = gson.fromJson(requestText, NewGameData.class);
-		
-		
-		GameData gameData = new GameData(data.gameType);
-		if (data.ruleSet == null)
-			data.ruleSet = new RuleSet(4, 70, 1);
-		Game game = new Game(gameData, data.ruleSet);
-		gameId = gameNamer.nextString();
-		games.put(gameId, game);
-		game.joinGame(data.pid, data.color);
-
-		// Send a JSON response that has gid, serialized map data, list of cities and loads
+	static public String buildNewGameResponse(String gid, GameData gameData) {
+		// Build a JSON string that has gid, serialized map data, list of cities and loads
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
 		NewGameResponse response = new NewGameResponse();
 		response.mapData = gameData.map.getSerializeData();
 		response.cities = gameData.cities.values();
+		response.geography = gameData.geography;
 		// Convert from loads to set of cities to loads to set of city names
 		response.loadset = new HashMap<String, Set<String>>();
 		for (String load: gameData.loads.keySet()) {
@@ -215,8 +206,23 @@ public class TrainServer {
 				cities.add(city.name);
 			response.loadset.put(load, cities);
 		}
-		response.gid = gameId;
+		response.gid = gid;
 		return gsonBuilder.create().toJson(response);
+	}
+	
+	static public String newGame(String requestText) throws GameException {			
+		String gameId = null;
+		Gson gson = new GsonBuilder().create();
+		NewGameData data = gson.fromJson(requestText, NewGameData.class);
+		
+		GameData gameData = new GameData(data.gameType);
+		if (data.ruleSet == null)
+			data.ruleSet = new RuleSet(4, 70, 1);
+		Game game = new Game(gameData, data.ruleSet);
+		gameId = gameNamer.nextString();
+		games.put(gameId, game);
+		game.joinGame(data.pid, data.color);
+		return buildNewGameResponse(gameId, gameData);
 	}
 
 	static class JoinGameData {
@@ -225,7 +231,7 @@ public class TrainServer {
 		public String color;
 		}
 	
-	static public void joinGame(String requestText) throws GameException {
+	static public String joinGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
 		Game game = games.get(data.gid);
@@ -237,7 +243,21 @@ public class TrainServer {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		}
 		game.joinGame(data.pid, data.color);
+		return buildNewGameResponse(data.gid, game.gameData);
+	}
 
+	static public String resumeGame(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+		{
+			log.warn("Can't find game {}", data.gid);
+			for (String key: games.keySet())
+				log.info("found gid {}", key);
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		}
+		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
 	static class StartGameData {

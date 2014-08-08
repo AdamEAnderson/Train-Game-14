@@ -90,6 +90,7 @@ public class GameTest {
         game.endTurn(game.getActivePlayer().name);	// skip over other players
         game.endTurn(game.getActivePlayer().name);
         game.endTurn(game.getActivePlayer().name);
+        activePlayer = game.getActivePlayer().name;
         game.upgradeTrain(activePlayer, 0, UpgradeType.CAPACITY);
         
         game.startTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!

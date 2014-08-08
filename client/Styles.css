@@ -16,6 +16,14 @@ body
 	display: none;
 }
 
+#geographyPicker { width: 200px; }
+
+#geographyPicker-button
+{
+	font-size: 0.9em;
+	margin-top: 10px;
+}
+
 #lobbyText { margin: 0 0 5px 23px; }
 #colorPicker { width: 200px; }
 #colorPicker-button { font-size: 0.9em; }

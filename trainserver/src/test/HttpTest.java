@@ -57,23 +57,7 @@ public class HttpTest {
 		
 	}
 	
-	// Send a simple POST request to the server with the message as content and return the result code
-	private static String sendMessage(HttpURLConnection connection, String message, boolean isPost) throws IOException, InterruptedException {
-		
-        String charset = "UTF-8";
-        connection.setRequestProperty("Accept-Charset", charset);
-        if (isPost)
-        	connection.setDoOutput(true);
-        else
-            connection.setRequestMethod("GET");
-        connectToServer(connection);
-
-        if (message != null || message.length() > 0)
-        	connection.getOutputStream().write(message.getBytes());
-        // give it 15 seconds to respond
-        connection.setReadTimeout(15*1000);
-        
-        
+	private static String getResponse(HttpURLConnection connection) throws IOException {
         // read the output from the server
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder stringBuilder = new StringBuilder();
@@ -83,6 +67,23 @@ public class HttpTest {
           stringBuilder.append(line + "\n");
 
         return stringBuilder.toString();
+	}
+	
+	// Send a simple POST request to the server with the message as content and return the result code
+	private static String sendMessage(HttpURLConnection connection, String message, boolean isPost) throws IOException, InterruptedException {
+		
+        String charset = "UTF-8";
+        connection.setRequestProperty("Accept-Charset", charset);
+        if (isPost)
+        	connection.setDoOutput(true);
+        connectToServer(connection);
+
+        if (message != null || message.length() > 0)
+        	connection.getOutputStream().write(message.getBytes());
+        // give it 15 seconds to respond
+        connection.setReadTimeout(15*1000);
+
+        return getResponse(connection);
     }
 
 	// Send a simple POST request to the server with the message as content and return the result code
@@ -96,7 +97,8 @@ public class HttpTest {
     }
 
 	private static String list(String listType, String expectedGid) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"list\", \"listType\":\"%s\"}", listType);
+		String jsonPayload = String.format("{\"messageType\":\"list\",\"listType\":\"%s\"}", listType);
+		jsonPayload = jsonPayload.replace("\"", "%22");	// url encode double quotes
 		log.info("jsonPayload {}", jsonPayload);
 
 		String url = serverURL + "?" + jsonPayload;	// form query string
@@ -107,11 +109,11 @@ public class HttpTest {
         int code = connection.getResponseCode();
         System.out.println("Got response code " + code);
 
-        String responseMessage = sendGetMessage(connection, null);
+        String responseMessage = getResponse(connection);
         log.info("Got response message: {}", responseMessage);
         assertEquals(connection.getResponseCode(), 200);
-        assertTrue(responseMessage.startsWith("{\"gids\":\""));
-        String gid = responseMessage.substring(8, 16);
+        assertTrue(responseMessage.startsWith("{\"gids\":["));
+        String gid = responseMessage.substring(10, 18);
         assertEquals(expectedGid, gid);
         return gid;
 	}
@@ -265,7 +267,7 @@ public class HttpTest {
         String gid = newGame("Adam", "red");
         list("joinable", gid);	// the new game should appear in the list of joinable games
         joinGame(gid, "Sandra", "green");
-        joinGame(gid, "Sandy", "red");
+        joinGame(gid, "Sandy", "aqua");
         joinGame(gid, "Robin", "purple");
         startGame(gid, "Adam");
      /*   All of the following requires getting status messages 

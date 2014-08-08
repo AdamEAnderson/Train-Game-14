@@ -49,6 +49,7 @@ public class GameData {
 	TrainMap map;		/** Mileposts, cities, building costs */
 	Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
 	Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
+	String geography;	/** which game is played (africa, russia, china, etc.) */
 	
 	/** Directory where data for all games is stored */
 	static private String dataDirectoryPath = null;
@@ -84,6 +85,7 @@ public class GameData {
 		queue.addAll(list);
 		deck = queue;
 		map = getMapData(gameType, cities);
+		geography = gameType;
 	}
 	
 	public Queue<Card> getDeck() { return deck; }
@@ -238,7 +240,7 @@ public class GameData {
 				List<String> cityloads = new ArrayList<String>();
 				for (int i = 1; i < fields.length && fields[i].length() > 0; ++i)
 					cityloads.add(fields[i]);
-				log.info("{} city {}", majorCity ? "Major" : "Minor", cityName);
+				log.debug("{} city {}", majorCity ? "Major" : "Minor", cityName);
 				City city = new City(cityName, cityloads, majorCity);
 				for (String load: cityloads) {
 					// Add it to the loads index
