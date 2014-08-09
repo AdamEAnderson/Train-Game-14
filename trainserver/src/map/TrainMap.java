@@ -39,12 +39,14 @@ public final class TrainMap {
 	/** Initialize the map data from a csv formatted string, where mileposts
 	 * are stored as fields in a 2-dimensional array, where each entry is one of:
 	 * b - blank (milepost does not exist here)
+	 * l - lake (milepost is underwater : does not exist here)
 	 * m - normal milepost
 	 * d - desert milepost
 	 * h - mountain milepost
 	 * a - alpine milepost
 	 * f - forest milepost
 	 * j - jungle milepost
+	 * u - chunnel milepost
 	 * cName - city milepost, where Name is name of the city
 	 * ccName - major city milepost, where Name is name of the city
 	 * 
@@ -106,6 +108,9 @@ public final class TrainMap {
 					break;
 				case "m":
 					mpType = Milepost.Type.NORMAL;
+					break;
+				case "u":
+					mpType = Milepost.Type.CHUNNEL;
 					break;
 				default:
 					String cityName;

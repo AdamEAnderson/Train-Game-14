@@ -10,17 +10,17 @@ public final class Edge {
 		int temp;
 		
 		switch (destination.type) {
+			case BLANK:
+				temp = Integer.MAX_VALUE;
+				break;
+			case CHUNNEL:
+				temp = 6;
+				break;
 			case ALPINE:
 				temp = 5;
 				break;
 			case MOUNTAIN:
 				temp = 2;
-				break;
-			case BLANK:
-				temp = Integer.MAX_VALUE;
-				break;
-			case DESERT:
-				temp = 1;
 				break;
 			case FOREST:
 				temp = 2;
@@ -31,12 +31,11 @@ public final class Edge {
 			case CITY:
 				temp = 3;
 				break;
+			case DESERT:
 			case MAJORCITY:
+			case NORMAL:
+			default:
 				temp = 1;
-				break;
-			default: 
-				temp = 1;
-				break;
 			}
 		
 		if (river) temp += 2;
