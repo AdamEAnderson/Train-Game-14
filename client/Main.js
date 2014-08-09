@@ -218,6 +218,17 @@ var enterLobby = function() {
 	}
 }
 
+// Return true if the milepost is top left of major city.
+// Top left will have preceding milepost not major city, following milepost is 
+// major city, and two rows below is not major city.
+// NOTE: incomplete major cities could mess this logic up!!
+var firstMajorCityMilepost = function(mp) {
+	return ((mp < 0 || gameData.mapData.orderedMileposts[mp - 1].type != 'MAJORCITY') && 
+		 gameData.mapData.orderedMileposts[mp + 1].type == 'MAJORCITY' && 
+		 mp + (gameData.mapData.mpWidth * 2) < gameData.mapData.orderedMileposts.length && 
+		 gameData.mapData.orderedMileposts[mp + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY');
+}
+
 var drawMileposts = function() {
 	var xDelta = gameData.mapData.mapWidth / gameData.mapData.mpWidth;
 	var yDelta = gameData.mapData.mapHeight / gameData.mapData.mpHeight;
@@ -238,6 +249,21 @@ var drawMileposts = function() {
 					milepostsGroup.push(paper.circle(x, y, 9).attr({'fill':'#d00','stroke-width':'0px','stroke':'#d00'}));
 					break;
 				case 'MAJORCITY':
+					// Draw the outline of the major city when we get to the first (top
+					// left) milepost of the city, so the stroke will come out below the
+					// mileposts. 
+					if (firstMajorCityMilepost(mp)) {
+						var pathString = "M" + x + " " + y + 
+							"L" + (x + xDelta) + " " + y + 
+							"L" + (x + (xDelta * 1.5)) + " " + (y + yDelta) +
+							"L" + (x + xDelta) + " " + (y + (yDelta * 2)) + 
+							"L" + x + " " + (y + (yDelta * 2)) + 
+							"L" + (x - (xDelta/2)) + " " + (y + yDelta) +
+							"L" + x + " " + y;
+						milepostsGroup.push(paper.path(pathString));
+						$('#milepostsGroup > path:last').attr({'stroke-width':'4px','stroke':'#d00'});
+						}
+					// fall through
 				case 'NORMAL':
 					milepostsGroup.push(paper.circle(x, y, 3).attr({'fill':'#000','stroke-width':'0px'}));
 					break;
