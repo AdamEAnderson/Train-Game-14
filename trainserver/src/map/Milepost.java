@@ -70,7 +70,7 @@ public class Milepost {
 		return builder.toString();
 	}
 
-	public boolean isCity(Milepost next) {
+	public boolean isSameCity(Milepost next) {
 		return this.city.equals(next.city);
 	}
 	

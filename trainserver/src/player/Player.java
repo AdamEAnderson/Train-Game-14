@@ -36,13 +36,11 @@ public class Player {
 		readyToStart = false;
 	}
 	
-	public void readyToStart(boolean ready) {
-		readyToStart = ready;
-	}
+	public void setNextPlayer(Player p){ nextPlayer = p;}
 	
-	public boolean readyToStart() {
-		return readyToStart;
-	}
+	public void readyToStart(boolean ready) { readyToStart = ready;}
+	
+	public boolean readyToStart() { return readyToStart; }
 	
 	public void startTrain(Milepost m, int t) throws GameException{
 		if (trains[t].getLocation() == null) trains[t].moveTrain(m);
@@ -54,7 +52,7 @@ public class Player {
 		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
-		if(l.isNeighbor(next) && (rail.connects(l, next) || l.isCity(next))) trains[t].moveTrain(next);
+		if(l.isNeighbor(next) && (rail.connects(l, next) || l.isSameCity(next))) trains[t].moveTrain(next);
 		else throw new GameException("InvalidMove");
 		movesMade++;
 		moveTrain(t, moves);

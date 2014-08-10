@@ -105,6 +105,7 @@ public class Game implements AbstractGame {
 			for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
 				last = temp;
 			}
+			last.setNextPlayer(first);
 			joinable = false;
 			++transaction;
 		}

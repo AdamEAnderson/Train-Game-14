@@ -1,11 +1,11 @@
 package map;
 
 
-public final class Edge {
+public class Edge {
 	public final Milepost destination;
 	public final int cost;
 
-	Edge(Milepost source, Milepost destination, boolean river, boolean lake){
+	Edge(Milepost destination, boolean river, boolean lake){
 		this.destination = destination;
 		int temp;
 		
@@ -40,8 +40,6 @@ public final class Edge {
 		
 		if (river) temp += 2;
 		if (lake) temp += 3;
-		
-		if (source.type == Milepost.Type.BLANK) temp = Integer.MAX_VALUE;
 		
 		cost = temp;
 	}

@@ -12,7 +12,7 @@ import map.Milepost;
 public class Rail {
 	
 	private Map<Milepost, Set<Milepost>> tracks; 
-		//all bindings are reversible: if a milepost is in another's set, that one's set contains the milepost
+		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
 	private Map<Milepost, Set<Milepost>> allTracks; //same object per game; holds everyone's tracks
 	
 	Rail(Map<Milepost, Set<Milepost>> all){

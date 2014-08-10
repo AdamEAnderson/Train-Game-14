@@ -171,7 +171,7 @@ public final class TrainMap {
 		boolean isSeaCrossing = isCrossing(sourceId, destinationId, seaCrossings);
 		
 		if (destination != null && destination.type != Milepost.Type.BLANK) {
-			edge = new Edge(source, destination, isRiverCrossing, isSeaCrossing);
+			edge = new Edge(destination, isRiverCrossing, isSeaCrossing);
 			log.debug("Generating edge from milepost [{}, {}] to milepost [{},{}]", source.y, source.x,
 					destination.y, destination.x);
 		}
