@@ -69,5 +69,9 @@ public class Milepost {
 		builder.append("]}");
 		return builder.toString();
 	}
+
+	public boolean isCity(Milepost next) {
+		return this.city.equals(next.city);
+	}
 	
 }

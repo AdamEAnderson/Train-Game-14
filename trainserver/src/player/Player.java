@@ -44,7 +44,7 @@ public class Player {
 		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
-		if(l.isNeighbor(next) && rail.connects(l, next)) trains[t].moveTrain(next);
+		if(l.isNeighbor(next) && (rail.connects(l, next) || l.isCity(next))) trains[t].moveTrain(next);
 		else throw new GameException("InvalidMove");
 		movesMade++;
 		moveTrain(t, moves);
