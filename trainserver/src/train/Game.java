@@ -105,7 +105,7 @@ public class Game implements AbstractGame {
 			for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
 				last = temp;
 			}
-			last.setNextPlayer(first);
+			last.resetNextPlayer(first);
 			joinable = false;
 			++transaction;
 		}
@@ -202,7 +202,7 @@ public class Game implements AbstractGame {
 			}
 			break;
 		case 1:
-			if(p.getNextPlayer() == getLastPlayer()){
+			if(getPrevPlayer(active) == getLastPlayer()){
 				turns++;
 			}else{
 				active = getPrevPlayer(active);
@@ -231,23 +231,20 @@ public class Game implements AbstractGame {
 		throw new GameException("PlayerNotFound");
 	}
 	
-	Player getLastPlayer(){
-		return last;
-	}
+	Player getLastPlayer(){	return last; }
 	
 	Player getPrevPlayer(Player p){
-		Player i = p;
-		do{
-			i = p.getNextPlayer();
-		}while (i.getNextPlayer() != p);
-		return i;
+		for(Player i : players){
+			if(i.getNextPlayer() == p) return i;
+		}
+		return null;
 	}
 	
-	List<Player> getPlayers(){
-		return players;
-	}
+	List<Player> getPlayers(){ return players; }
 	
 	boolean getJoinable() {return joinable;}
+	
+	public int getTurns() { return turns; }
 
 	private void checkActive(String pid) throws GameException {
 		if (!(getPlayer(pid) == active)) 

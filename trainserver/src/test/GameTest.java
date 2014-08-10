@@ -55,7 +55,16 @@ public class GameTest {
         for (int i = 0; i < handSize; ++i)
         	cards[i] = new Card(trips);
         game.getActivePlayer().testReplaceCards(cards);
-        game.pickupLoad(activePlayer, 0, "Diamonds");
+        
+        
+        int i = game.getTurns();
+        for(Player p = game.getActivePlayer(); i < 6; p = game.getActivePlayer()){
+        	i = game.getTurns();
+        	game.endTurn(p.name);
+        	log.info("Active player is {}", p.name);
+        	log.info("Increment is {}", i);
+        }
+        /*game.pickupLoad(activePlayer, 0, "Diamonds");
         game.pickupLoad(activePlayer, 0, "Arms");
         mileposts = new MilepostId[]{ new MilepostId(33, 58), new MilepostId(32, 58),
             	new MilepostId(31, 59) };
@@ -66,7 +75,7 @@ public class GameTest {
         game.endTurn(game.getActivePlayer().name);
         game.endTurn(game.getActivePlayer().name);
         String lastPlayer = game.getActivePlayer().name;
-        game.endGame(lastPlayer);
+        game.endGame(lastPlayer);*/
     }
 	
 	// Upgrade to a 3-hauler

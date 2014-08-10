@@ -36,12 +36,6 @@ public class Player {
 		readyToStart = false;
 	}
 	
-	public void setNextPlayer(Player p){ nextPlayer = p;}
-	
-	public void readyToStart(boolean ready) { readyToStart = ready;}
-	
-	public boolean readyToStart() { return readyToStart; }
-	
 	public void startTrain(Milepost m, int t) throws GameException{
 		if (trains[t].getLocation() == null) trains[t].moveTrain(m);
 		else throw new GameException("TrainAlreadyStarted");
@@ -135,41 +129,27 @@ public class Player {
 		return nextPlayer;
 	}
 	
-	public void resetNextPlayer(Player p){
-		nextPlayer = p;
-	}
+	public void readyToStart(boolean ready) { readyToStart = ready;}
 	
-	public String getPid(){
-		return name;
-	}
+	public boolean readyToStart() { return readyToStart; }
 	
-	public Player getNextPlayer(){
-		return nextPlayer;
-	}
+	public void resetNextPlayer(Player p){ nextPlayer = p; }
 	
-	public int getMoney() {
-		return money;
-	}
+	public String getPid(){ return name; }
 	
-	public int getSpending(){
-		return spendings;
-	}
+	public Player getNextPlayer(){ return nextPlayer; }
 	
-	public int getMovesMade(){
-		return movesMade;
-	}
+	public int getMoney() {	return money; }
 	
-	public Card[] getCards(){
-		return cards;
-	}
+	public int getSpending(){ return spendings; }
 	
-	public Train[] getTrains(){
-		return trains;
-	}
+	public int getMovesMade(){ return movesMade; }
 	
-	public Rail getRail(){
-		return rail;
-	}
+	public Card[] getCards(){ return cards; }
+	
+	public Train[] getTrains(){ return trains; }
+	
+	public Rail getRail(){ return rail; }
 	
 	/** Returns the money offered for the highest-paying trip in this players
 	 * hand of cards.

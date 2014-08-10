@@ -46,25 +46,12 @@ public class TrainServer {
 		return games.get(gid);		
 	}
 	
-	static class CardStatus {
-		public CardTripStatus[] trips;
-		CardStatus() {}
-	}
-	
-	static class CardTripStatus {
-		public String dest;
-		public String load;
-		public int cost;
-		CardTripStatus() {}
-	}
-	
 	static class PlayerStatus {
 		public String pid;
 		public String color;
 		public Train[] trains;
 		public int money;
 		public Map<MilepostId, Set<MilepostId>> rail;
-		//public CardStatus[] hand;
 		public Card[] hand;
 		public int spendings;
 		public int movesMade;
@@ -77,6 +64,7 @@ public class TrainServer {
 		public String lastid;
 		public String geography;
 		public boolean joinable;
+		public int turns;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
 		public int transaction;
 		GameStatus() {}
@@ -106,6 +94,7 @@ public class TrainServer {
 		status.geography = game.gameData.geography;
 		status.transaction = game.transaction();
 		status.joinable = game.getJoinable();
+		status.turns = game.getTurns();
 		Player p = game.getActivePlayer();
 		if(game.getLastPlayer() == null) {
 			status.activeid = "";
