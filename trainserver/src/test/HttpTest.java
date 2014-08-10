@@ -142,8 +142,8 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void startGame(String gid, String pid) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"startGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, pid);
+	private static void startGame(String gid, String pid, boolean ready) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"startGame\", \"gid\":\"%s\", \"pid\":\"%s\", \"ready\":\"%s\"}", gid, pid, ready);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -269,7 +269,10 @@ public class HttpTest {
         joinGame(gid, "Sandra", "green");
         joinGame(gid, "Sandy", "aqua");
         joinGame(gid, "Robin", "purple");
-        startGame(gid, "Adam");
+        startGame(gid, "Adam", true);
+        startGame(gid, "Robin", true);
+        startGame(gid, "Sandy", true);
+        startGame(gid, "Sandra", true);
      /*   All of the following requires getting status messages 
       * so we can use the correct player, etc.
         String mileposts = "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1},{\"x\":2,\"y\":2}]";

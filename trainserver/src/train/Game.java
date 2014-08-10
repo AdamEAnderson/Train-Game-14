@@ -84,18 +84,30 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void startGame(String pid) throws GameException {
-		log.info("startGame(pid={})", pid);
-		Player first = players.get(0);
-		for(int i = 1; i < players.size(); i++){
-			if(first.getMaxTrip() < players.get(i).getMaxTrip()) first = players.get(i);
+	public void startGame(String pid, boolean ready) throws GameException {
+		log.info("startGame(pid={}, ready={})", pid, ready);
+		Player p = getPlayer(pid);
+		p.readyToStart(ready);
+		
+		boolean start = true;
+		for (Player player: players)
+			if (!player.readyToStart())
+				start = false;
+		
+		if (start) {	// All players are ready to start - start the game
+			log.info("Starting game");
+			Player first = players.get(0);
+			for(int i = 1; i < players.size() && p.readyToStart(); i++){
+				if(first.getMaxTrip() < players.get(i).getMaxTrip()) first = players.get(i);
+			}
+	
+			active = first;
+			for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
+				last = temp;
+			}
+			joinable = false;
+			++transaction;
 		}
-		active = first;
-		for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
-			last = temp;
-		}
-		joinable = false;
-		++transaction;
 	}
 
 	@Override
@@ -233,6 +245,8 @@ public class Game implements AbstractGame {
 	List<Player> getPlayers(){
 		return players;
 	}
+	
+	boolean getJoinable() {return joinable;}
 
 	private void checkActive(String pid) throws GameException {
 		if (!(getPlayer(pid) == active)) 

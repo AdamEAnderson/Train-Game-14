@@ -17,7 +17,8 @@ interface AbstractGame {
 	void joinGame(String player, String color) throws GameException;
 	
 	/** Start the game. 
-	 * All players should by now have joined. Game moves into building turns.
+	 * Players signal when they are ready to start the game. When all players are ready,
+	 * the game is started.
 	 * @param pid Player who started the game
 	 * @throws GameException
 	 * 
@@ -26,7 +27,7 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void startGame(String player) throws GameException;
+	void startGame(String player, boolean ready) throws GameException;
 	
 	/** Player builds new track
 	 * @param player	Player who is building
