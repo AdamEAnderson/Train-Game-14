@@ -4,11 +4,15 @@ var paper, panZoom;
 var server = location.origin.replace(/\:[0-9]+/,'') + ':8080';
 var pid, gid;
 var lastStatus;
+var lastStatusMessage;
+var yourTurn;
 var gameData;
 var mapHeight, mapWidth;
 var mileposts = {};
 var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE'/*, 'FOREST'*/];
 var geography;
+var started = false;
+var placedTrain = false;
 
 //Loaded
 $(document).ready(function(){
@@ -140,7 +144,16 @@ var joinGame = function(GID,color,handle) {
 
 //Tells server to resume a game
 var resumeGame = function(GID,handle) {
-	post({messageType:'resumeGame', gid:GID, pid:handle}, function(data){gid = GID; $('#mainMenu').hide(); $('#lobby').show();});
+	post({messageType:'resumeGame', gid:GID, pid:handle}, function(data) {
+		gameData = data;
+		gid = GID; 
+		pid = handle;
+		for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
+			gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
+		geography = data.geography;
+		console.log("resume game: " + gid);
+		enterLobby();
+	});
 	pid = handle;
 };
 
@@ -200,11 +213,16 @@ var initMap = function(geography) {
 
 var enterLobby = function() {
 	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
-	$('#lobby').append('<div id="players"/>');
+	$('#lobby').append($('<div id="topBar"/>').append('<div id="players"/>','<div id="controls"/>'));
 	$('#lobby').append('<div id="map"/>');
 	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
 	$('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
 	$('#lobbyMenuJUI').menu();
+	$('#controls').append('<input id="startGame" type="checkbox"><label for="startGame">Start Game</label></input>');
+	$('#controls').buttonset();
+	$('#startGame').change(function(){
+		startGame($('#startGame')[0].checked);
+	});
 	paper = new Raphael('map',$('#map').width(),$('#map').height());
 	$('#map').resize(function(){
 		paper.setSize($('#map').width(),$('#map').height());
@@ -285,35 +303,34 @@ var drawMileposts = function() {
 }
 
 //Tells server to start the game(from host)
-var startGame = function() {
-	post({messageType:'startGame', gid:gid, pid:pid},function(){});
+var startGame = function(checked) {
+	post({messageType:'startGame', gid:gid, pid:pid, ready:checked});
 };
 
 //Tells server we've built track
 var builtTrack = function(edges) {
-	post({messageType:'trackBuilt',pid:pid,gid:gid,edgesBuilt:edges},processStatus);
+	post({messageType:'trackBuilt',pid:pid,gid:gid,edgesBuilt:edges});
 };
 
 //Tells server we've started our train
 var startedTrain = function(position) {
-	post({messageType:'startedTrain',pid:pid,gid:gid,position:position},processStatus);
+	post({messageType:'startedTrain',pid:pid,gid:gid,position:position});
 };
 
 //Tells server we've upgraded our train
 var upgradedTrain = function(trainState) {
-	post({messageType:'upgradedTrain',pid:pid,gid:gid,upgradeState:trainState},processStatus);
+	post({messageType:'upgradedTrain',pid:pid,gid:gid,upgradeState:trainState});
 };
 
 //Tells server we're done with our turn
 var endTurn = function() {
-	post({messageType:'endTurn',pid:pid,gid:gid},processStatus);
+	post({messageType:'endTurn',pid:pid,gid:gid});
+	$('#turnControls').buttonset('option','disabled',true);
 };
 
 //Tells server our game is done(from host)
-var endGame = function() {
-	post({messageType:'endGame',pid:pid,gid:gid},processStatus);
-	gid = undefined;
-	pid = undefined;
+var endGame = function(checked) {
+	post({messageType:'endGame',pid:pid,gid:gid,ready:checked});
 }
 
 //Gets a status response from the server
@@ -340,7 +357,7 @@ var statusGet= function() {
 var refreshPlayers = function(players) {
 	$('#players').empty();
 	for(var i = 0; i < players.length; i++){
-		$('#players').append('<input type="radio" id="' + i + '"><label for="' + i + '">' + players[i].pid + '</label></input>');
+		$('#players').append($('<input type="radio" id="' + i + '"><label for="' + i + '">' + players[i].pid + '</label></input>').attr({'readonly':'','disabled':''}));
 	}
 	$('#players').buttonset();
 }
@@ -385,15 +402,66 @@ var findPid = function(players, pid) {
 //Processes a status response from the server
 var processStatus = function(data) {
 	if (data.transaction != lastStatus) {
+		if(!started && data.joinable == false) {
+			started = true;
+			console.log('Started Game!');
+			$('#controls').buttonset('destroy');
+			$('#controls').empty();
+			$('#controls').append('<div id="turnControls"/>');
+			$('#controls').append('<div id="endControls"/>');
+			$('#endControls').append('<input type="checkbox" id="endGame"><label for="endGame">End Game</label></input>');
+			$('#endControls').append('<button id="resign">Resign</button>');
+			$('#endGame').change(function() {
+				endGame($('#endGame')[0].checked);
+			});
+			$('#resign').click(function() {
+				//Open confirm box for them and make sure they want to resign
+				//If they do, post to the server telling it to resign this player
+			});
+			$('#turnControls').append('<button id="build">Build</button>');
+			$('#turnControls').append('<button id="upgrade">Upgrade</button>');
+			$('#turnControls').append($('<button id="move">Move</button>').hide());
+			$('#turnControls').append($('<button id="deliver">Deliver</button>').hide());
+			$('#turnControls').append($('<button id="pickup">Pickup</button>').hide());
+			$('#turnControls').append($('<button id="drop">Drop</button>').hide());
+			$('#turnControls').append($('<button id="placeTrain">Place Train</button>').hide().click(function(){
+				//Place Train Code Goes Here
+				$('#move').show();
+				$('#drop').show();
+				$('#placeTrain').hide();
+				placedTrain = true;
+			}));
+			$('#turnControls').append('<button id="endTurn">End Turn</button>').click(function(){
+				endTurn();
+			});
+			$('#turnControls').buttonset();
+			$('#turnControls').buttonset('option','disabled',data.activeid != pid)
+			$('#endControls').buttonset();
+			yourTurn = data.activeid == pid;
+		}
 		if (!geography && data.geography) {
 			geography = data.geography;
 			initMap(data.geography);
 		}
+		if(data.turns == 3 && placedTrain == false){
+			$('#placeTrain').show();
+		}
 		refreshPlayers(data.players);
+		if(started)
+			$('#0').next().addClass('ui-state-active');
 		me = findPid(data.players, pid);
 		refreshCards(me.hand);
 		refreshTrains(me.trains);
 		refreshMoney(me.money);
+		if(data.activeid && data.activeid == pid) {
+			yourTurn = true;
+			$('#turnControls').buttonset('option','disabled',false);
+		}
+		else if(data.activeid && data.activeid != pid) {
+			yourTurn = false;
+			$('#turnControls').buttonset('option','disabled',true);
+		}
+		lastStatusMessage = data;
 		/*
 		if(data.events) {
 			for(var i = 0; i < data.events.length; i++) {

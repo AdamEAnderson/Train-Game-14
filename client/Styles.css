@@ -39,8 +39,49 @@ body
 
 #players
 {
-	height: 10%;
-	width: 100%;
+	height: 100%;
+	width: 40%;
+	padding-top:2px;
+}
+
+#players > .ui-button-disabled {
+	opacity:1 !important;
+}
+
+#controls
+{
+	height:100%;
+	width:60%;
+	position:relative;
+	top:-100%;
+	left:40%;
+}
+
+#turnControls
+{
+	height:100%;
+	width:70%;
+}
+
+#pickup,#deliver
+{
+	display:none;
+}
+
+#endControls
+{
+	height:100%;
+	width:30%;
+	position:relative;
+	top:-100%;
+	left:70%;
+}
+
+#topBar
+{
+	overflow: hidden;
+	width:100%;
+	height:10%;
 }
 
 #map
