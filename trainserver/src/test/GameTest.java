@@ -32,7 +32,10 @@ public class GameTest {
         game.joinGame("Sandra", "green");
         game.joinGame("Sandy", "red");
         game.joinGame("Robin", "purple");
-        game.startGame("Adam");
+        game.startGame("Adam", true);
+        game.startGame("Robin", true);
+        game.startGame("Sandy", true);
+        game.startGame("Sandra", true);
         
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
@@ -78,7 +81,10 @@ public class GameTest {
         game.joinGame("Sandra", "green");
         game.joinGame("Sandy", "red");
         game.joinGame("Robin", "purple");
-        game.startGame("Adam");
+        game.startGame("Adam", true);
+        game.startGame("Robin", true);
+        game.startGame("Sandy", true);
+        game.startGame("Sandra", true);
         
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
@@ -134,7 +140,10 @@ public class GameTest {
         game.joinGame("Sandra", "green");
         game.joinGame("Sandy", "red");
         game.joinGame("Robin", "purple");
-        game.startGame("Adam");
+        game.startGame("Adam", true);
+        game.startGame("Robin", true);
+        game.startGame("Sandy", true);
+        game.startGame("Sandra", true);
         
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
@@ -194,7 +203,10 @@ public class GameTest {
         game.joinGame("Sandy", "red");
         game.joinGame("Robin", "purple");
         log.info("post-join status message {}", TrainServer.status(gid));
-        game.startGame("Adam");
+        game.startGame("Adam", true);
+        game.startGame("Robin", true);
+        game.startGame("Sandy", true);
+        game.startGame("Sandra", true);
         log.info("status after starting the game {}", TrainServer.status(gid));
         
         String activePlayer = game.getActivePlayer().name;

@@ -19,6 +19,7 @@ public class Player {
 	private Card[] cards;
 	private int spendings;
 	private int movesMade;
+	private boolean readyToStart;
 	
 	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
 			Player next, Map<Milepost, Set<Milepost>> globalRail){
@@ -32,6 +33,15 @@ public class Player {
 		this.color = color;
 		spendings = 0;
 		nextPlayer = next;
+		readyToStart = false;
+	}
+	
+	public void readyToStart(boolean ready) {
+		readyToStart = ready;
+	}
+	
+	public boolean readyToStart() {
+		return readyToStart;
 	}
 	
 	public void startTrain(Milepost m, int t) throws GameException{

@@ -76,6 +76,7 @@ public class TrainServer {
 		public String activeid;
 		public String lastid;
 		public String geography;
+		public boolean joinable;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
 		public int transaction;
 		GameStatus() {}
@@ -104,6 +105,7 @@ public class TrainServer {
 		status.players = new ArrayList<PlayerStatus>();
 		status.geography = game.gameData.geography;
 		status.transaction = game.transaction();
+		status.joinable = game.getJoinable();
 		Player p = game.getActivePlayer();
 		if(game.getLastPlayer() == null) {
 			status.activeid = "";
@@ -263,6 +265,7 @@ public class TrainServer {
 	static class StartGameData {
 		public String gid;
 		public String pid;
+		boolean ready;
 	}
 
 	static public void startGame(String requestText) throws GameException {
@@ -271,7 +274,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.startGame(data.pid);
+		game.startGame(data.pid, data.ready);
 	}
 
 	static class BuildTrackData {
