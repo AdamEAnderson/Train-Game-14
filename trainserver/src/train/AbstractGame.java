@@ -141,5 +141,5 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void endGame(String player) throws GameException;
+	void endGame(String player, boolean ready) throws GameException;
 }

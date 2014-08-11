@@ -107,34 +107,11 @@ public class GameTest {
         game.endTurn(game.getActivePlayer().name);
         activePlayer = game.getActivePlayer().name;
         game.upgradeTrain(activePlayer, 0, UpgradeType.CAPACITY);
-        
-        game.startTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
-        // Stack the player's hand with cards we can deliver
-        Trip[] trips = new Trip[3];
-        trips[0] = new Trip("Kimberley", "Diamonds", 12);
-        trips[1] = new Trip("Kimberley", "Arms", 6);
-        trips[2] = new Trip("Kimberley", "Ecotourists", 8);
-        int handSize = game.getRuleSet().handSize;
-        Card cards[] = new Card[handSize];
-        for (int i = 0; i < handSize; ++i)
-        	cards[i] = new Card(trips);
-        game.getActivePlayer().testReplaceCards(cards);
-        game.pickupLoad(activePlayer, 0, "Diamonds");
-        game.pickupLoad(activePlayer, 0, "Arms");
-        game.pickupLoad(activePlayer, 0, "Ecotourists");
-        mileposts = new MilepostId[]{ new MilepostId(33, 58), new MilepostId(32, 58),
-            	new MilepostId(31, 59) };
-        game.moveTrain(activePlayer, 0, mileposts);				// arrive in Kimberley
-        game.deliverLoad(activePlayer, 0, "Diamonds", 0);
-        game.deliverLoad(activePlayer, 0, "Arms", 1);
-        game.deliverLoad(activePlayer, 0, "Ecotourists", 2);
-        Player movingPlayer = game.getActivePlayer();
-        game.endTurn(activePlayer);
-        assertTrue(movingPlayer.getMoney() == 71);
         game.endTurn(game.getActivePlayer().name);
-        game.endTurn(game.getActivePlayer().name);
-        String lastPlayer = game.getActivePlayer().name;
-        game.endGame(lastPlayer);
+        game.endGame("Adam", true);
+        game.endGame("Robin", true);
+        game.endGame("Sandy", true);
+        game.endGame("Sandra", true);
     }
 	
 	// Play a short game with two trains
@@ -147,11 +124,7 @@ public class GameTest {
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Sandra", "green");
-        game.joinGame("Sandy", "red");
-        game.joinGame("Robin", "purple");
         game.startGame("Adam", true);
-        game.startGame("Robin", true);
-        game.startGame("Sandy", true);
         game.startGame("Sandra", true);
         
         String activePlayer = game.getActivePlayer().name;
@@ -161,10 +134,19 @@ public class GameTest {
             	new MilepostId(31, 59) };
         game.buildTrack(activePlayer, mileposts);
         assertTrue(game.getActivePlayer().getSpending() == 5);
-        
         game.startTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
         game.startTrain(activePlayer, 1, new MilepostId(31, 59));	// Kimberley!
+        game.endTurn(game.getActivePlayer().name);
+
+        // Skip past building turns
+        for(Player p = game.getActivePlayer(); game.getTurns() < 3; p = game.getActivePlayer()){
+        	game.endTurn(p.name);
+        	log.info("Active player is {}", p.name);
+        	log.info("Turn count is {}", game.getTurns());
+        }
         
+        log.info("Active player is {}", game.getActivePlayer().name);
+
         // Stack the player's hand with cards we can deliver
         Trip[] trips = new Trip[3];
         trips[0] = new Trip("Kimberley", "Diamonds", 12);
@@ -172,8 +154,8 @@ public class GameTest {
         trips[2] = new Trip("Johannesburg", "Uranium", 8);
         int handSize = game.getRuleSet().handSize;
         Card cards[] = new Card[handSize];
-        for (int i = 0; i < handSize; ++i)
-        	cards[i] = new Card(trips);
+        for (int j = 0; j < handSize; ++j)
+        	cards[j] = new Card(trips);
         game.getActivePlayer().testReplaceCards(cards);
         game.pickupLoad(activePlayer, 0, "Diamonds");
         game.pickupLoad(activePlayer, 0, "Arms");
@@ -194,8 +176,8 @@ public class GameTest {
         assertTrue(movingPlayer.getMoney() == 121);	// total should includes deliveries - building
         game.endTurn(game.getActivePlayer().name);
         game.endTurn(game.getActivePlayer().name);
-        String lastPlayer = game.getActivePlayer().name;
-        game.endGame(lastPlayer);
+        game.endGame("Adam", true);
+        game.endGame("Sandra", true);
     }
 	
 	@Test
@@ -204,19 +186,20 @@ public class GameTest {
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
-        String statusMsg = TrainServer.status(gid);
+        String jsonRequestPayload = "{\"gid\":\"" + gid + "\"}";
+        String statusMsg = TrainServer.status(jsonRequestPayload);
         log.info("empty status message {}", statusMsg);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Sandra", "green");
         game.joinGame("Sandy", "red");
         game.joinGame("Robin", "purple");
-        log.info("post-join status message {}", TrainServer.status(gid));
+        log.info("post-join status message {}", TrainServer.status(jsonRequestPayload));
         game.startGame("Adam", true);
         game.startGame("Robin", true);
         game.startGame("Sandy", true);
         game.startGame("Sandra", true);
-        log.info("status after starting the game {}", TrainServer.status(gid));
+        log.info("status after starting the game {}", TrainServer.status(jsonRequestPayload));
         
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
@@ -224,7 +207,7 @@ public class GameTest {
         mileposts = new MilepostId[]{ new MilepostId(34, 58), new MilepostId(33, 58), new MilepostId(32, 58),
             	new MilepostId(31, 59) };
         game.buildTrack(activePlayer, mileposts);
-        log.info("post track building {}", TrainServer.status(gid));
+        log.info("post track building {}", TrainServer.status(jsonRequestPayload));
 	}
 	
 }

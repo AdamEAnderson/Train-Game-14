@@ -462,14 +462,6 @@ var processStatus = function(data) {
 			$('#turnControls').buttonset('option','disabled',true);
 		}
 		lastStatusMessage = data;
-		/*
-		if(data.events) {
-			for(var i = 0; i < data.events.length; i++) {
-				if(data.events[i].type == 'startGame') {
-					//Init game here
-				}
-			}
-		} */
 		lastStatus = data.transaction;
 	}
 };

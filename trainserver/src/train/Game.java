@@ -31,7 +31,8 @@ public class Game implements AbstractGame {
 	private Player last;
 	private Map<Milepost, Set<Milepost>> globalRail;
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
-	private boolean joinable;
+	private boolean joinable;	// game has not yet started
+	private boolean ended; // game has ended
 	private int transaction;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
@@ -59,6 +60,8 @@ public class Game implements AbstractGame {
 	
 	public boolean isJoinable() { return joinable; }
 	
+	public boolean isOver() { return ended; }
+
 	public int transaction() { return transaction; }
 	
 	@Override
@@ -131,7 +134,6 @@ public class Game implements AbstractGame {
 			throws GameException {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
 		checkActive(pid);
-		checkBuilding();
 		active.upgradeTrain(train, upgrade);
 		++transaction;
 	}
@@ -217,10 +219,21 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void endGame(String pid) throws GameException {
-		log.info("endGame(pid={})", pid);
-		if(!(active == last)) throw new GameException("PlayerNotActive");
-		active.endTurn();
+	public void endGame(String pid, boolean ready) throws GameException {
+		log.info("endGame(pid={}, ready={})", pid, ready);
+		Player p = getPlayer(pid);
+		p.readyToEnd(ready);
+		
+		boolean end = true;
+		for (Player player: players)
+			if (!player.readyToEnd())
+				end = false;
+		
+		if (end) {	// All players are ready to end - end the game
+			log.info("ending game");
+			ended = true;
+			active = null;
+		}
 		++transaction;
 	}
 

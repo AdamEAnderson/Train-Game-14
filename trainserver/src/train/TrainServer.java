@@ -64,6 +64,7 @@ public class TrainServer {
 		public String lastid;
 		public String geography;
 		public boolean joinable;
+		public boolean ended;
 		public int turns;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
 		public int transaction;
@@ -94,6 +95,7 @@ public class TrainServer {
 		status.geography = game.gameData.geography;
 		status.transaction = game.transaction();
 		status.joinable = game.getJoinable();
+		status.ended = game.isOver();
 		status.turns = game.getTurns();
 		Player p = game.getActivePlayer();
 		if(game.getLastPlayer() == null) {
@@ -407,6 +409,7 @@ public class TrainServer {
 	static class EndGame {
 		public String gid;
 		public String pid;
+		public boolean ready;
 	}
 
 	static public void endGame(String requestText) throws GameException {
@@ -415,7 +418,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.endGame(data.pid);
+		game.endGame(data.pid, data.ready);
 	}
 	
 }
