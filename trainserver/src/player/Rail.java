@@ -39,7 +39,7 @@ public class Rail {
 	}
 	
 	boolean connectsByFerry(Milepost one, Milepost two){
-		return (ferries.containsKey(one) ? false : ferries.get(one).destination.equals(two));
+		return (ferries.containsKey(one) ? ferries.get(one).destination.equals(two) : false);
 	}
 	
 	boolean anyConnects(Milepost one, Milepost two){
