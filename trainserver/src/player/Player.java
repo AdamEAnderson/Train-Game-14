@@ -50,6 +50,14 @@ public class Player {
 		Milepost next = moves.poll();
 		if(l.isNeighbor(next) && (rail.connects(l, next) || l.isSameCity(next))) trains[t].moveTrain(next);
 		else throw new GameException("InvalidMove");
+		if(rail.connectsByFerry(l, next)){
+			if(movesMade == 0){
+				movesMade = (trains[t].getSpeed())/2;
+			} else{
+				trains[t].moveTrain(l);
+				throw new GameException("InvalidMove");
+			}
+		}
 		movesMade++;
 		moveTrain(t, moves);
 	}

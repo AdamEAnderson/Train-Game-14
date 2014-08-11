@@ -20,9 +20,7 @@ public class Train {
 	/** Moves the train to the given location.
 	 * Does no checks for the legality of the move.
 	 */
-	void moveTrain(Milepost location){
-		loc = location;
-	}
+	void moveTrain(Milepost location){ loc = location;}
 	
 	public void upgradeSpeed() throws GameException {
 		if(speed < 20){
@@ -75,17 +73,11 @@ public class Train {
 		throw new GameException("TrainFull");
 	}
 	
-	public int getSpeed(){
-		return speed;
-	}
+	public int getSpeed(){ return speed;}
 	
-	public int getCapacity(){
-		return capacity;
-	}
+	public int getCapacity(){ return capacity;}
 	
-	public String[] getLoads(){
-		return loads;
-	}
+	public String[] getLoads(){	return loads;}
 	
 	public boolean containsLoad(String l){
 		for(int i = 0; i < loads.length; i++){
@@ -94,7 +86,5 @@ public class Train {
 		return false;
 	}
 	
-	public Milepost getLocation(){
-		return loc;
-	}
+	public Milepost getLocation(){ return loc;}
 }

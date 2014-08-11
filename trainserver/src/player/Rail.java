@@ -7,6 +7,7 @@ import java.util.Set;
 import train.GameException;
 
 import map.Edge;
+import map.Ferry;
 import map.Milepost;
 
 public class Rail {
@@ -14,10 +15,12 @@ public class Rail {
 	private Map<Milepost, Set<Milepost>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
 	private Map<Milepost, Set<Milepost>> allTracks; //same object per game; holds everyone's tracks
+	private Map<Milepost, Ferry> ferries;
 	
 	Rail(Map<Milepost, Set<Milepost>> all){
 		allTracks = all;
 		tracks = new HashMap<Milepost, Set<Milepost>>();
+		ferries = new HashMap<Milepost, Ferry>();
 	}
 	
 	public Map<Milepost, Set<Milepost>> getRail(){
@@ -33,6 +36,10 @@ public class Rail {
 	 */
 	boolean connects(Milepost one, Milepost two){
 		return tracks.get(one).contains(two);
+	}
+	
+	boolean connectsByFerry(Milepost one, Milepost two){
+		return (ferries.containsKey(one) ? false : ferries.get(one).destination.equals(two));
 	}
 	
 	boolean anyConnects(Milepost one, Milepost two){
@@ -54,7 +61,19 @@ public class Rail {
 			tracks.put(next, new HashSet<Milepost>());
 		}
 		tracks.get(next).add(origin);
-		int cost = getEdge(origin, next).cost;
+		Edge e = getEdge(origin, next);
+		if(e instanceof Ferry){
+			Edge back = getEdge(next, origin);
+			if(back instanceof Ferry){
+				ferries.put(origin, (Ferry) e);
+				ferries.put(next, (Ferry) back);
+			}
+			else {
+				erase(origin, next);
+				throw new GameException("InvalidTrack");
+			}
+		}
+		int cost = e.cost;
 		return cost;
 	}
 	
