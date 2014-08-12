@@ -106,8 +106,12 @@ public class GameTest {
         game.endTurn(game.getActivePlayer().name);
         game.endTurn(game.getActivePlayer().name);
         activePlayer = game.getActivePlayer().name;
-        game.upgradeTrain(activePlayer, 0, UpgradeType.CAPACITY);
+        game.upgradeTrain(activePlayer, 0, UpgradeType.CAPACITY);	// upgrade during building turn
         game.endTurn(game.getActivePlayer().name);
+        skipPastBuildingTurns(game);
+        
+        game.upgradeTrain(game.getActivePlayer().name, 0, UpgradeType.SPEED);	// upgrade during standard turn
+
         game.endGame("Adam", true);
         game.endGame("Robin", true);
         game.endGame("Sandy", true);
@@ -138,12 +142,7 @@ public class GameTest {
         game.startTrain(activePlayer, 1, new MilepostId(31, 59));	// Kimberley!
         game.endTurn(game.getActivePlayer().name);
 
-        // Skip past building turns
-        for(Player p = game.getActivePlayer(); game.getTurns() < 3; p = game.getActivePlayer()){
-        	game.endTurn(p.name);
-        	log.info("Active player is {}", p.name);
-        	log.info("Turn count is {}", game.getTurns());
-        }
+        skipPastBuildingTurns(game);
         
         log.info("Active player is {}", game.getActivePlayer().name);
 
@@ -210,4 +209,12 @@ public class GameTest {
         log.info("post track building {}", TrainServer.status(jsonRequestPayload));
 	}
 	
+	private void skipPastBuildingTurns(Game game) throws GameException {
+        // Skip past building turns
+        for(Player p = game.getActivePlayer(); game.getTurns() < 3; p = game.getActivePlayer()){
+        	game.endTurn(p.name);
+        	log.info("Active player is {}", p.name);
+        	log.info("Turn count is {}", game.getTurns());
+        }
+	}
 }

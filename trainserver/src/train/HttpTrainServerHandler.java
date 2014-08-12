@@ -210,7 +210,11 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private static String parseMessageType(String requestText) {
 		// String extends from the 3rd to the fourth 4th quote
 		int startIndex = findNthExprInString(requestText, "\"", 3);
+		if (startIndex < 0 && startIndex >= requestText.length())
+			return "badMessage";
 		int endIndex = findNthExprInString(requestText, "\"", 4);
+		if (endIndex < 0 && endIndex >= requestText.length())
+			return "badMessage";
 		return requestText.substring(startIndex + 1, endIndex);
 	}
 
