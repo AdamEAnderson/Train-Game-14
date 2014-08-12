@@ -82,10 +82,13 @@ public class Player {
 		if(mileposts.isEmpty()) return;
 		Milepost next = mileposts.peek();
 		
+		// We can only start building from the end of our track, or from a major city
 		if(!rail.contains(origin) && origin.type != Milepost.Type.MAJORCITY){
 			throw new GameException("InvalidTrack");
 		}
-		if(rail.anyConnects(origin, next)) throw new GameException("InvalidTrack"); 
+		
+		// Cannot build over track that has already been built
+		if(rail.anyConnects(origin, next)) throw new GameException("InvalidTrack");
 		if(!origin.isNeighbor(next)) throw new GameException("InvalidTrack");
 		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) 
 			throw new GameException("InvalidTrack");

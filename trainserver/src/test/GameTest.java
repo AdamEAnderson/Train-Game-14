@@ -1,6 +1,7 @@
 package test;
 
 import static org.junit.Assert.*;
+
 import map.MilepostId;
 
 import org.junit.Test;
@@ -178,6 +179,110 @@ public class GameTest {
         game.endGame("Adam", true);
         game.endGame("Sandra", true);
     }
+	
+	@Test
+	public void testBuild() throws GameException {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+        String responseMessage = TrainServer.newGame(jsonPayload);
+        log.info("newGame response {}", responseMessage);
+        String gid = responseMessage.substring(8, 16);
+        Game game = TrainServer.getGame(gid);
+        assertTrue(game != null);
+        game.joinGame("Sandra", "green");
+        game.startGame("Adam", true);
+        game.startGame("Sandra", true);
+        
+        // First player builds from Cairo to Luxor - check building into a city
+        log.info("Active player is {}", game.getActivePlayer().name);
+        MilepostId[] mileposts;
+        mileposts = new MilepostId[]{ new MilepostId(37, 8), new MilepostId(37, 9), new MilepostId(38, 10) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        assertEquals(game.getActivePlayer().getSpending(), 4);	// Incremental cost of 4
+        
+        // Build back into Cairo from Luxor
+        // Tests that player can build from end of their track into major city
+        mileposts = new MilepostId[]{ new MilepostId(38, 10), new MilepostId(37, 10), new MilepostId(36, 9), new MilepostId(36, 8) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        assertEquals(game.getActivePlayer().getSpending(), 7);	// Incremental cost of 3
+        game.endTurn(game.getActivePlayer().name);
+        
+        game.endTurn(game.getActivePlayer().name);
+        skipPastBuildingTurns(game);
+        
+        game.endGame("Adam", true);
+        game.endGame("Sandra", true);
+	}
+	
+	@Test
+	public void testBuildFromUnconnectedTrack()  {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        assertTrue(game != null);
+	        game.joinGame("Sandra", "green");
+	        game.startGame("Adam", true);
+	        game.startGame("Sandra", true);
+		} catch (GameException e) {
+			fail("Unexpected exception in test setup");
+		} 
+        
+        // First player builds from Luxor to Cairo - should fail because player hasn't build to Luxor
+        log.info("Active player is {}", game.getActivePlayer().name);
+        MilepostId[] mileposts;
+        mileposts = new MilepostId[]{ new MilepostId(38, 10), new MilepostId(37, 10), new MilepostId(36, 9), new MilepostId(36, 8) };
+        try {
+        	game.buildTrack(game.getActivePlayer().name, mileposts);
+        	fail("Build track should have thrown");
+        } catch (GameException e) {
+        }
+
+		try {
+	        game.endGame("Adam", true);
+	        game.endGame("Sandra", true);
+		} catch (GameException e) {
+			fail("Unexpected exception in test cleanup");
+		} 
+	}
+	
+	/** Test fails because allTrack is not updated 
+	@Test
+	public void testBuildOverExistingTrack()  {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        assertTrue(game != null);
+	        game.joinGame("Sandra", "green");
+	        game.startGame("Adam", true);
+	        game.startGame("Sandra", true);
+		} catch (GameException e) {
+			fail("Unexpected exception in test setup");
+		} 
+        
+        // First player builds from Luxor to Cairo - should fail because player hasn't build to Luxor
+        log.info("Active player is {}", game.getActivePlayer().name);
+        MilepostId[] mileposts;
+        mileposts = new MilepostId[]{ new MilepostId(37, 8), new MilepostId(37, 9), new MilepostId(38, 10) };
+        try {
+        	game.buildTrack(game.getActivePlayer().name, mileposts);
+        	game.endTurn(game.getActivePlayer().name);
+        	game.buildTrack(game.getActivePlayer().name, mileposts);	// next player builds same track
+        	fail("Build track should have thrown");
+        } catch (GameException e) {
+        }
+
+		try {
+	        game.endGame("Adam", true);
+	        game.endGame("Sandra", true);
+		} catch (GameException e) {
+			fail("Unexpected exception in test cleanup");
+		} 
+	} */
 	
 	@Test
 	public void testStatusMsg() throws GameException{

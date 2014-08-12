@@ -90,6 +90,8 @@ public class TrainServer {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		GameStatus status = new GameStatus();
 		Game game = getGame(gid);
+		if (game == null)
+			return "{}";
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
 		status.geography = game.gameData.geography;

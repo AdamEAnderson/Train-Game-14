@@ -37,7 +37,7 @@ public class Milepost {
 	
 	public boolean isNeighbor(Milepost m){
 		for(int i = 0; i < 6; i++){
-			if(edges[i].destination.equals(m)) return true;
+			if(edges[i] != null && edges[i].destination.equals(m)) return true;
 		}
 		return false;
 	}

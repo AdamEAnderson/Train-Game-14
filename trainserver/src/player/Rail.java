@@ -47,12 +47,7 @@ public class Rail {
 		return dests != null && allTracks.get(one).contains(two);
 	}
 	
-	/** Adds the given track to the player's rails, if and only if the track can be legally built.
-	 * @param origin: the milepost already attached to the rail; next is where
-	 * you build towards.
-	 * @return the cost of the build
-	 */
-	int build(Milepost origin, Milepost next) throws GameException {
+	static void addTrack(Map<Milepost, Set<Milepost>> tracks, Milepost origin, Milepost next) {
 		if(!tracks.containsKey(origin)){
 			tracks.put(origin, new HashSet<Milepost>());
 		}
@@ -61,6 +56,16 @@ public class Rail {
 			tracks.put(next, new HashSet<Milepost>());
 		}
 		tracks.get(next).add(origin);
+	}
+	
+	/** Adds the given track to the player's rails, if and only if the track can be legally built.
+	 * @param origin: the milepost already attached to the rail; next is where
+	 * you build towards.
+	 * @return the cost of the build
+	 */
+	int build(Milepost origin, Milepost next) throws GameException {
+		addTrack(tracks, origin, next);
+		//buildTracks(allTracks, origin, next);
 		Edge e = getEdge(origin, next);
 		if(e instanceof Ferry){
 			Edge back = getEdge(next, origin);
@@ -79,7 +84,7 @@ public class Rail {
 	
 	private Edge getEdge(Milepost origin, Milepost next){
 		for(int i = 0; i < origin.edges.length; i++){
-			if(origin.edges[i].destination.equals(next)){
+			if(origin.edges[i] != null && origin.edges[i].destination.equals(next)){
 				return origin.edges[i];
 			}
 		}
