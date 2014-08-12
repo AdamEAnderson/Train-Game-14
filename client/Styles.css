@@ -77,6 +77,12 @@ body
 	left:70%;
 }
 
+#buildControls
+{
+	height:100%:
+	width:100%;
+}
+
 #topBar
 {
 	overflow: hidden;
@@ -181,6 +187,27 @@ div.train > p:not(:last-child) { border-bottom: 1px solid black; }
 	display: block;
 	height: 27px;
 	width: 29px;
+}
+
+.no-close .ui-dialog-titlebar-close {
+	display: none;
+}
+
+#upgradeDialog > ul {
+	list-style-type:none;
+	padding:0;
+}
+
+#upgradeDialog > ul > li:hover {
+	background-color:#fff;
+	border:1px dashed #aaa;
+	border-radius: 1px;
+}
+
+#upgradeDialog > ul > li.clicked {
+	background-color:#fff;
+	border:1px solid #888 !important;
+	border-radius: 1px;
 }
 
 #mapControls

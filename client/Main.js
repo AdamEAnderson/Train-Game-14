@@ -13,6 +13,8 @@ var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE'/*, 'FOREST'*/];
 var geography;
 var started = false;
 var placedTrain = false;
+var moneySpent = 0;
+var verticesBuilt;
 
 //Loaded
 $(document).ready(function(){
@@ -94,6 +96,64 @@ $(document).ready(function(){
 	lastStatus = 0;
 	//statusGet();
 });
+
+var upgradeDialogStageTwo = function(train,skippedStageOne){
+	var upgrades = [];
+	if(train.capacity < 3) {
+		upgrades.push('Upgrade Capacity');
+	}
+	if(train.speed < 20) {
+		upgrades.push('Upgrade Speed');
+	}
+	if(upgrades.length == 1) {
+		if(skippedStageOne){
+			$('#upgradeDialog').append('<p>Are you sure you want to upgrade?</p>');
+			var buttons = $('#upgradeDialog').dialog('option','buttons');
+			buttons.push({
+				text:'Yes',
+				click:function(){
+					upgradedTrain(upgrades[0].replace('Upgrade ',''));
+					if((upgrades[0] == 'Upgrade Speed' && train.speed == 16) || (upgrades[0] == 'Upgrade Capacity' && train.capacity == 2))
+						$('#upgrade').hide();
+					$('#upgradeDialog').dialog('destroy');
+					$('#upgradeDialog').remove();
+				}
+			});
+			$('#upgradeDialog').dialog('option','buttons',buttons);
+		}
+		else {
+			upgradedTrain(upgrades[0].replace('Upgrade ',''));
+			checkUpgradeHiding();
+			$('#upgradeDialog').dialog('destroy');
+			$('#upgradeDialog').remove();
+		}
+	}
+	else if(upgrades.length == 2){
+		$('#upgradeDialog').append('<ul/>');
+		for(var i = 0; i < upgrades.length; i++) {
+			$('#upgradeDialog > ul').append('<li>' + upgrades[i] + '</li>').find('li:last').click(function(){
+				$('#upgradeDialog > ul > li').removeClass('clicked');
+				$(this).addClass('clicked');
+			});
+		}
+		var buttons = $('#upgradeDialog').dialog('option','buttons');
+		buttons.push({
+			text:'Upgrade',
+			click:function(){
+				if($('#upgradeDialog > ul > li.clicked').length == 1) {
+					upgradedTrain($('#upgradeDialog > ul > li.clicked').text().replace('Upgrade ',''));
+					$('#upgradeDialog').dialog('destroy');
+					$('#upgradeDialog').remove();
+				}
+			}
+		});
+		$('#upgradeDialog').dialog('option','buttons',buttons);
+	}
+};
+
+Array.prototype.clone = function() {
+	return this.slice(0);
+};
 
 var join = function(/* path segments */) {
 	// Split the inputs into a list of path commands.
@@ -265,6 +325,7 @@ var drawMileposts = function() {
 			switch(gameData.mapData.orderedMileposts[mp].type) {
 				case 'CITY':
 					milepostsGroup.push(paper.circle(x, y, 9).attr({'fill':'#d00','stroke-width':'0px','stroke':'#d00'}));
+					$('#milepostsGroup > circle:last').attr('id','milepost' + w.toString() + ',' + h.toString());
 					break;
 				case 'MAJORCITY':
 					// Draw the outline of the major city when we get to the first (top
@@ -284,6 +345,7 @@ var drawMileposts = function() {
 					// fall through
 				case 'NORMAL':
 					milepostsGroup.push(paper.circle(x, y, 3).attr({'fill':'#000','stroke-width':'0px'}));
+					$('#milepostsGroup > circle:last').attr('id','milepost' + w.toString() + ',' + h.toString());
 					break;
 				case 'BLANK':
 					break;
@@ -294,12 +356,17 @@ var drawMileposts = function() {
 					var scale = 0.035;
 					x -= (bbox.width / 2) * scale;
 					y -= (bbox.height / 2) * scale;
-					$('#milepostsGroup').find('g:last').attr('transform','translate(' + x + ',' + y + ') scale(' + scale + ')');
+					$('#milepostsGroup').find('g:last').attr('transform','translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id','milepost' + w + ',' + h);
 					break;
 			}
 			++mp;
 		}
 	}
+	$('#milepostsGroup > *:not(path)').click(function(){
+		console.log($(this).attr('id').replace('milepost',''));
+		var currentMilepost = $(this).attr('id').replace('milepost','').split(',');
+		console.log(gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])]);
+	});
 }
 
 //Tells server to start the game(from host)
@@ -309,22 +376,26 @@ var startGame = function(checked) {
 
 //Tells server we've built track
 var builtTrack = function(edges) {
-	post({messageType:'trackBuilt',pid:pid,gid:gid,edgesBuilt:edges});
+	post({messageType:'buildTrack',pid:pid,gid:gid,edgesBuilt:edges});
 };
 
 //Tells server we've started our train
 var startedTrain = function(position) {
-	post({messageType:'startedTrain',pid:pid,gid:gid,position:position});
+	post({messageType:'startTrain',pid:pid,gid:gid,position:position});
 };
 
 //Tells server we've upgraded our train
 var upgradedTrain = function(trainState) {
-	post({messageType:'upgradedTrain',pid:pid,gid:gid,upgradeState:trainState});
+	moneySpent += 20;
+	checkBuildMoney();
+	post({messageType:'upgradeTrain',pid:pid,gid:gid,upgradeType:trainState});
 };
 
 //Tells server we're done with our turn
 var endTurn = function() {
 	post({messageType:'endTurn',pid:pid,gid:gid});
+	moneySpent = 0;
+	checkBuildMoney();
 	$('#turnControls').buttonset('option','disabled',true);
 };
 
@@ -334,7 +405,7 @@ var endGame = function(checked) {
 }
 
 //Gets a status response from the server
-var statusGet= function() {
+var statusGet = function() {
 	setTimeout(200,statusGet);
 	
 	//Request status from server
@@ -360,7 +431,7 @@ var refreshPlayers = function(players) {
 		$('#players').append($('<input type="radio" id="' + i + '"><label for="' + i + '">' + players[i].pid + '</label></input>').attr({'readonly':'','disabled':''}));
 	}
 	$('#players').buttonset();
-}
+};
 
 var refreshCards = function(cards) {
 	$('#hand').empty();
@@ -375,7 +446,7 @@ var refreshCards = function(cards) {
 			//	$('#hand').children().eq(c).append('<div class="trip"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
 		}
 	}
-}
+};
 
 var refreshTrains = function(trains) {
 	$('#trains').empty();
@@ -385,7 +456,7 @@ var refreshTrains = function(trains) {
 		for (var l = 0; l < trains[t].loads.length; ++l)
 			$('#trains').children().eq(t).append('<p><span>' + trains[t].loads[l] + '</span></p>');
 	}
-}
+};
 
 var refreshMoney = function(money) {
 	$('#money').empty();
@@ -397,7 +468,16 @@ var findPid = function(players, pid) {
 		if (players[i].pid == pid)
 			return players[i];
 	return null;
-}
+};
+
+var checkBuildMoney = function(){
+	if(moneySpent > 0) {
+		$('#upgrade').button('option','disabled',true);
+	}
+	else {
+		$('#upgrade').button('option','disabled',false);
+	}
+};
 
 //Processes a status response from the server
 var processStatus = function(data) {
@@ -409,6 +489,9 @@ var processStatus = function(data) {
 			$('#controls').empty();
 			$('#controls').append('<div id="turnControls"/>');
 			$('#controls').append('<div id="endControls"/>');
+			$('#controls').append('<div id="buildControls"/>').find('div:last').hide();
+			$('#buildControls').append('<button id="acceptBuild">OK</button>')
+			$('#buildControls').append('<button id="cancelBuild">Cancel</button>');
 			$('#endControls').append('<input type="checkbox" id="endGame"><label for="endGame">End Game</label></input>');
 			$('#endControls').append('<button id="resign">Resign</button>');
 			$('#endGame').change(function() {
@@ -418,8 +501,92 @@ var processStatus = function(data) {
 				//Open confirm box for them and make sure they want to resign
 				//If they do, post to the server telling it to resign this player
 			});
-			$('#turnControls').append('<button id="build">Build</button>');
-			$('#turnControls').append('<button id="upgrade">Upgrade</button>');
+			$('#turnControls').append('<button id="build">Build</button>').find('button:last').click(function(){
+	/*			$('#turnControls').hide();
+				$('#endControls').hide();
+				$('#buildControls').show();
+				verticiesBuilt = [];
+				var milepostsClick = function(){
+					if(verticiesBuilt.length > 20 - moneySpent)
+						return;
+					var lastMilepost = verticiesBuilt[verticiesBuilt.length - 1];
+					lastMilepost = gameData.mapData.orderedMileposts[(lastMilepost.y * gameData.mapData.mpWidth) + lastMilepost.x];
+					var currentMilepost = $(this).attr('id').replace('milepost','').split(',');
+					currentMilepost = gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + currentMilepost[0]];
+					var isValidMilepost = false;
+					for(var i = 0; i < currentMilepost.edges.length; i++) {
+						if(currentMilepost.edges[i].x == lastMilepost.x && currentMilepost.edges[i].y == lastMilepost.y)
+							isValidMilepost = true;
+					}
+					if(isValidMilepost == false)
+						return;
+					var lastX, lastY;
+					if($(verticiesBuilt[verticiesBuilt.length - 1]).prop("tagName") == 'CIRCLE') {
+						lastX = $(verticiesBuilt[verticiesBuilt.length - 1]).attr('cx');
+						lastY = $(verticiesBuilt[verticiesBuilt.length - 1]).attr('cy');
+					}
+					else if($(verticiesBuilt[verticiesBuilt.length - 1]).prop("tagName") == 'G') {
+						var translate = $(verticiesBuilt[verticiesBuilt.length - 1]).attr('transform').replace(/\ scale\([0-9\.]+)\/,'').replace('transform(','').replace(')','').split(',');
+						lastX = translate[0];
+						lastY = translate[1];
+					}
+					if(!lastY || !lastX)
+						return;
+					
+				}
+				$('#milepostsGroup > *:not(path)').click(milepostsClick); */
+			});
+			$('#turnControls').append('<button id="upgrade">Upgrade</button>').find('button:last').click(function(){
+				for(var i = 0; i < lastStatusMessage.players.length; i++)
+					if(lastStatusMessage.players[i].pid == pid){
+						var player = lastStatusMessage.players[i];
+						$('#lobby').append('<div id="upgradeDialog" title="Upgrade Your Train" />').find('div:last').dialog({
+							dialogClass: "no-close",
+							buttons: [{
+								text: "Cancel",
+								click: function() {
+									$( this ).dialog( "destroy" );
+									$('#upgradeDialog').remove();
+								}
+							}]
+						});
+						var trains = player.trains.clone();
+						for(var i = 0; i < trains.length; i++){
+							if(trains[i].capacity == 3 && trains[i].speed == 20){
+								trains.splice(i,1);
+							}
+						}
+						if(trains.length > 1) {
+							$('#upgradeDialog').append('<ul/>');
+							for(var i = 0; i < player.trains.length; i++){
+								$('#upgradeDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function(){
+									$('#upgradeDialog > ul > li').removeClass('clicked');
+									$(this).addClass('clicked');
+								});
+							}
+							var buttons = $('#upgradeDialog').dialog('option','buttons');
+							buttons.push({
+								text:"OK",
+								click:function(){
+									$('#upgradeDialog').empty();
+									var buttons = $('#upgradeDialog').dialog('option','buttons');
+									buttons.pop();
+									$('#upgradeDialog').dialog('option','buttons',buttons);
+									upgradeDialogStageTwo(player.trains[parseInt($('#upgradeDialog > ul > li.clicked').text().replace('Train ',''))],false);
+								}
+							});
+							$('#upgradeDialog').dialog('option','buttons',buttons);
+						}
+						else if(trains.length == 1) {
+							upgradeDialogStageTwo(player.trains[0],true);
+						}
+						else if(trains.length == 0) {
+							checkUpgradeHiding();
+							$('#upgradeDialog').dialog('destroy');
+							$('#upgradeDialog').remove();
+						}
+					}
+			});
 			$('#turnControls').append($('<button id="move">Move</button>').hide());
 			$('#turnControls').append($('<button id="deliver">Deliver</button>').hide());
 			$('#turnControls').append($('<button id="pickup">Pickup</button>').hide());
@@ -431,13 +598,16 @@ var processStatus = function(data) {
 				$('#placeTrain').hide();
 				placedTrain = true;
 			}));
-			$('#turnControls').append('<button id="endTurn">End Turn</button>').click(function(){
-				endTurn();
-			});
+			$('#turnControls').append('<button id="endTurn">End Turn</button>').find('button:last').click(endTurn);
 			$('#turnControls').buttonset();
 			$('#turnControls').buttonset('option','disabled',data.activeid != pid)
 			$('#endControls').buttonset();
+			$('#buildControls').buttonset();
 			yourTurn = data.activeid == pid;
+			$('#map').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','track'));
+			for(var i = 0; i < data.players.length; i++) {
+				$('#track').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id',data.players.gid));
+			}
 		}
 		if (!geography && data.geography) {
 			geography = data.geography;
@@ -456,6 +626,7 @@ var processStatus = function(data) {
 		if(data.activeid && data.activeid == pid) {
 			yourTurn = true;
 			$('#turnControls').buttonset('option','disabled',false);
+			checkBuildMoney();
 		}
 		else if(data.activeid && data.activeid != pid) {
 			yourTurn = false;
