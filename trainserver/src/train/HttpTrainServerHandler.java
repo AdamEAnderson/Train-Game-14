@@ -39,7 +39,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String START_GAME = "startGame";
 	private final static String BUILD_TRACK = "buildTrack";
 	private final static String UPGRADE_TRAIN = "upgradeTrain";
-	private final static String START_TRAIN = "startTrain";
+	private final static String PLACE_TRAIN = "placeTrain";
 	private final static String PICKUP_LOAD = "pickupLoad";
 	private final static String DELIVER_LOAD = "deliverLoad";
 	private final static String DUMP_LOAD = "dumpLoad";
@@ -142,8 +142,8 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					case UPGRADE_TRAIN:
 						TrainServer.upgradeTrain(requestText);
 						break;
-					case START_TRAIN:
-						TrainServer.startTrain(requestText);
+					case PLACE_TRAIN:
+						TrainServer.placeTrain(requestText);
 						break;
 					case MOVE_TRAIN:
 						TrainServer.moveTrain(requestText);
@@ -173,6 +173,8 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					String jsonError = gson.toJson(errorString);
 		            FullHttpResponse result = new DefaultFullHttpResponse(HTTP_1_1, 
 		            	BAD_REQUEST, Unpooled.copiedBuffer(jsonError, CharsetUtil.UTF_8));
+		            result.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
+		            result.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
 		            sendHttpResponse(ctx, result);
 
 					buf.append(jsonError);

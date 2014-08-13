@@ -310,20 +310,20 @@ public class TrainServer {
 						: UpgradeType.SPEED);
 	}
 
-	static class StartTrainData {
+	static class PlaceTrainData {
 		public String gid;
 		public String pid;
 		public int train;
 		public MilepostId where;
 	}
 
-	static public void startTrain(String requestText) throws GameException {
+	static public void placeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
-		StartTrainData data = gson.fromJson(requestText, StartTrainData.class);
+		PlaceTrainData data = gson.fromJson(requestText, PlaceTrainData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.startTrain(data.pid, data.train, data.where);
+		game.placeTrain(data.pid, data.train, data.where);
 	}
 
 	static class MoveTrainData {
