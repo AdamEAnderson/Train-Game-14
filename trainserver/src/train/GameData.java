@@ -249,7 +249,7 @@ public class GameData {
 						loadLocations = new HashSet<City>();
 					loadLocations.add(city);
 					loads.put(load, loadLocations);
-					log.info("{}", load);
+					log.debug("{}", load);
 				}
 				cities.put(cityName, city);
 			}

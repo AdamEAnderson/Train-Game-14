@@ -65,7 +65,7 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void startTrain(String player, int train, MilepostId where) throws GameException; 
+	void placeTrain(String player, int train, MilepostId where) throws GameException; 
 	
 	/** Player moves their train
 	 * @param pid		Player whose train is being moved

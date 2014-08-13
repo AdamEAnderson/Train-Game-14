@@ -14,7 +14,9 @@ var geography;
 var started = false;
 var placedTrain = false;
 var moneySpent = 0;
+var moneySpentThisBuild = 0;
 var verticesBuilt;
+var edgesBuilt;
 
 //Loaded
 $(document).ready(function(){
@@ -375,8 +377,26 @@ var startGame = function(checked) {
 };
 
 //Tells server we've built track
-var builtTrack = function(edges) {
-	post({messageType:'buildTrack',pid:pid,gid:gid,edgesBuilt:edges});
+var builtTrack = function(vertices,edges,cost) {
+	//var edges = edges.clone();
+	var data = {messageType:'buildTrack',pid:pid,gid:gid,mileposts:vertices};
+	$.ajax({
+		type: "POST",
+		url: server,
+		data: JSON.stringify(data),
+		error: function(xhr, textStatus, errorThrown) {
+			if(xhr.responseText.toLowerCase().contains('invalidtrack')) {
+				for(var i = 0; i < edges.length; i++) {
+					$(edges[i]).remove();
+				}
+				moneySpent -= cost;
+				checkBuildMoney();
+			}
+			else
+				console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
+		},
+		dataType: 'json'
+	});
 };
 
 //Tells server we've started our train
@@ -458,6 +478,47 @@ var refreshTrains = function(trains) {
 	}
 };
 
+var refreshRails = function(players) {
+	for(var i = 0; i < players.length; i++) {
+		if(players[i].pid == pid)
+			continue;
+		$('#pid' + players[i].pid).empty();
+		var rail = players[i].rail;
+		for(var key in rail) {
+			var builtEdges = rail[key];
+			for(var k = 0; k < builtEdges.length; k++) {
+				var m1 = builtEdges[k];
+				var m2 = JSON.parse(key);
+				var m1jQ = $(document.getElementById('milepost' + m1.x + ',' + m1.y));
+				var m2jQ = $(document.getElementById('milepost' + m2.x + ',' + m2.y));
+				var m1svg = {x:0,y:0};
+				var m2svg = {x:0,y:0};
+				if(m1jQ.prop('tagName') == 'circle') {
+					m1svg.x = m1jQ.attr('cx');
+					m1svg.y = m1jQ.attr('cy');
+				}
+				else {
+					var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+					var bbox = m1jQ.getBBox();
+					m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+					m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+				}
+				if(m2jQ.prop('tagName') == 'circle') {
+					m2svg.x = m2jQ.attr('cx');
+					m2svg.y = m2jQ.attr('cy');
+				}
+				else {
+					var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+					var bbox = m2jQ.getBBox();
+					m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+					m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+				}
+				drawLineBetweenMileposts(m1svg.x,m1svg.y,m2svg.x,m2svg.y,players[i].pid);
+			}
+		}
+	}
+};
+
 var refreshMoney = function(money) {
 	$('#money').empty();
 	$('#money').append('<span>' + money + '</span>');
@@ -477,7 +538,20 @@ var checkBuildMoney = function(){
 	else {
 		$('#upgrade').button('option','disabled',false);
 	}
+	if(moneySpent == 20) {
+		$('#build').button('option','disabled',true);
+	}
+	else {
+		$('#build').button('option','disabled',false);
+	}
 };
+
+var drawLineBetweenMileposts = function(x1, y1, x2, y2, PID) {
+	$('#pid' + PID).append($(document.createElementNS('http://www.w3.org/2000/svg','line')).attr({x1:x1,y1:y1,x2:x2,y2:y2}).css({'stroke-width':'4px','stroke':findPid(lastStatusMessage.players,PID).color}));
+	if(PID == pid) {
+		edgesBuilt.push($('#pid' + PID + ' > line:last'))
+	}
+}
 
 //Processes a status response from the server
 var processStatus = function(data) {
@@ -502,39 +576,96 @@ var processStatus = function(data) {
 				//If they do, post to the server telling it to resign this player
 			});
 			$('#turnControls').append('<button id="build">Build</button>').find('button:last').click(function(){
-	/*			$('#turnControls').hide();
+				$('#turnControls').hide();
 				$('#endControls').hide();
 				$('#buildControls').show();
-				verticiesBuilt = [];
+				moneySpentThisBuild = 0;
+				verticesBuilt = [];
+				edgesBuilt = []
 				var milepostsClick = function(){
-					if(verticiesBuilt.length > 20 - moneySpent)
+					if(verticesBuilt.length == 0) {
+						var currentMilepost = $(this).attr('id').replace('milepost','').split(',');
+						currentMilepost = gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])];
+						verticesBuilt.push({x:currentMilepost.x,y:currentMilepost.y});
 						return;
-					var lastMilepost = verticiesBuilt[verticiesBuilt.length - 1];
+					}
+					var lastMilepost = verticesBuilt[verticesBuilt.length - 1];
 					lastMilepost = gameData.mapData.orderedMileposts[(lastMilepost.y * gameData.mapData.mpWidth) + lastMilepost.x];
 					var currentMilepost = $(this).attr('id').replace('milepost','').split(',');
-					currentMilepost = gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + currentMilepost[0]];
+					currentMilepost = gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])];
 					var isValidMilepost = false;
-					for(var i = 0; i < currentMilepost.edges.length; i++) {
-						if(currentMilepost.edges[i].x == lastMilepost.x && currentMilepost.edges[i].y == lastMilepost.y)
+					var milepostCost;
+					for(var i = 0; i < lastMilepost.edges.length; i++) {
+						if(lastMilepost.edges[i].x == currentMilepost.x && lastMilepost.edges[i].y == currentMilepost.y) {
 							isValidMilepost = true;
+							milepostCost = lastMilepost.edges[i].cost;
+							break;
+						}
 					}
 					if(isValidMilepost == false)
 						return;
 					var lastX, lastY;
-					if($(verticiesBuilt[verticiesBuilt.length - 1]).prop("tagName") == 'CIRCLE') {
-						lastX = $(verticiesBuilt[verticiesBuilt.length - 1]).attr('cx');
-						lastY = $(verticiesBuilt[verticiesBuilt.length - 1]).attr('cy');
+					if($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'circle') {
+						lastX = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('cx');
+						lastY = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('cy');
 					}
-					else if($(verticiesBuilt[verticiesBuilt.length - 1]).prop("tagName") == 'G') {
-						var translate = $(verticiesBuilt[verticiesBuilt.length - 1]).attr('transform').replace(/\ scale\([0-9\.]+)\/,'').replace('transform(','').replace(')','').split(',');
-						lastX = translate[0];
-						lastY = translate[1];
+					else if($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
+						var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+						var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
+						lastX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+						lastY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
 					}
-					if(!lastY || !lastX)
+					var currentX, currentY;
+					if($(this).prop("tagName") == 'circle') {
+						currentX = $(this).attr('cx');
+						currentY = $(this).attr('cy');
+					}
+					else if($(this).prop("tagName") == 'g') {
+						var translate = $(this).attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+						var bbox = $(this)[0].getBBox();
+						currentX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+						currentY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+					}
+					if(!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
 						return;
-					
-				}
-				$('#milepostsGroup > *:not(path)').click(milepostsClick); */
+					if(20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)
+						return;
+					drawLineBetweenMileposts(lastX,lastY,currentX,currentY,pid);
+					verticesBuilt.push({x:currentMilepost.x,y:currentMilepost.y});
+					moneySpentThisBuild += milepostCost;
+					console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);			
+				};
+				$('#milepostsGroup > *:not(path)').click(milepostsClick);
+				var acceptBuild = function(){
+					builtTrack(verticesBuilt,edgesBuilt,moneySpentThisBuild);
+					$('#acceptBuild').off('click');
+					$('#cancelBuild').off('click');
+					$('#milepostsGroup > *:not(path)').off('click',milepostsClick);
+					$('#buildControls').hide();
+					$('#turnControls').show();
+					$('#endControls').show();
+					verticesBuilt = [];
+					edgesBuilt = [];
+					moneySpent += moneySpentThisBuild;
+					moneySpentThisBuild = 0;
+					checkBuildMoney();
+				};
+				$('#acceptBuild').click(acceptBuild);
+				var cancelBuild = function(){
+					$('#acceptBuild').off('click');
+					$('#cancelBuild').off('click');
+					$('#milepostsGroup > *:not(path)').off('click',milepostsClick);
+					$('#buildControls').hide();
+					$('#turnControls').show();
+					$('#endControls').show();
+					verticesBuilt = [];
+					for(var i = 0; i < edgesBuilt.length; i++) {
+						$(edgesBuilt[i]).remove();
+					}
+					edgesBuilt = [];
+					moneySpentThisBuild = 0;
+				};
+				$('#cancelBuild').click(cancelBuild);
 			});
 			$('#turnControls').append('<button id="upgrade">Upgrade</button>').find('button:last').click(function(){
 				for(var i = 0; i < lastStatusMessage.players.length; i++)
@@ -604,9 +735,9 @@ var processStatus = function(data) {
 			$('#endControls').buttonset();
 			$('#buildControls').buttonset();
 			yourTurn = data.activeid == pid;
-			$('#map').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','track'));
+			$('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','track'));
 			for(var i = 0; i < data.players.length; i++) {
-				$('#track').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id',data.players.gid));
+				$('#track').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','pid' + data.players[i].pid));
 			}
 		}
 		if (!geography && data.geography) {
@@ -617,8 +748,10 @@ var processStatus = function(data) {
 			$('#placeTrain').show();
 		}
 		refreshPlayers(data.players);
-		if(started)
+		if(started) {
 			$('#0').next().addClass('ui-state-active');
+			refreshRails(data.players);
+		}
 		me = findPid(data.players, pid);
 		refreshCards(me.hand);
 		refreshTrains(me.trains);
@@ -656,7 +789,7 @@ var post = function(data,callback){
 		data: JSON.stringify(data),
 		success: callback,
 		error: function(xhr, textStatus, errorThrown) {
-			console.log("error " + textStatus + " " + errorThrown);
+			console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
 		},
 		dataType: 'json'
 	});

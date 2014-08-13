@@ -105,6 +105,7 @@ public class Game implements AbstractGame {
 			}
 	
 			active = first;
+			last = first;
 			for(Player temp = first.getNextPlayer(); !(temp == active); temp = temp.getNextPlayer()){
 				last = temp;
 			}
@@ -139,10 +140,10 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void startTrain(String pid, int train, MilepostId where) throws GameException {
-		log.info("startTrain(pid={}, city={})", pid, where);
+	public void placeTrain(String pid, int train, MilepostId where) throws GameException {
+		log.info("placeTrain(pid={}, city={})", pid, where);
 		checkActive(pid);
-		active.startTrain(map.getMilepost(where), train);
+		active.placeTrain(map.getMilepost(where), train);
 		++transaction;
 	}
 
