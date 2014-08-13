@@ -225,10 +225,64 @@ public class GameTest {
         //game.buildTrack(game.getActivePlayer().name, mileposts);
         //assertEquals(game.getActivePlayer().getSpending(), 10);	// Incremental cost of 3
         
+        // Sea inlet crossing - build from Cairo to the Sinai
+        //mileposts = new MilepostId[]{ new MilepostId(37, 7), new MilepostId(38, 6) };
+        //game.buildTrack(game.getActivePlayer().name, mileposts);
+        //assertEquals(game.getActivePlayer().getSpending(), 14);	// Incremental cost of 3
+        
         skipPastBuildingTurns(game);
         
         game.endGame("Adam", true);
         game.endGame("Sandra", true);
+	}
+	
+	/** Test buliding too much (cost more than 20) */
+	@Test
+	public void testBuildOverCost() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        assertTrue(game != null);
+	        game.startGame("Adam", true);
+		} catch (GameException e) {
+			fail("Unexpected exception in test setup");
+		} 
+        
+        // Build more than 20
+        MilepostId[] mileposts;
+        mileposts = new MilepostId[]{ 
+        	new MilepostId(34,56),
+        	new MilepostId(33,55),
+	        new MilepostId(33,54),
+	        new MilepostId(32,53),
+	        new MilepostId(31,53),
+	        new MilepostId(31,52),
+	        new MilepostId(30,52),
+	        new MilepostId(29,52),
+	        new MilepostId(28,52),
+	        new MilepostId(27,52),
+	        new MilepostId(26,51),
+	        new MilepostId(26,50),
+	        new MilepostId(25,49),
+	        new MilepostId(25,48),
+	        new MilepostId(24,47),
+	        new MilepostId(25,46),
+	        new MilepostId(25,45)
+        };
+        try {
+        	game.buildTrack(game.getActivePlayer().name, mileposts);
+        	fail("Build track should have thrown");
+        } catch (GameException e) {
+        }
+
+		try {
+	        game.endGame("Adam", true);
+		} catch (GameException e) {
+			fail("Unexpected exception in test cleanup");
+		} 
 	}
 	
 	/** Test that building from a place that is not a mojor city, and not already on the player's track fails */

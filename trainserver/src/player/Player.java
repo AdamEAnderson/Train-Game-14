@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import reference.*;
 import train.GameException;
 import map.Milepost;
@@ -22,6 +25,8 @@ public class Player {
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	
+	private static Logger log = LoggerFactory.getLogger(Player.class);
+
 	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
 			Player next, Map<Milepost, Set<Milepost>> globalRail){
 		trains = new Train[numTrain];
@@ -88,15 +93,27 @@ public class Player {
 		}
 		
 		// Cannot build over track that has already been built
-		if(rail.anyConnects(origin, next)) throw new GameException("InvalidTrack");
-		if(!origin.isNeighbor(next)) throw new GameException("InvalidTrack");
-		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) 
+		if(rail.anyConnects(origin, next)) {
+			log.warn("Track is already built there ({}, {}) and ({}, {})", origin.x, origin.y, next.x, next.y);
 			throw new GameException("InvalidTrack");
+		}
+		if(!origin.isNeighbor(next)) {
+			log.warn("Mileposts are not contiguous ({}, {}) and ({}, {})", origin.x, origin.y, next.x, next.y);
+			throw new GameException("InvalidTrack");
+		}
+		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) {
+			if (origin.type == Milepost.Type.BLANK)
+				log.warn("Mileposts is blank ({}, {})", origin.x, origin.y);
+			if (next.type == Milepost.Type.BLANK) 
+				log.warn("Mileposts is blank ({}, {})", next.x, next.y);
+			throw new GameException("InvalidTrack");
+		}
 		
 		int cost = rail.build(origin, next);
 		if(spendings + cost <= 20){
 			spendings += cost;
 		} else {
+			log.warn("Cost {} exceeded maximum of 20", spendings + cost);
 			rail.erase(origin, next);
 			throw new GameException("ExceededAllowance");
 		}
