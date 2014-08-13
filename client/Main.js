@@ -377,8 +377,26 @@ var startGame = function(checked) {
 };
 
 //Tells server we've built track
-var builtTrack = function(vertices) {
-	post({messageType:'buildTrack',pid:pid,gid:gid,mileposts:vertices});
+var builtTrack = function(vertices,edges,cost) {
+	//var edges = edges.clone();
+	var data = {messageType:'buildTrack',pid:pid,gid:gid,mileposts:vertices};
+	$.ajax({
+		type: "POST",
+		url: server,
+		data: JSON.stringify(data),
+		error: function(xhr, textStatus, errorThrown) {
+			if(xhr.responseText.toLowerCase().contains('invalidtrack')) {
+				for(var i = 0; i < edges.length; i++) {
+					$(edges[i]).remove();
+				}
+				moneySpent -= cost;
+				checkBuildMoney();
+			}
+			else
+				console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
+		},
+		dataType: 'json'
+	});
 };
 
 //Tells server we've started our train
@@ -460,6 +478,47 @@ var refreshTrains = function(trains) {
 	}
 };
 
+var refreshRails = function(players) {
+	for(var i = 0; i < players.length; i++) {
+		if(players[i].pid == pid)
+			continue;
+		$('#pid' + players[i].pid).empty();
+		var rail = players[i].rail;
+		for(var key in rail) {
+			var builtEdges = rail[key];
+			for(var k = 0; k < builtEdges.length; k++) {
+				var m1 = builtEdges[k];
+				var m2 = JSON.parse(key);
+				var m1jQ = $(document.getElementById('milepost' + m1.x + ',' + m1.y));
+				var m2jQ = $(document.getElementById('milepost' + m2.x + ',' + m2.y));
+				var m1svg = {x:0,y:0};
+				var m2svg = {x:0,y:0};
+				if(m1jQ.prop('tagName') == 'circle') {
+					m1svg.x = m1jQ.attr('cx');
+					m1svg.y = m1jQ.attr('cy');
+				}
+				else {
+					var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+					var bbox = m1jQ.getBBox();
+					m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+					m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+				}
+				if(m2jQ.prop('tagName') == 'circle') {
+					m2svg.x = m2jQ.attr('cx');
+					m2svg.y = m2jQ.attr('cy');
+				}
+				else {
+					var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+					var bbox = m2jQ.getBBox();
+					m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+					m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+				}
+				drawLineBetweenMileposts(m1svg.x,m1svg.y,m2svg.x,m2svg.y,players[i].pid);
+			}
+		}
+	}
+};
+
 var refreshMoney = function(money) {
 	$('#money').empty();
 	$('#money').append('<span>' + money + '</span>');
@@ -482,11 +541,16 @@ var checkBuildMoney = function(){
 	if(moneySpent == 20) {
 		$('#build').button('option','disabled',true);
 	}
+	else {
+		$('#build').button('option','disabled',false);
+	}
 };
 
 var drawLineBetweenMileposts = function(x1, y1, x2, y2, PID) {
 	$('#pid' + PID).append($(document.createElementNS('http://www.w3.org/2000/svg','line')).attr({x1:x1,y1:y1,x2:x2,y2:y2}).css({'stroke-width':'4px','stroke':findPid(lastStatusMessage.players,PID).color}));
-	edgesBuilt.push($('#pid' + PID + ' > line:last'))
+	if(PID == pid) {
+		edgesBuilt.push($('#pid' + PID + ' > line:last'))
+	}
 }
 
 //Processes a status response from the server
@@ -531,10 +595,10 @@ var processStatus = function(data) {
 					currentMilepost = gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])];
 					var isValidMilepost = false;
 					var milepostCost;
-					for(var i = 0; i < currentMilepost.edges.length; i++) {
-						if(currentMilepost.edges[i].x == lastMilepost.x && currentMilepost.edges[i].y == lastMilepost.y) {
+					for(var i = 0; i < lastMilepost.edges.length; i++) {
+						if(lastMilepost.edges[i].x == currentMilepost.x && lastMilepost.edges[i].y == currentMilepost.y) {
 							isValidMilepost = true;
-							milepostCost = currentMilepost.edges[i].cost;
+							milepostCost = lastMilepost.edges[i].cost;
 							break;
 						}
 					}
@@ -569,11 +633,11 @@ var processStatus = function(data) {
 					drawLineBetweenMileposts(lastX,lastY,currentX,currentY,pid);
 					verticesBuilt.push({x:currentMilepost.x,y:currentMilepost.y});
 					moneySpentThisBuild += milepostCost;
-					
+					console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);			
 				};
 				$('#milepostsGroup > *:not(path)').click(milepostsClick);
 				var acceptBuild = function(){
-					builtTrack(verticesBuilt);
+					builtTrack(verticesBuilt,edgesBuilt,moneySpentThisBuild);
 					$('#acceptBuild').off('click');
 					$('#cancelBuild').off('click');
 					$('#milepostsGroup > *:not(path)').off('click',milepostsClick);
@@ -684,8 +748,10 @@ var processStatus = function(data) {
 			$('#placeTrain').show();
 		}
 		refreshPlayers(data.players);
-		if(started)
+		if(started) {
 			$('#0').next().addClass('ui-state-active');
+			refreshRails(data.players);
+		}
 		me = findPid(data.players, pid);
 		refreshCards(me.hand);
 		refreshTrains(me.trains);
@@ -723,7 +789,7 @@ var post = function(data,callback){
 		data: JSON.stringify(data),
 		success: callback,
 		error: function(xhr, textStatus, errorThrown) {
-			console.log("error " + textStatus + " " + errorThrown);
+			console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
 		},
 		dataType: 'json'
 	});
