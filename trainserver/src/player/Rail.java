@@ -58,6 +58,13 @@ public class Rail {
 		tracks.get(next).add(origin);
 	}
 	
+	static void removeTrack(Map<Milepost, Set<Milepost>> tracks, Milepost one, Milepost two){
+		Set<Milepost> s = tracks.get(one);
+		s.remove(two);
+		s = tracks.get(two);
+		s.remove(one);
+	}
+
 	/** Adds the given track to the player's rails, if and only if the track can be legally built.
 	 * @param origin: the milepost already attached to the rail; next is where
 	 * you build towards.
@@ -65,7 +72,7 @@ public class Rail {
 	 */
 	int build(Milepost origin, Milepost next) throws GameException {
 		addTrack(tracks, origin, next);
-		//buildTracks(allTracks, origin, next);
+		addTrack(allTracks, origin, next);
 		Edge e = getEdge(origin, next);
 		if(e instanceof Ferry){
 			Edge back = getEdge(next, origin);
@@ -95,9 +102,7 @@ public class Rail {
 	/** Erases the track between these neighboring mileposts
 	 */
 	void erase(Milepost one, Milepost two){
-		Set<Milepost> s = tracks.get(one);
-		s.remove(two);
-		s = tracks.get(two);
-		s.remove(one);
+		removeTrack(tracks, one, two);
+		removeTrack(allTracks, one, two);
 	}
 }

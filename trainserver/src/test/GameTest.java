@@ -180,6 +180,7 @@ public class GameTest {
         game.endGame("Sandra", true);
     }
 	
+	/** Test that normal building works as expected */
 	@Test
 	public void testBuild() throws GameException {
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
@@ -199,20 +200,25 @@ public class GameTest {
         game.buildTrack(game.getActivePlayer().name, mileposts);
         assertEquals(game.getActivePlayer().getSpending(), 4);	// Incremental cost of 4
         
+        // Build into minor & major cities
         // Build back into Cairo from Luxor
         // Tests that player can build from end of their track into major city
         mileposts = new MilepostId[]{ new MilepostId(38, 10), new MilepostId(37, 10), new MilepostId(36, 9), new MilepostId(36, 8) };
         game.buildTrack(game.getActivePlayer().name, mileposts);
         assertEquals(game.getActivePlayer().getSpending(), 7);	// Incremental cost of 3
-        game.endTurn(game.getActivePlayer().name);
         
-        game.endTurn(game.getActivePlayer().name);
+        // River crossing - build from Luxor over the Nile
+        mileposts = new MilepostId[]{ new MilepostId(38, 10), new MilepostId(39, 10) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        assertEquals(game.getActivePlayer().getSpending(), 10);	// Incremental cost of 3
+        
         skipPastBuildingTurns(game);
         
         game.endGame("Adam", true);
         game.endGame("Sandra", true);
 	}
 	
+	/** Test that building from a place that is not a mojor city, and not already on the player's track fails */
 	@Test
 	public void testBuildFromUnconnectedTrack()  {
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
@@ -247,7 +253,7 @@ public class GameTest {
 		} 
 	}
 	
-	/** Test fails because allTrack is not updated 
+	/** Test that building over track that has already been built fails */
 	@Test
 	public void testBuildOverExistingTrack()  {
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
@@ -282,7 +288,7 @@ public class GameTest {
 		} catch (GameException e) {
 			fail("Unexpected exception in test cleanup");
 		} 
-	} */
+	} 
 	
 	@Test
 	public void testStatusMsg() throws GameException{

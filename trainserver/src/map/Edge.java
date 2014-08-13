@@ -38,8 +38,10 @@ public class Edge {
 				temp = 1;
 			}
 		
-		if (river) temp += 2;
-		if (lake) temp += 3;
+		if (river) 
+			temp += 2;
+		if (lake) 
+			temp += 3;
 		
 		cost = temp;
 	}
