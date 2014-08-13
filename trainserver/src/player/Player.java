@@ -107,9 +107,7 @@ public class Player {
 		trains[t].addLoad(load);
 	}
 	
-	public void dropLoad(int t, String load) throws GameException{
-		trains[t].dropLoad(load);
-	}
+	public void dropLoad(int t, String load) throws GameException{ trains[t].dropLoad(load); }
 	
 	/** Delivers a load on the given card.
 	 * @param index is the location of the card in the player's hand, array-wise
