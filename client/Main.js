@@ -223,7 +223,7 @@ var pickupDialogStageThree = function(train,load) {
 		}
 		var buttons = $('#pickupDialog').dialog('option','buttons');
 		buttons.push({
-			text:'Drop & Pickup',
+			text:'Dump & Pickup',
 			click:function(){
 				if($('#pickupDialog > ul > li.clicked').length == 1) {
 					var buttons = $('#pickupDialog').dialog('option','buttons');
@@ -238,6 +238,63 @@ var pickupDialogStageThree = function(train,load) {
 			}
 		});
 		$('#pickupDialog').dialog('option','buttons',buttons);
+	}
+};
+
+var dumpDialogStageTwo = function(train,skippedStageOne) {
+	var loads = [];
+	for(var i = 0; i < train.loads.length; i++) {
+		if(train.loads[i] != null) {
+			loads.push(train.loads[i]);
+		}
+	}
+	if(loads.length == 0) {
+		$('#dumpDialog').dialog('destroy');
+		$('#dumpDialog').empty().remove();
+		return;
+	}
+	if(loads.length == 1 && !skippedStageOne) {
+		dumpLoad(train.index,loads[0]);
+		$('#dumpDialog').dialog('destroy');
+		$('#dumpDialog').empty().remove();
+	}
+	else if(loads.length == 1 && skippedStageOne) {
+		$('#dumpDialog').append('<p>Are you sure you want to dump ' + loads[0].toLowerCase() + '?</p>');
+		var buttons = $('#dumpDialog').dialog('option','buttons');
+		buttons.push({
+			text:'Yes',
+			click:function(){
+				dumpLoad(train.index,loads[0]);
+				$('#dumpDialog').dialog('destroy');
+				$('#dumpDialog').empty().remove();
+			}
+		});
+		$('#dumpDialog').dialog('option','buttons',buttons)
+	}
+	else {
+		$('#dumpDialog').append('<ul/>');
+		for(var i = 0; i < loads.length; i++) {
+			$('#dumpDialog > ul').append('<li>Dump ' + train.loads[i] + '</li>').find('li:last').click(function(){
+				$('#dumpDialog > ul > li').removeClass('clicked');
+				$(this).addClass('clicked');
+			});
+		}
+		var buttons = $('#dumpDialog').dialog('option','buttons');
+		buttons.push({
+			text:'Dump',
+			click:function(){
+				if($('#dumpDialog > ul > li.clicked').length == 1) {
+					var buttons = $('#dumpDialog').dialog('option','buttons');
+					buttons.pop();
+					$('#dumpDialog').dialog('option','buttons',buttons);
+					var drop = $('#dumpDialog > ul > li.clicked').text().replace('Dump ','');
+					dumpLoad(train.index,drop);
+					$('#dumpDialog').dialog('destroy');
+					$('#dumpDialog').empty().remove();
+				}
+			}
+		});
+		$('#dumpDialog').dialog('option','buttons',buttons);
 	}
 };
 
@@ -566,22 +623,32 @@ var refreshCards = function(cards) {
 };
 
 var checkLoadButtons = function(players) {
-	var shown = false;
+	var shownPickup = false;
+	var shownDump = false;
 	for(var i = 0; i < findPid(players,pid).trains.length; i++) {
 		var train = findPid(players,pid).trains[i];
 		if(!train.loc)
 			continue;
+		for(var j = 0; j < train.loads.length; j++) {
+			if(train.loads[j] != null) {
+				$('#dump').show();
+				shownDump = true;
+			}
+		}
 		var milepost = JSON.parse(train.loc);
 		if(milepost.type == 'MAJORCITY' || milepost.type == 'CITY') {
 			if(milepost.city.loads) {
 				$('#pickup').show();
-				shown = true;
+				shownPickup = true;
 			}
 			checkDeliver(milepost,findPid(players,pid),train);
 		}
 	}
-	if(!shown) {
+	if(!shownPickup) {
 		$('#pickup').hide();
+	}
+	if(!shownDump) {
+		$('#dump').hide();
 	}
 }
 
@@ -925,7 +992,56 @@ var processStatus = function(data) {
 					$('#pickupDialog').dialog('option','buttons',buttons);
 				}
 			}));
-			$('#turnControls').append($('<button id="drop">Drop</button>').hide());
+			$('#turnControls').append($('<button id="dump">Dump</button>').hide().click(function(){
+				var validTrains = [];
+				var player = findPid(lastStatusMessage.players,pid);
+				for(var i = 0; i < player.trains.length; i++) {
+					for(var j = 0; j < player.trains[i].loads.length; j++) {
+						if(player.trains[i].loads[j] != null) {
+							validTrains[i] = player.trains[i];
+						}
+					}
+				}
+				if(validTrains.length == 0)
+					return;
+				$('#lobby').append('<div id="dumpDialog" title="Dump a load" />').find('div:last').dialog({
+					dialogClass: "no-close",
+					buttons: [{
+						text: "Cancel",
+						click: function() {
+							$(this).dialog( "destroy" );
+							$('#dumpDialog').remove();
+						}
+					}]
+				});
+				if(validTrains.length == 1) {
+					dumpDialogStageTwo(validTrains[0],true);
+				}
+				else if(validTrains.length > 1) {
+					$('#dumpDialog').append('<ul/>');
+					for(var i = 0; i < player.trains.length; i++){
+						if(!validTrains.contains(player.trains[i]))
+							continue;
+						$('#dumpDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function(){
+							$('#dumpDialog > ul > li').removeClass('clicked');
+							$(this).addClass('clicked');
+						});
+					}
+					var buttons = $('#dumpDialog').dialog('option','buttons');
+					buttons.push({
+						text:"OK",
+						click:function(){
+							var buttons = $('#dumpDialog').dialog('option','buttons');
+							buttons.pop();
+							$('#dumpDialog').dialog('option','buttons',buttons);
+							var train = player.trains[parseInt($('#dumpDialog > ul > li.clicked').text().replace('Train ','')) - 1];
+							$('#dumpDialog').empty();
+							dumpDialogStageTwo(train,false);
+						}
+					});
+					$('#dumpDialog').dialog('option','buttons',buttons);
+				}
+			}));
 			$('#turnControls').append($('<button id="placeTrain">Place Train</button>').hide().click(function(){
 				placeTrainLocations = [];
 				var milepostClick = function() {

@@ -236,6 +236,23 @@ div.train > p:not(:last-child) { border-bottom: 1px solid black; }
 	border-radius: 1px;
 }
 
+#dumpDialog > ul {
+	list-style-type:none;
+	padding:0;
+}
+
+#dumpDialog > ul > li:hover {
+	background-color:#fff;
+	border:1px dashed #aaa;
+	border-radius: 1px;
+}
+
+#dumpDialog > ul > li.clicked {
+	background-color:#fff;
+	border:1px solid #888 !important;
+	border-radius: 1px;
+}
+
 #mapControls
 {
 	position: absolute;
