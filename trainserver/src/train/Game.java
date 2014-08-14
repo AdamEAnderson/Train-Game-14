@@ -141,7 +141,7 @@ public class Game implements AbstractGame {
 
 	@Override
 	public void placeTrain(String pid, int train, MilepostId where) throws GameException {
-		log.info("placeTrain(pid={}, city={})", pid, where);
+		log.info("placeTrain(pid={}, train={}, where={})", pid, train, where);
 		checkActive(pid);
 		active.placeTrain(map.getMilepost(where), train);
 		++transaction;

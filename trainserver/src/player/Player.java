@@ -44,8 +44,11 @@ public class Player {
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
-		if (trains[t].getLocation() == null) trains[t].moveTrain(m);
-		else throw new GameException("TrainAlreadyPlaced");
+		if (trains[t].getLocation() == null) 
+			trains[t].moveTrain(m);
+		else 
+			throw new GameException("TrainAlreadyPlaced");
+		log.info("after place");
 	}
 	
 	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {

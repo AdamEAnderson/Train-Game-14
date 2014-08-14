@@ -20,7 +20,10 @@ public class Train {
 	/** Moves the train to the given location.
 	 * Does no checks for the legality of the move.
 	 */
-	void moveTrain(Milepost location){ loc = location;}
+	void moveTrain(Milepost location)
+	{ 
+		loc = location;
+	}
 	
 	public void upgradeSpeed() throws GameException {
 		if(speed < 20){

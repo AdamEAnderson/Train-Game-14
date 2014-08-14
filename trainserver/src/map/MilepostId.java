@@ -7,6 +7,8 @@ public class MilepostId implements Comparable<MilepostId> {
 	public int x;
 	public int y;
 	
+	public MilepostId() {}
+	
 	public MilepostId(int x, int y) {
 		this.x = x;
 		this.y = y;

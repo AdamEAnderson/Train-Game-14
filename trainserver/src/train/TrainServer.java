@@ -34,6 +34,10 @@ import com.google.gson.JsonSerializer;
  */
 public class TrainServer {
 	private static Logger log = LoggerFactory.getLogger(TrainServer.class);
+	
+	private static String statusCache = null;
+	private static int statusTransaction = 0;	// transaction that was current when statusCache was created
+	private static String statusGid = null;		// GID used for generating statusCache
 
 	private static RandomString gameNamer = new RandomString(8); // use for
 																	// generating
@@ -82,16 +86,22 @@ public class TrainServer {
 		StatusRequest() {}
 	}
 	
-	static public String status(String requestText) throws GameException {
+	synchronized static public String status(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		StatusRequest data = gson.fromJson(requestText, StatusRequest.class);
 		String gid = data.gid;
-		
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		GameStatus status = new GameStatus();
 		Game game = getGame(gid);
 		if (game == null)
 			return "{}";
+
+		// Status hasn't changed since the last time we sent a response -- just resend
+		if (gid.equals(statusGid) && game.transaction() == statusTransaction && statusCache != null)  
+			return statusCache;
+			
+		// Generate a new status message
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
+		GameStatus status = new GameStatus();
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
 		status.geography = game.gameData.geography;
@@ -131,7 +141,11 @@ public class TrainServer {
 			p = p.getNextPlayer();
 		}while(p != game.getActivePlayer());
 		
-		return gsonBuilder.create().toJson(status);
+		statusCache = gsonBuilder.create().toJson(status);
+		statusGid = gid;
+		statusTransaction = game.transaction();
+		
+		return statusCache;
 	}
 	
 	static class ListRequest {
@@ -144,7 +158,7 @@ public class TrainServer {
 		ListResponse() { gids = new HashSet<String>(); }
 	}
 	
-	static public String list(String requestText) throws GameException {
+	synchronized static public String list(String requestText) throws GameException {
 		log.info("list requestText: {}", requestText);
 		Gson gson = new GsonBuilder().create();
 		ListRequest data = gson.fromJson(requestText, ListRequest.class);
@@ -205,7 +219,7 @@ public class TrainServer {
 		return gsonBuilder.create().toJson(response);
 	}
 	
-	static public String newGame(String requestText) throws GameException {			
+	synchronized static public String newGame(String requestText) throws GameException {			
 		String gameId = null;
 		Gson gson = new GsonBuilder().create();
 		NewGameData data = gson.fromJson(requestText, NewGameData.class);
@@ -226,7 +240,7 @@ public class TrainServer {
 		public String color;
 		}
 	
-	static public String joinGame(String requestText) throws GameException {
+	synchronized static public String joinGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
 		Game game = games.get(data.gid);
@@ -241,7 +255,7 @@ public class TrainServer {
 		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
-	static public String resumeGame(String requestText) throws GameException {
+	synchronized static public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
 		Game game = games.get(data.gid);
@@ -261,7 +275,7 @@ public class TrainServer {
 		boolean ready;
 	}
 
-	static public void startGame(String requestText) throws GameException {
+	synchronized static public void startGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		StartGameData data = gson.fromJson(requestText, StartGameData.class);
 		Game game = games.get(data.gid);
@@ -276,7 +290,7 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
-	static public void buildTrack(String requestText) throws GameException {
+	synchronized static public void buildTrack(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
 		Game game = games.get(data.gid);
@@ -296,7 +310,7 @@ public class TrainServer {
 		}
 	}
 
-	static public void upgradeTrain(String requestText) throws GameException {
+	synchronized static public void upgradeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		UpgradeTrainData data = gson.fromJson(requestText,
 				UpgradeTrainData.class);
@@ -317,7 +331,7 @@ public class TrainServer {
 		public MilepostId where;
 	}
 
-	static public void placeTrain(String requestText) throws GameException {
+	synchronized static public void placeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PlaceTrainData data = gson.fromJson(requestText, PlaceTrainData.class);
 		Game game = games.get(data.gid);
@@ -333,7 +347,7 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
-	static public void moveTrain(String requestText) throws GameException {
+	synchronized static public void moveTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
 		Game game = games.get(data.gid);
@@ -350,7 +364,7 @@ public class TrainServer {
 		public String load;
 	}
 
-	static public void pickupLoad(String requestText) throws GameException {
+	synchronized static public void pickupLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PickupLoadData data = gson.fromJson(requestText, PickupLoadData.class);
 		Game game = games.get(data.gid);
@@ -368,7 +382,7 @@ public class TrainServer {
 		public int card;
 	}
 
-	static public void deliverLoad(String requestText) throws GameException {
+	synchronized static public void deliverLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DeliverLoadData data = gson
 				.fromJson(requestText, DeliverLoadData.class);
@@ -385,7 +399,7 @@ public class TrainServer {
 		public String load;
 	}
 
-	static public void dumpLoad(String requestText) throws GameException {
+	synchronized static public void dumpLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DumpLoadData data = gson.fromJson(requestText, DumpLoadData.class);
 		Game game = games.get(data.gid);
@@ -399,7 +413,7 @@ public class TrainServer {
 		public String pid;
 	}
 
-	static public void endTurn(String requestText) throws GameException {
+	synchronized static public void endTurn(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndTurnData data = gson.fromJson(requestText, EndTurnData.class);
 		Game game = games.get(data.gid);
@@ -414,7 +428,7 @@ public class TrainServer {
 		public boolean ready;
 	}
 
-	static public void endGame(String requestText) throws GameException {
+	synchronized static public void endGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndGame data = gson.fromJson(requestText, EndGame.class);
 		Game game = games.get(data.gid);
