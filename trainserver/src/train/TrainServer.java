@@ -360,7 +360,6 @@ public class TrainServer {
 		public String gid;
 		public String pid;
 		public int train;
-		public String city;
 		public String load;
 	}
 
