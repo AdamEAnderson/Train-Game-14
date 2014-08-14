@@ -192,6 +192,7 @@ public class GameTest {
 	@Test
 	public void testBuild() throws GameException {
 		int expectedTotalSpent = 0;
+		int accumulatedTotal = 70;
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
@@ -202,6 +203,8 @@ public class GameTest {
         game.startGame("Adam", true);
         game.startGame("Sandra", true);
         
+        Player firstPlayer = game.getActivePlayer();
+
         // First player builds from Cairo to Luxor - check building into a city & over a river
         log.info("Active player is {}", game.getActivePlayer().name);
         MilepostId[] mileposts;
@@ -222,13 +225,36 @@ public class GameTest {
         mileposts = new MilepostId[]{ new MilepostId(37, 7), new MilepostId(38, 6) };
         game.buildTrack(game.getActivePlayer().name, mileposts);
         expectedTotalSpent += 4;
-        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());	// Incremental cost of 4
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());
         
-        skipPastBuildingTurns(game);
+        // Build to a jungle
+        mileposts = new MilepostId[]{ new MilepostId(2, 20), new MilepostId(3, 20), new MilepostId(3, 21) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        expectedTotalSpent += 4;
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());
+        
+        // Build to a mountain, extended from current track end
+        mileposts = new MilepostId[]{ new MilepostId(3, 21), new MilepostId(4, 22), new MilepostId(5, 22) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        expectedTotalSpent += 3;
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());
+           
+        game.endTurn(game.getActivePlayer().name);
         
         // Check that the total was adjusted correctly
-        assertEquals(70 - expectedTotalSpent, game.getActivePlayer().getMoney());
-        assertEquals(0, game.getActivePlayer().getSpending());
+        assertEquals(accumulatedTotal - expectedTotalSpent, firstPlayer.getMoney());
+        accumulatedTotal = firstPlayer.getMoney();
+        assertEquals(0, firstPlayer.getSpending());
+        
+        expectedTotalSpent = 0;
+        
+        // Build to an alpine milepost from Nairobi
+        mileposts = new MilepostId[]{ new MilepostId(41, 35), new MilepostId(41, 36) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        expectedTotalSpent += 5;
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());	
+
+        skipPastBuildingTurns(game);
         
         game.endGame("Adam", true);
         game.endGame("Sandra", true);
