@@ -9,12 +9,23 @@ public class Train {
 	private int capacity; //2 or 3
 	private String[] loads; //length the same as the capacity
 	private Milepost loc;
+	private int index;	// where train is in array
 	
 	public Train(){
 		speed = 12;
 		capacity = 2;
 		loads = new String[2];
 		loc = null;
+		index = 0;
+	}
+	
+	public void index(int newIndex)
+	{
+		this.index = newIndex;
+	}
+	
+	public int index() {
+		return index;
 	}
 	
 	/** Moves the train to the given location.

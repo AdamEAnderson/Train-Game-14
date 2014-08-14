@@ -30,8 +30,10 @@ public class Player {
 	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
 			Player next, Map<Milepost, Set<Milepost>> globalRail){
 		trains = new Train[numTrain];
-		for (int i = 0; i < numTrain; ++i)
+		for (int i = 0; i < numTrain; ++i) {
 			trains[i] = new Train();
+			trains[i].index(i);
+		}
 		money = startMoney;
 		rail = new Rail(globalRail);
 		cards = hand;
