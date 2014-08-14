@@ -169,12 +169,12 @@ public final class TrainMap {
 		MilepostId sourceId = new MilepostId(source.x, source.y);
 		boolean isRiverCrossing = isCrossing(sourceId, destinationId, riverCrossings);
 		if (isRiverCrossing)
-			log.info("River crossing ({}, {} to ({}, {})", source.x, source.y, destinationId.x, destinationId.y);
+			log.debug("River crossing ({}, {} to ({}, {})", source.x, source.y, destinationId.x, destinationId.y);
 		boolean isSeaCrossing = isCrossing(sourceId, destinationId, seaCrossings);
 		
 		if (destination != null && destination.type != Milepost.Type.BLANK) {
 			edge = new Edge(destination, isRiverCrossing, isSeaCrossing);
-			log.info("Generating edge from milepost [{}, {}] to milepost [{},{}], cost {}", source.y, source.x,
+			log.debug("Generating edge from milepost [{}, {}] to milepost [{},{}], cost {}", source.y, source.x,
 					destination.y, destination.x, edge.cost);
 		}
 		return edge;
@@ -191,19 +191,19 @@ public final class TrainMap {
 			}
 			
 			String[] mpsSource = fields[0].split(";");
-			int ySource = Integer.parseInt(mpsSource[0]);	// add one for 0-base (data is 1-based)
-			int xSource = Integer.parseInt(mpsSource[1]);
+			int xSource = Integer.parseInt(mpsSource[0]);
+			int ySource = Integer.parseInt(mpsSource[1]);
 			
 			String[] mpsDestination = fields[1].split(";");
-			int yDestination = Integer.parseInt(mpsDestination[0].trim());	// add one for 0-base (data is 1-based)
-			int xDestination = Integer.parseInt(mpsDestination[1].trim());
+			int xDestination = Integer.parseInt(mpsDestination[0].trim());
+			int yDestination = Integer.parseInt(mpsDestination[1].trim());
 			MilepostId mpSource = new MilepostId(xSource, ySource);
 			MilepostId mpDestination = new MilepostId(xDestination, yDestination);
 			Set<MilepostId> dests = crossings.get(mpSource);
 			if (dests == null) 	// add the first mapping for the milepost
 				dests = new HashSet<MilepostId>();
 			dests.add(mpDestination);
-			log.info("Adding crossing [{},{}] to [{},{}]", ySource, xSource, yDestination, xDestination);
+			log.debug("Adding crossing [{},{}] to [{},{}]", ySource, xSource, yDestination, xDestination);
 			crossings.put(mpSource, dests);
 		}
 		return crossings;

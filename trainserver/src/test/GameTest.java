@@ -191,6 +191,7 @@ public class GameTest {
 	/** Test that normal building works as expected */
 	@Test
 	public void testBuild() throws GameException {
+		int expectedTotalSpent = 0;
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
@@ -201,35 +202,33 @@ public class GameTest {
         game.startGame("Adam", true);
         game.startGame("Sandra", true);
         
-        // First player builds from Cairo to Luxor - check building into a city
+        // First player builds from Cairo to Luxor - check building into a city & over a river
         log.info("Active player is {}", game.getActivePlayer().name);
         MilepostId[] mileposts;
         mileposts = new MilepostId[]{ new MilepostId(37, 8), new MilepostId(37, 9), new MilepostId(38, 10) };
         game.buildTrack(game.getActivePlayer().name, mileposts);
-        assertEquals(game.getActivePlayer().getSpending(), 4);	// Incremental cost of 4
+        expectedTotalSpent += 6;	// Incremental cost of 6
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());
         
         // Build into minor & major cities
         // Build back into Cairo from Luxor
         // Tests that player can build from end of their track into major city
         mileposts = new MilepostId[]{ new MilepostId(38, 10), new MilepostId(37, 10), new MilepostId(36, 9), new MilepostId(36, 8) };
         game.buildTrack(game.getActivePlayer().name, mileposts);
-        assertEquals(game.getActivePlayer().getSpending(), 7);	// Incremental cost of 3
-        
-        // River crossing - build from Luxor over the Nile
-        //mileposts = new MilepostId[]{ new MilepostId(38, 10), new MilepostId(39, 10) };
-        //game.buildTrack(game.getActivePlayer().name, mileposts);
-        //assertEquals(game.getActivePlayer().getSpending(), 10);	// Incremental cost of 3
+        expectedTotalSpent += 3;
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());
         
         // Sea inlet crossing - build from Cairo to the Sinai
-        //mileposts = new MilepostId[]{ new MilepostId(37, 7), new MilepostId(38, 6) };
-        //game.buildTrack(game.getActivePlayer().name, mileposts);
-        //assertEquals(game.getActivePlayer().getSpending(), 14);	// Incremental cost of 3
+        mileposts = new MilepostId[]{ new MilepostId(37, 7), new MilepostId(38, 6) };
+        game.buildTrack(game.getActivePlayer().name, mileposts);
+        expectedTotalSpent += 4;
+        assertEquals(expectedTotalSpent, game.getActivePlayer().getSpending());	// Incremental cost of 4
         
         skipPastBuildingTurns(game);
         
         // Check that the total was adjusted correctly
-        assertEquals(game.getActivePlayer().getMoney(), 70 - 7);
-        assertEquals(game.getActivePlayer().getSpending(), 0);
+        assertEquals(70 - expectedTotalSpent, game.getActivePlayer().getMoney());
+        assertEquals(0, game.getActivePlayer().getSpending());
         
         game.endGame("Adam", true);
         game.endGame("Sandra", true);
