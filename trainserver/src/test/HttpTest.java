@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.HttpURLConnection;
 
+import map.MilepostId;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +80,7 @@ public class HttpTest {
         	connection.setDoOutput(true);
         connectToServer(connection);
 
-        if (message != null || message.length() > 0)
+        if (message != null && message.length() > 0)
         	connection.getOutputStream().write(message.getBytes());
         // give it 15 seconds to respond
         connection.setReadTimeout(15*1000);
@@ -87,15 +89,30 @@ public class HttpTest {
     }
 
 	// Send a simple POST request to the server with the message as content and return the result code
-	private static String sendGetMessage(HttpURLConnection connection, String message) throws IOException, InterruptedException {
-		return sendMessage(connection, message, false);
-    }
-
-	// Send a simple POST request to the server with the message as content and return the result code
 	private static String sendPostMessage(HttpURLConnection connection, String message) throws IOException, InterruptedException {
 		return sendMessage(connection, message, true);
     }
 
+	private static String status(String gid) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"status\",\"gid\":\"%s\"}", gid);
+		jsonPayload = jsonPayload.replace("\"", "%22");	// url encode double quotes
+		log.info("jsonPayload {}", jsonPayload);
+
+		String url = serverURL + "?" + jsonPayload;	// form query string
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        String charset = "UTF-8";
+        connection.setRequestProperty("Accept-Charset", charset);
+        
+        int code = connection.getResponseCode();
+        System.out.println("Got response code " + code);
+
+        String responseMessage = getResponse(connection);
+        log.info("Got response message: {}", responseMessage);
+        assertEquals(connection.getResponseCode(), 200);
+        assertTrue(responseMessage.startsWith("{\"gid\":\"" + gid + "\""));
+        return responseMessage;
+	}
+	
 	private static String list(String listType, String expectedGid) throws IOException, InterruptedException {
 		String jsonPayload = String.format("{\"messageType\":\"list\",\"listType\":\"%s\"}", listType);
 		jsonPayload = jsonPayload.replace("\"", "%22");	// url encode double quotes
@@ -178,8 +195,8 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void startTrain(String gid, String pid, String where) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"startTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"where\":%s}", gid, pid, where);
+	private static void placeTrain(String gid, String pid, int train, String where) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"placeTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"train\":%s, \"where\":%s}", gid, pid, train, where);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -190,8 +207,8 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void moveTrain(String gid, String pid, String mileposts) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"moveTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"mileposts\":%s}", gid, pid, mileposts);
+	private static void moveTrain(String gid, String pid, int train, String mileposts) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"moveTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"train\":%s, \"mileposts\":%s}", gid, pid, train, mileposts);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -202,8 +219,8 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void pickupDeliverLoad(String messageType, String gid, String pid, String city, String load) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"%s\", \"gid\":\"%s\", \"pid\":\"%s\", \"city\":\"%s\", \"load\":\"%s\"}", messageType, gid, pid, city, load);
+	private static void pickupDeliverLoad(String messageType, String gid, String pid, int train, String load) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"%s\", \"gid\":\"%s\", \"pid\":\"%s\", \"train\":%s, \"load\":\"%s\"}", messageType, gid, pid, train, load);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -214,16 +231,16 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void pickupLoad(String gid, String pid, String city, String load) throws IOException, InterruptedException {
-		pickupDeliverLoad("pickupLoad", gid, pid, city, load);
+	private static void pickupLoad(String gid, String pid, int train, String load) throws IOException, InterruptedException {
+		pickupDeliverLoad("pickupLoad", gid, pid, train, load);
 	}
 	
-	private static void deliverLoad(String gid, String pid, String city, String load) throws IOException, InterruptedException {
-		pickupDeliverLoad("deliverLoad", gid, pid, city, load);
-	}
+/*	private static void deliverLoad(String gid, String pid, int train, String load) throws IOException, InterruptedException {
+		pickupDeliverLoad("deliverLoad", gid, pid, train, load);
+	} */
 	
-	private static void dumpLoad(String gid, String pid, String city, String load) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"dumpLoad\", \"gid\":\"%s\", \"pid\":\"%s\", \"city\":\"%s\", \"load\":\"%s\"}", gid, pid, city, load);
+	private static void dumpLoad(String gid, String pid, int train,  String load) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"dumpLoad\", \"gid\":\"%s\", \"pid\":\"%s\", \"train\":%s, \"load\":\"%s\"}", gid, pid, train, load);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -259,6 +276,12 @@ public class HttpTest {
 	}
 	
 
+	private String getActivePlayer(String gid) throws Exception {
+        String playerName = status(gid);
+        playerName = playerName.substring(30);	// chop off start
+        return playerName.substring(0, playerName.indexOf("\""));
+	}
+	
 	// Send a stream of requests to the server check the results
 	@Test
 	public void testTrain() throws Exception {
@@ -267,27 +290,33 @@ public class HttpTest {
         String gid = newGame("Adam", "red");
         list("joinable", gid);	// the new game should appear in the list of joinable games
         joinGame(gid, "Sandra", "green");
-        joinGame(gid, "Sandy", "aqua");
-        joinGame(gid, "Robin", "purple");
         startGame(gid, "Adam", true);
-        startGame(gid, "Robin", true);
-        startGame(gid, "Sandy", true);
         startGame(gid, "Sandra", true);
-     /*   All of the following requires getting status messages 
-      * so we can use the correct player, etc.
-        String mileposts = "[{\"x\":0,\"y\":0},{\"x\":1,\"y\":1},{\"x\":2,\"y\":2}]";
-        buildTrack(gid, "Sandy", mileposts);
+        String currentPlayer = getActivePlayer(gid);
         
-        startTrain(gid, "Sandy", "{\"x\":1, \"y\":1}");
-        moveTrain(gid, "Sandy", mileposts);
-        pickupLoad(gid, "Sandy", "Abidjan", "turnips");
-        moveTrain(gid, "Sandy", mileposts);
-        deliverLoad(gid, "Sandy", "Port Harcourt", "turnips");
-        dumpLoad(gid, "Sandy", "Port Harcourt", "iron");
-        endTurn(gid, "Sandy");
-        upgradeTrain(gid, "Adam", "Speed");
+        String mileposts = "[{\"x\":34,\"y\":58},{\"x\":33,\"y\":58},{\"x\":32,\"y\":58},{\"x\":31,\"y\":59}]";
+        buildTrack(gid, currentPlayer, mileposts);
+        
+        // skip past building turns
+        endTurn(gid, currentPlayer);
+        upgradeTrain(gid, getActivePlayer(gid), "Speed");
+        endTurn(gid, getActivePlayer(gid));
+        endTurn(gid, getActivePlayer(gid));
+        endTurn(gid, getActivePlayer(gid));
+        endTurn(gid, getActivePlayer(gid));
+        endTurn(gid, getActivePlayer(gid));
+                
+        placeTrain(gid, currentPlayer, 0, "{\"x\":34, \"y\":58}");
+
+        String moveMileposts = "[ {\"x\":33,\"y\":58},{\"x\":32,\"y\":58},{\"x\":31,\"y\":59}]";
+        pickupLoad(gid, currentPlayer, 0, "Diamonds");
+        pickupLoad(gid, currentPlayer, 0, "Arms");
+        moveTrain(gid, currentPlayer, 0, moveMileposts);
+        // deliverLoad(gid, currentPlayer, "turnips");
+        dumpLoad(gid, currentPlayer, 0, "Arms");
+        endTurn(gid, currentPlayer);
+        endGame(gid, "Adam");
         endGame(gid, "Sandra");
-        */
         
         //join game
         HttpTrainServer.stopServer();
