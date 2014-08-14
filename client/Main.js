@@ -17,6 +17,7 @@ var moneySpent = 0;
 var moneySpentThisBuild = 0;
 var verticesBuilt;
 var edgesBuilt;
+var placeTrainLocations;
 
 //Loaded
 $(document).ready(function(){
@@ -153,6 +154,93 @@ var upgradeDialogStageTwo = function(train,skippedStageOne){
 	}
 };
 
+var pickupDialogStageTwo = function(train,skippedStageOne) {
+	var milepost = JSON.parse(train.loc);
+	var loads = milepost.city.loads;
+	if(loads.length == 1) {
+		if(skippedStageOne){
+			$('#pickupDialog').append('<p>Are you sure you want to pickup' + loads[0].toLowerCase() + '?</p>');
+			var buttons = $('#pickupDialog').dialog('option','buttons');
+			buttons.push({
+				text:'Yes',
+				click:function(){
+					$('#pickupDialog').empty();
+					var buttons = $('#pickupDialog').dialog('option','buttons');
+					buttons.pop();
+					$('#pickupDialog').dialog('option','buttons',buttons);
+					pickupDialogStageThree(train,loads[0]);
+				}
+			});
+			$('pickupDialog').dialog('option','buttons',buttons);
+		}
+		else {
+			$('#pickupDialog').empty();
+			var buttons = $('#pickupDialog').dialog('option','buttons');
+			buttons.pop();
+			$('#pickupDialog').dialog('option','buttons',buttons);
+			pickupDialogStageThree(train,loads[0]);
+		}
+	}
+	else if(loads.length > 1) {
+		$('#pickupDialog').append('<ul/>');
+		for(var i = 0; i < loads.length; i++) {
+			$('#pickupDialog > ul').append('<li>' + loads[i] + '</li>').find('li:last').click(function(){
+				$('#pickupDialog > ul > li').removeClass('clicked');
+				$(this).addClass('clicked');
+			});
+		}
+		var buttons = $('#pickupDialog').dialog('option','buttons');
+		buttons.push({
+			text:'Pickup',
+			click:function(){
+				if($('#pickupDialog > ul > li.clicked').length == 1) {
+					var buttons = $('#pickupDialog').dialog('option','buttons');
+					buttons.pop();
+					$('#pickupDialog').dialog('option','buttons',buttons);
+					var load = $('#pickupDialog > ul > li.clicked').text();
+					$('#pickupDialog').empty();
+					pickupDialogStageThree(train,load);
+				}
+			}
+		});
+		$('#pickupDialog').dialog('option','buttons',buttons);
+	}
+};
+
+var pickupDialogStageThree = function(train,load) {
+	if(train.loads.indexOf(null) != -1) {
+		pickupLoad(train.index,load);
+		$('#pickupDialog').dialog('destroy');
+		$('#pickupDialog').empty().remove();
+	}
+	else {
+		$('#pickupDialog').append('<ul/>');
+		for(var i = 0; i < train.loads.length; i++) {
+			$('#pickupDialog > ul').append('<li>Dump ' + train.loads[i] + '</li>').find('li:last').click(function(){
+				$('#pickupDialog > ul > li').removeClass('clicked');
+				$(this).addClass('clicked');
+			});
+		}
+		var buttons = $('#pickupDialog').dialog('option','buttons');
+		buttons.push({
+			text:'Drop & Pickup',
+			click:function(){
+				if($('#pickupDialog > ul > li.clicked').length == 1) {
+					var buttons = $('#pickupDialog').dialog('option','buttons');
+					buttons.pop();
+					$('#pickupDialog').dialog('option','buttons',buttons);
+					var drop = $('#pickupDialog > ul > li.clicked').text().replace('Dump ','');
+					dumpLoad(train.index,drop);
+					pickupLoad(train.index,load);
+					$('#pickupDialog').dialog('destroy');
+					$('#pickupDialog').empty().remove();
+				}
+			}
+		});
+		$('#pickupDialog').dialog('option','buttons',buttons);
+	}
+};
+
 Array.prototype.clone = function() {
 	return this.slice(0);
 };
@@ -222,8 +310,9 @@ var resumeGame = function(GID,handle) {
 var newGame = function(color, handle, gameGeo) {
 	post({messageType:'newGame', color:color, pid:handle, gameType:gameGeo}, function(data) {
 		gameData = data;
-		for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
+		for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i) {
 			gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
+		}
 		gid = data.gid;
 		pid = handle;
 		geography = gameGeo;
@@ -265,7 +354,7 @@ var initMap = function(geography) {
 			$('#lobby').show();
 			panZoom.enable();
 			drawMileposts();
-			setInterval('statusGet()', 2000);
+			setInterval('statusGet()', 1000);
 		},
 		error: function(a,b,c){
 			console.log('error:' + arguments.toString());
@@ -399,9 +488,17 @@ var builtTrack = function(vertices,edges,cost) {
 	});
 };
 
+var pickupLoad = function(train,load) {
+	post({messageType:'pickupLoad',train:train,load:load,pid:pid,gid:gid});
+};
+
+var dumpLoad = function(train,load) {
+	post({messageType:'dumpLoad',train:train,load:load,pid:pid,gid:gid});
+};
+
 //Tells server we've started our train
-var startedTrain = function(position) {
-	post({messageType:'startTrain',pid:pid,gid:gid,position:position});
+var placeTrain = function(train,milepost) {
+	post({messageType:'placeTrain',pid:pid,gid:gid,train:train,where:milepost});
 };
 
 //Tells server we've upgraded our train
@@ -468,6 +565,43 @@ var refreshCards = function(cards) {
 	}
 };
 
+var checkLoadButtons = function(players) {
+	var shown = false;
+	for(var i = 0; i < findPid(players,pid).trains.length; i++) {
+		var train = findPid(players,pid).trains[i];
+		if(!train.loc)
+			continue;
+		var milepost = JSON.parse(train.loc);
+		if(milepost.type == 'MAJORCITY' || milepost.type == 'CITY') {
+			if(milepost.city.loads) {
+				$('#pickup').show();
+				shown = true;
+			}
+			checkDeliver(milepost,findPid(players,pid),train);
+		}
+	}
+	if(!shown) {
+		$('#pickup').hide();
+	}
+}
+
+var checkDeliver = function(milepost,player,train) {
+	for(var i = 0; i < player.hand.length; i++) {
+		for(var j = 0; j < player.hand[i].trips.length; j++){
+			var trip = player.hand[i].trips[j];
+			if(trip.dest == milepost.city.name) {
+				for(var k = 0; k < train.loads.length; k++) {
+					if(train.loads[k] == trip.load) {
+						$('#deliver').show();
+						return;
+					}
+				}
+			}
+		}
+	}
+	$('#deliver').hide();
+};
+
 var refreshTrains = function(trains) {
 	$('#trains').empty();
 	for (var t = 0; t < trains.length; ++t) {
@@ -475,6 +609,31 @@ var refreshTrains = function(trains) {
 		$('#trains').children().eq(t).append('<p><span>' + trains[t].speed + '</span></p>');
 		for (var l = 0; l < trains[t].loads.length; ++l)
 			$('#trains').children().eq(t).append('<p><span>' + trains[t].loads[l] + '</span></p>');
+	}
+};
+
+var refreshTrainLocations = function(players) {
+	for(var i = 0; i < players.length; i++) {
+		if(players[i].pid == pid)
+			continue;
+		for(var j = 0; j < players[i].trains.length; j++) {
+			if(!players[i].trains[j].loc)
+				continue;
+			var milepost = JSON.parse(players[i].trains[j].loc);
+			var mpsvg = {x:0,y:0};
+			var mpjQ = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y));
+			if(mpjQ.prop('tagName') == 'circle') {
+				mpsvg.x = mpjQ.attr('cx');
+				mpsvg.y = mpjQ.attr('cy');
+			}
+			else {
+				var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+				var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
+				mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+				mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+			}
+			$('#trains' + players[i].pid).append($(document.createElementNS('http://www.w3.org/2000/svg','circle')).attr({'id':'train' + players[i].pid + j, 'cx':mpsvg.x, 'cy' : mpsvg.y,'r':10, 'fill':players[i].color}));
+		}
 	}
 };
 
@@ -563,9 +722,13 @@ var processStatus = function(data) {
 			$('#controls').empty();
 			$('#controls').append('<div id="turnControls"/>');
 			$('#controls').append('<div id="endControls"/>');
-			$('#controls').append('<div id="buildControls"/>').find('div:last').hide();
-			$('#buildControls').append('<button id="acceptBuild">OK</button>')
-			$('#buildControls').append('<button id="cancelBuild">Cancel</button>');
+			$('#controls').append('<div id="okControls"/>').find('div:last').hide();
+			$('#controls').append('<div id="placeControls"/>').find('div:last').hide();
+			$('#okControls').append('<button id="acceptBuild">OK</button>')
+			$('#okControls').append('<button id="cancelBuild">Cancel</button>');
+			for(var i = 0; i < findPid(data.players,pid).trains.length; i++) {
+				$('#placeControls').append('<input type="radio" id="trainpicker' + i + '"><label for="trainpicker' + i + '">Train ' + (i + 1) + '</label></input>');
+			}
 			$('#endControls').append('<input type="checkbox" id="endGame"><label for="endGame">End Game</label></input>');
 			$('#endControls').append('<button id="resign">Resign</button>');
 			$('#endGame').change(function() {
@@ -578,7 +741,7 @@ var processStatus = function(data) {
 			$('#turnControls').append('<button id="build">Build</button>').find('button:last').click(function(){
 				$('#turnControls').hide();
 				$('#endControls').hide();
-				$('#buildControls').show();
+				$('#okControls').show();
 				moneySpentThisBuild = 0;
 				verticesBuilt = [];
 				edgesBuilt = []
@@ -641,7 +804,7 @@ var processStatus = function(data) {
 					$('#acceptBuild').off('click');
 					$('#cancelBuild').off('click');
 					$('#milepostsGroup > *:not(path)').off('click',milepostsClick);
-					$('#buildControls').hide();
+					$('#okControls').hide();
 					$('#turnControls').show();
 					$('#endControls').show();
 					verticesBuilt = [];
@@ -655,7 +818,7 @@ var processStatus = function(data) {
 					$('#acceptBuild').off('click');
 					$('#cancelBuild').off('click');
 					$('#milepostsGroup > *:not(path)').off('click',milepostsClick);
-					$('#buildControls').hide();
+					$('#okControls').hide();
 					$('#turnControls').show();
 					$('#endControls').show();
 					verticesBuilt = [];
@@ -690,6 +853,8 @@ var processStatus = function(data) {
 						if(trains.length > 1) {
 							$('#upgradeDialog').append('<ul/>');
 							for(var i = 0; i < player.trains.length; i++){
+								if(!trains.contains(player.trains[i]))
+									continue;
 								$('#upgradeDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function(){
 									$('#upgradeDialog > ul > li').removeClass('clicked');
 									$(this).addClass('clicked');
@@ -703,41 +868,144 @@ var processStatus = function(data) {
 									var buttons = $('#upgradeDialog').dialog('option','buttons');
 									buttons.pop();
 									$('#upgradeDialog').dialog('option','buttons',buttons);
-									upgradeDialogStageTwo(player.trains[parseInt($('#upgradeDialog > ul > li.clicked').text().replace('Train ',''))],false);
+									upgradeDialogStageTwo(player.trains[parseInt($('#upgradeDialog > ul > li.clicked').text().replace('Train ','')) - 1],false);
 								}
 							});
 							$('#upgradeDialog').dialog('option','buttons',buttons);
-						}
-						else if(trains.length == 1) {
-							upgradeDialogStageTwo(player.trains[0],true);
-						}
-						else if(trains.length == 0) {
-							checkUpgradeHiding();
-							$('#upgradeDialog').dialog('destroy');
-							$('#upgradeDialog').remove();
 						}
 					}
 			});
 			$('#turnControls').append($('<button id="move">Move</button>').hide());
 			$('#turnControls').append($('<button id="deliver">Deliver</button>').hide());
-			$('#turnControls').append($('<button id="pickup">Pickup</button>').hide());
+			$('#turnControls').append($('<button id="pickup">Pickup</button>').hide().click(function(){
+				var player = findPid(lastStatusMessage.players,pid);
+				var validTrains = [];
+				for(var i = 0; i < player.trains.length; i++) {
+					var milepost = JSON.parse(player.trains[i].loc);
+					if(milepost.type == 'CITY' || milepost.type == 'MAJORCITY') {
+						validTrains.push(player.trains[i]);
+					}
+				}
+				if(validTrains.length == 0)
+					return;
+				$('#lobby').append('<div id="pickupDialog" title="Pickup a load" />').find('div:last').dialog({
+					dialogClass: "no-close",
+					buttons: [{
+						text: "Cancel",
+						click: function() {
+							$( this ).dialog( "destroy" );
+							$('#pickupDialog').remove();
+						}
+					}]
+				});
+				if(validTrains.length == 1) {
+					pickupDialogStageTwo(validTrains[0],true);
+				}
+				else if(validTrains.length > 1) {
+					$('#pickupDialog').append('<ul/>');
+					for(var i = 0; i < player.trains.length; i++){
+						if(!validTrains.contains(player.trains[i]))
+							continue;
+						$('#pickupDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function(){
+							$('#pickupDialog > ul > li').removeClass('clicked');
+							$(this).addClass('clicked');
+						});
+					}
+					var buttons = $('#pickupDialog').dialog('option','buttons');
+					buttons.push({
+						text:"OK",
+						click:function(){
+							$('#pickupDialog').empty();
+							var buttons = $('#pickupDialog').dialog('option','buttons');
+							buttons.pop();
+							$('#pickupDialog').dialog('option','buttons',buttons);
+							pickupDialogStageTwo(player.trains[parseInt($('#pickupDialog > ul > li.clicked').text().replace('Train ','')) - 1],false);
+						}
+					});
+					$('#pickupDialog').dialog('option','buttons',buttons);
+				}
+			}));
 			$('#turnControls').append($('<button id="drop">Drop</button>').hide());
 			$('#turnControls').append($('<button id="placeTrain">Place Train</button>').hide().click(function(){
-				//Place Train Code Goes Here
-				$('#move').show();
-				$('#drop').show();
-				$('#placeTrain').hide();
-				placedTrain = true;
+				placeTrainLocations = [];
+				var milepostClick = function() {
+					if(findPid(data.players,pid).trains.length > 1 && $('#placeControls > .ui-state-active').length == 0)
+						return;
+					var location = $(this).attr('id').replace('milepost','').split(',');
+					var milepost = {x:location[0],y:location[1]};
+					var train = findPid(data.players,pid).trains.length == 1?0:parseInt($($('#placeControls > .ui-state-active').children()).first().text().replace('Train ','')) - 1;
+					if($('#train' + pid + train).length > 0)
+						return;
+					placeTrainLocations[train] = {train:train,milepost:milepost};
+					var mpsvg = {x:0,y:0};
+					var mpjQ = $(this);
+					if(mpjQ.prop('tagName') == 'circle') {
+						mpsvg.x = mpjQ.attr('cx');
+						mpsvg.y = mpjQ.attr('cy');
+					}
+					else {
+						var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/,'').replace('translate(','').replace(')','').split(',');
+						var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
+						mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+						mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+					}
+					$('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg','circle')).attr({'id':'train' + pid + train, 'cx':mpsvg.x, 'cy' : mpsvg.y,'r':10, 'fill':findPid(data.players,pid).color}));
+					if(placeTrainLocations.length == findPid(data.players,pid).trains.length)
+						$('#acceptBuild').button('option','disabled',false);
+					else
+						$('#acceptBuild').button('option','disabled',true);
+				};
+				$('#milepostsGroup > *:not(path)').click(milepostClick);
+				$('#acceptBuild').click(function() {
+					if(placeTrainLocations.length != findPid(data.players,pid).trains.length)
+						return;
+					for(var i = 0; i < placeTrainLocations.length; i++) {
+						placeTrain(placeTrainLocations[i].train,placeTrainLocations[i].milepost);
+					}
+					$('#move').show();
+					$('#drop').show();
+					$('#placeTrain').hide();
+					placedTrain = true;
+					placeTrainLocations = [];
+					$('#turnControls').show();
+					$('#endControls').show();
+					$('okControls').hide();
+					$('#placeControls').hide();
+					$('#okControls').buttonset('option','disabled',false);
+					$('#acceptBuild').off('click');
+					$('#cancelBuild').off('click');
+				});
+				$('#cancelBuild').click(function() {
+					placeTrainLocations = [];
+					$('#turnControls').show();
+					$('#endControls').show();
+					$('okControls').hide();
+					$('#placeControls').hide();
+					$('#okControls').buttonset('option','disabled',false);
+					$('#acceptBuild').off('click');
+					$('#cancelBuild').off('click');
+					$('#trains' + pid).empty();
+				});
+				$('#turnControls').hide();
+				$('#endControls').hide();
+				$('#okControls').show();
+				$('#acceptBuild').button('option','disabled',true);
+				if(findPid(data.players,pid).trains.length > 1) {
+					$('#placeControls').show();
+				}
 			}));
 			$('#turnControls').append('<button id="endTurn">End Turn</button>').find('button:last').click(endTurn);
 			$('#turnControls').buttonset();
 			$('#turnControls').buttonset('option','disabled',data.activeid != pid)
 			$('#endControls').buttonset();
-			$('#buildControls').buttonset();
+			$('#okControls').buttonset();
+			$('#placeControls').buttonset();
 			yourTurn = data.activeid == pid;
 			$('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','track'));
+			$('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','trainsDisplay'));
 			for(var i = 0; i < data.players.length; i++) {
 				$('#track').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','pid' + data.players[i].pid));
+				$('#trainsDisplay').append($(document.createElementNS('http://www.w3.org/2000/svg','g')).attr('id','trains' + data.players[i].pid));
 			}
 		}
 		if (!geography && data.geography) {
@@ -751,6 +1019,7 @@ var processStatus = function(data) {
 		if(started) {
 			$('#0').next().addClass('ui-state-active');
 			refreshRails(data.players);
+			refreshTrainLocations(data.players);
 		}
 		me = findPid(data.players, pid);
 		refreshCards(me.hand);
@@ -760,6 +1029,7 @@ var processStatus = function(data) {
 			yourTurn = true;
 			$('#turnControls').buttonset('option','disabled',false);
 			checkBuildMoney();
+			checkLoadButtons(data.players);
 		}
 		else if(data.activeid && data.activeid != pid) {
 			yourTurn = false;

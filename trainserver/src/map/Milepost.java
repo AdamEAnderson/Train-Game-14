@@ -54,8 +54,19 @@ public class Milepost {
 	public String toString() {
 		StringBuilder builder = new StringBuilder(128);
 		builder.append("{" + "\"x\":" + x + "," + "\"y\":" + y + "," + "\"type\":\"" + type.name() + "\"");
-		if (city != null)
-			builder.append(",\"city\":\"" + city.name + "\"");
+		if (city != null) {
+			builder.append(",\"city\":{\"name\":\"" + city.name + "\",\"loads\":[");
+			boolean first = true;
+			for (String load: city.loads) {
+				if (!first)
+					builder.append(",");
+				builder.append("\"");
+				builder.append(load);
+				builder.append("\"");
+				first = false;
+			}
+			builder.append("]}");
+		}
 		builder.append(",\"edges\":[");
 		boolean firstEdge = true;
 		for (Edge edge: edges) {

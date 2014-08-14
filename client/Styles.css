@@ -77,10 +77,19 @@ body
 	left:70%;
 }
 
-#buildControls
+#okControls
 {
 	height:100%:
-	width:100%;
+	width:50%;
+}
+
+#placeControls
+{
+	height:100%;
+	width:50%;
+	position: absolute;
+	top:0;
+	right:0;
 }
 
 #topBar
@@ -205,6 +214,23 @@ div.train > p:not(:last-child) { border-bottom: 1px solid black; }
 }
 
 #upgradeDialog > ul > li.clicked {
+	background-color:#fff;
+	border:1px solid #888 !important;
+	border-radius: 1px;
+}
+
+#pickupDialog > ul {
+	list-style-type:none;
+	padding:0;
+}
+
+#pickupDialog > ul > li:hover {
+	background-color:#fff;
+	border:1px dashed #aaa;
+	border-radius: 1px;
+}
+
+#pickupDialog > ul > li.clicked {
 	background-color:#fff;
 	border:1px solid #888 !important;
 	border-radius: 1px;
