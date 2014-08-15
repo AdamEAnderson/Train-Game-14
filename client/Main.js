@@ -12,7 +12,7 @@ var yourTurn;
 var gameData;
 var mapHeight, mapWidth;
 var mileposts = {};
-var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE'/*, 'FOREST'*/];
+var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE', 'FOREST', 'CHUNNEL'];
 var geography;
 var started = false;
 var placedTrain = false;
