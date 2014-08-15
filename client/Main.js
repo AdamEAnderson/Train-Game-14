@@ -159,7 +159,7 @@ var pickupDialogStageTwo = function(train,skippedStageOne) {
 	var loads = milepost.city.loads;
 	if(loads.length == 1) {
 		if(skippedStageOne){
-			$('#pickupDialog').append('<p>Are you sure you want to pickup' + loads[0].toLowerCase() + '?</p>');
+			$('#pickupDialog').append('<p>Are you sure you want to pickup ' + loads[0].toLowerCase() + '?</p>');
 			var buttons = $('#pickupDialog').dialog('option','buttons');
 			buttons.push({
 				text:'Yes',
@@ -171,7 +171,7 @@ var pickupDialogStageTwo = function(train,skippedStageOne) {
 					pickupDialogStageThree(train,loads[0]);
 				}
 			});
-			$('pickupDialog').dialog('option','buttons',buttons);
+			$('#pickupDialog').dialog('option','buttons',buttons);
 		}
 		else {
 			$('#pickupDialog').empty();
@@ -551,6 +551,10 @@ var pickupLoad = function(train,load) {
 
 var dumpLoad = function(train,load) {
 	post({messageType:'dumpLoad',train:train,load:load,pid:pid,gid:gid});
+};
+
+var deliverLoad = function(train,load,card) {
+	post({messageType:'deliverLoad',train:train,load:load,card:card});
 };
 
 //Tells server we've started our train
@@ -943,7 +947,72 @@ var processStatus = function(data) {
 					}
 			});
 			$('#turnControls').append($('<button id="move">Move</button>').hide());
-			$('#turnControls').append($('<button id="deliver">Deliver</button>').hide());
+			$('#turnControls').append($('<button id="deliver">Deliver</button>').hide().click(function() {
+				var deliveries = [];
+				for(var i = 0; i < player.hand.length; i++) {
+					for(var j = 0; j < player.hand[i].trips.length; j++){
+						var trip = player.hand[i].trips[j];
+						if(trip.dest == milepost.city.name) {
+							for(var k = 0; k < train.loads.length; k++) {
+								if(train.loads[k] == trip.load) {
+									deliveries.push({train:k,load:trip.load,city:trip.dest,card:i});
+								}
+							}
+						}
+					}
+				}
+				$('#lobby').append('<div id="deliverDialog" title="Deliver a load" />').find('div:last').dialog({
+					dialogClass: "no-close",
+					buttons: [{
+						text: "Cancel",
+						click: function() {
+							$(this).dialog('destroy');
+							$('#deliverDialog').remove();
+						}
+					}]
+				});
+				if(deliveries.length == 1) {
+					$('#deliverDialog').append('<p>Are you sure you want to deliver ' + deliveries[0].load.toLowerCase() + ' to ' + deliveries[0].city + '?</p>');
+					var buttons = $('#deliverDialog').dialog('option','buttons');
+					buttons.push({
+						text:'Yes',
+						click:function(){
+							var buttons = $('#deliverDialog').dialog('option','buttons');
+							buttons.pop();
+							$('#deliverDialog').dialog('option','buttons',buttons);
+							deliverLoad(deliveries[0].train,deliveries[0].load,deliveries[0].card);
+							$('#deliverDialog').dialog('destroy');
+							$('#deliverDialog').empty().remove();
+						}
+					});
+					$('#deliverDialog').dialog('option','buttons',buttons);
+				}
+				else {
+					$('#deliverDialog').append('<ul/>');
+					for(var i = 0; i < deliveries.length; i++) {
+						$('#deliverDialog > ul').append('<li>Deliver ' + deliveries[i].load.toLowerCase() + ' to ' + deliveries[i].city + '</li>').find('li:last').click(function(){
+							$('#deliverDialog > ul > li').removeClass('clicked');
+							$(this).addClass('clicked');
+						}).attr('id','delivery' + i);
+					}
+					var buttons = $('#deliverDialog').dialog('option','buttons');
+					buttons.push({
+						text:'Deliver',
+						click:function(){
+							if($('#deliverDialog > ul > li.clicked').length == 1) {
+								var buttons = $('#deliverDialog').dialog('option','buttons');
+								buttons.pop();
+								$('#deliverDialog').dialog('option','buttons',buttons);
+								var deliver = deliveries[parseInt($('#deliverDialog > ul > li.clicked').attr('id').replace('delivery',''))];
+								deliverLoad(deliver.train,deliver.load,deliver.card);
+								$('#deliverDialog').dialog('destroy');
+								$('#deliverDialog').empty().remove();
+							}
+						}
+					});
+					$('#deliverDialog').dialog('option','buttons',buttons);
+				}
+			}));
 			$('#turnControls').append($('<button id="pickup">Pickup</button>').hide().click(function(){
 				var player = findPid(lastStatusMessage.players,pid);
 				var validTrains = [];
