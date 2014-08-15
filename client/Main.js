@@ -1,11 +1,9 @@
 //Global Variables
 var paper, panZoom;
 //var server = 'http://127.0.0.1:8080';
-//var server;
-//if(location.orgin)
-	//server = location.origin.replace(/\:[0-9]+/,'') + ':8080';
-//else
-var server = 'http://' + location.hostname + ':8080';
+if(!location.origin)
+	location.origin = 'http://' + location.host;
+var server = location.origin.replace(/\:[0-9]+/,'') + ':8080';
 var pid, gid;
 var lastStatus;
 var lastStatusMessage;
