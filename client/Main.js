@@ -334,6 +334,9 @@ milepostsNeeded.forEach(function(e){
 		url:location.origin + join(location.pathname, '../../data/mileposts/' + e.toLowerCase() + '.svg'),
 		success:function(d){
 			mileposts[e] = d;
+		},
+		error:function(err) {
+			console.log("error finding milepost " + e.toLowerCase() + " icon ");
 		}
 	});
 });
@@ -426,7 +429,12 @@ var enterLobby = function() {
 	$('#lobby').append('<ul id="lobbyMenuJUI"/>');
 	$('#lobby').append($('<div id="topBar"/>').append('<div id="players"/>','<div id="controls"/>'));
 	$('#lobby').append('<div id="map"/>');
-	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"/>');
+	var moneyPNG = location.origin + join(location.pathname, '../../data/' + geography + '/money.png');
+	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"><div id="moneyTotal"><img id="moneyTotalIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div><div id="moneySpent"><img id="moneySpentIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div></div>');
+	//$('#moneyTotalIcon').attr('width', $('#moneyTotal').width());
+	//$('#moneyTotalIcon').attr('height', $('#moneyTotal').height());
+	//$('#moneySpentIcon').attr('width', $('#moneySpent').width());
+	//$('#moneySpentIcon').attr('height', $('#moneySpent').height());
 	$('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
 	$('#lobbyMenuJUI').menu();
 	$('#controls').append('<input id="startGame" type="checkbox"><label for="startGame">Start Game</label></input>');
@@ -753,8 +761,13 @@ var refreshRails = function(players) {
 };
 
 var refreshMoney = function(money) {
-	$('#money').empty();
-	$('#money').append('<span>' + money + '</span>');
+	$('#moneyTotalNumber').empty();
+	$('#moneyTotalNumber').append('<span>' + money + '</span>');
+}
+
+var refreshMoneySpent = function(moneySpent) {
+	$('#moneySpentNumber').empty();
+	$('#moneySpentNumber').append('<span>' + moneySpent + '</span>');
 }
 
 var findPid = function(players, pid) {
@@ -777,6 +790,7 @@ var checkBuildMoney = function(){
 	else {
 		$('#build').button('option','disabled',false);
 	}
+	refreshMoneySpent(moneySpent + moneySpentThisBuild);
 };
 
 var drawLineBetweenMileposts = function(x1, y1, x2, y2, PID) {
@@ -870,6 +884,7 @@ var processStatus = function(data) {
 					drawLineBetweenMileposts(lastX,lastY,currentX,currentY,pid);
 					verticesBuilt.push({x:currentMilepost.x,y:currentMilepost.y});
 					moneySpentThisBuild += milepostCost;
+					refreshMoneySpent(moneySpent + moneySpentThisBuild);
 					console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);			
 				};
 				$('#milepostsGroup > *:not(path)').click(milepostsClick);

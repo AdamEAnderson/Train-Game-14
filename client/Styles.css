@@ -176,10 +176,48 @@ div.train > p:not(:last-child) { border-bottom: 1px solid black; }
 {
 	display: inline-block;
 	vertical-align: top;
-	width: 70px;
+	width: 200px;
 	font-size: 1.8em;
 	margin-right: 5px;
 	margin-top:2px;
+}
+
+#moneyTotal
+{
+	height: 50%;
+	width: 100%;
+}
+
+#moneyTotalIcon
+{
+	height: 100%;
+	width: 100%;
+}
+
+#moneySpent
+{
+	height: 50%;
+	width: 100%;
+}
+
+#moneySpentIcon
+{
+	height: 100%;
+	width: 100%;
+}
+
+#moneyTotalNumber 
+{
+	position: relative;
+	top: -50%;
+	left: 50%;
+}
+
+#moneySpentNumber 
+{
+	position: relative;
+	top: -50%;
+	left: 50%;
 }
 
 #up
