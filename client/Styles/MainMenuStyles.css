@@ -1,31 +1,48 @@
-﻿.phaseDiv { display: none; }
-#actionPicker { width: 200px; }
-#actionPicker-button { font-size: 0.9em; }
-#gamePicker { width: 200px; }
-
-#gamePicker-button
-{
-	font-size: 0.9em;
-	margin-top: 10px;
-	display: none;
+﻿.phaseDiv {
+    display: none;
 }
 
-#geographyPicker { width: 200px; }
-
-#geographyPicker-button
-{
-	font-size: 0.9em;
-	margin-top: 10px;
+#actionPicker {
+    width: 200px;
 }
 
-#colorPicker { width: 200px; }
-#colorPicker-button { font-size: 0.9em; }
-
-#newGameButton
-{
-	margin-top: 15px;
-	width: 200px;
-	font-size: .8em;
+#actionPicker-button {
+    font-size: 0.9em;
 }
 
-#mainMenu select { display: block; }
+#gamePicker {
+    width: 200px;
+}
+
+#gamePicker-button {
+    font-size: 0.9em;
+    margin-top: 10px;
+    display: none;
+}
+
+#geographyPicker {
+    width: 200px;
+}
+
+#geographyPicker-button {
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+#colorPicker {
+    width: 200px;
+}
+
+#colorPicker-button {
+    font-size: 0.9em;
+}
+
+#newGameButton {
+    margin-top: 15px;
+    width: 200px;
+    font-size: .8em;
+}
+
+#mainMenu select {
+    display: block;
+}

@@ -1,54 +1,54 @@
 ﻿.no-close .ui-dialog-titlebar-close {
-	display: none;
+    display: none;
 }
 
 #upgradeDialog > ul {
-	list-style-type:none;
-	padding:0;
+    list-style-type: none;
+    padding: 0;
 }
 
-#upgradeDialog > ul > li:hover {
-	background-color:#fff;
-	border:1px dashed #aaa;
-	border-radius: 1px;
-}
+    #upgradeDialog > ul > li:hover {
+        background-color: #fff;
+        border: 1px dashed #aaa;
+        border-radius: 1px;
+    }
 
-#upgradeDialog > ul > li.clicked {
-	background-color:#fff;
-	border:1px solid #888 !important;
-	border-radius: 1px;
-}
+    #upgradeDialog > ul > li.clicked {
+        background-color: #fff;
+        border: 1px solid #888 !important;
+        border-radius: 1px;
+    }
 
 #pickupDialog > ul {
-	list-style-type:none;
-	padding:0;
+    list-style-type: none;
+    padding: 0;
 }
 
-#pickupDialog > ul > li:hover {
-	background-color:#fff;
-	border:1px dashed #aaa;
-	border-radius: 1px;
-}
+    #pickupDialog > ul > li:hover {
+        background-color: #fff;
+        border: 1px dashed #aaa;
+        border-radius: 1px;
+    }
 
-#pickupDialog > ul > li.clicked {
-	background-color:#fff;
-	border:1px solid #888 !important;
-	border-radius: 1px;
-}
+    #pickupDialog > ul > li.clicked {
+        background-color: #fff;
+        border: 1px solid #888 !important;
+        border-radius: 1px;
+    }
 
 #dumpDialog > ul {
-	list-style-type:none;
-	padding:0;
+    list-style-type: none;
+    padding: 0;
 }
 
-#dumpDialog > ul > li:hover {
-	background-color:#fff;
-	border:1px dashed #aaa;
-	border-radius: 1px;
-}
+    #dumpDialog > ul > li:hover {
+        background-color: #fff;
+        border: 1px dashed #aaa;
+        border-radius: 1px;
+    }
 
-#dumpDialog > ul > li.clicked {
-	background-color:#fff;
-	border:1px solid #888 !important;
-	border-radius: 1px;
-}
+    #dumpDialog > ul > li.clicked {
+        background-color: #fff;
+        border: 1px solid #888 !important;
+        border-radius: 1px;
+    }

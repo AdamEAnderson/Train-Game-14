@@ -132,8 +132,8 @@ var enterLobby = function () {
     $('#lobby').append('<ul id="lobbyMenuJUI"/>');
     $('#lobby').append($('<div id="topBar"/>').append('<div id="players"/>', '<div id="controls"/>'));
     $('#lobby').append('<div id="map"/>');
-	var moneyPNG = location.origin + join(location.pathname, '../../data/' + geography + '/money.png');
-	$('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"><div id="moneyTotal"><img id="moneyTotalIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div><div id="moneySpent"><img id="moneySpentIcon" src="' + moneyPNG + '"/><div id="moneySpentNumber"/></div></div>');
+    var moneyPNG = location.origin + join(location.pathname, '../../data/' + geography + '/money.png');
+    $('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"><div id="moneyTotal"><img id="moneyTotalIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div><div id="moneySpent"><img id="moneySpentIcon" src="' + moneyPNG + '"/><div id="moneySpentNumber"/></div></div>');
     $('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
     $('#lobbyMenuJUI').menu();
     $('#controls').append('<input id="startGame" type="checkbox"><label for="startGame">Start Game</label></input>');
