@@ -1,5 +1,6 @@
 package player;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class Player {
 	private Card[] cards;
 	private int spendings;
 	private int movesMade;
-	private String rentingFrom;
+	private ArrayList<String> rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	
@@ -34,8 +35,7 @@ public class Player {
 			Player next, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries){
 		trains = new Train[ruleSet.numTrains];
 		for (int i = 0; i < ruleSet.numTrains; ++i) {
-			trains[i] = new Train();
-			trains[i].index(i);
+			trains[i] = new Train(i);
 		}
 		money = ruleSet.startingMoney;
 		rail = new Rail(globalRail, globalFerries, name);
@@ -43,7 +43,7 @@ public class Player {
 		this.name = name;
 		this.color = color;
 		spendings = 0;
-		rentingFrom = "";
+		rentingFrom = new ArrayList<String>();
 		nextPlayer = next;
 		readyToStart = false;
 		readyToEnd = false;
@@ -67,8 +67,8 @@ public class Player {
 			else {
 				String s = rail.anyConnects(l, next);
 				if(s.equals("")) throw new GameException("InvalidMove");
-				if(!rentingFrom.equals(s)){
-					rentingFrom = s;
+				if(!rentingFrom.contains(s)){
+					rentingFrom.add(s);
 					money -= 4;
 					for(Player p = nextPlayer; p != this; p.getNextPlayer()){
 						if(p.name.equals(s)){
@@ -180,7 +180,7 @@ public class Player {
 		money -= spendings;
 		spendings = 0;
 		movesMade = 0;
-		rentingFrom = "";
+		rentingFrom.clear();
 		return nextPlayer;
 	}
 	
