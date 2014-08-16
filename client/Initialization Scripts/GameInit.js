@@ -1,4 +1,17 @@
-﻿var startedGame = function (data) {
+﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
+/// <reference path="http://underscorejs.org/underscore.js" /> 
+/// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
+/// <reference path="../libraries/raphael-pan-zoom.js" /> 
+/// <reference path="../libraries/d3.js" /> 
+/// <reference path="../Globals.js" /> 
+/// <reference path="../Utility Scripts/Utilities.js" /> 
+/// <reference path="../Utility Scripts/DOMChecker.js" /> 
+/// <reference path="../Utility Scripts/DOMRefresh.js" /> 
+/// <reference path="../Utility Scripts/ServerInterface.js" /> 
+/// <reference path="../Initialization Scripts/Initialization.js" /> 
+
+var startedGame = function (data) {
     started = true;
     for (var i = 0; i < findPid(data.players, pid).trains.length; i++) {
         trainLocations[i] = [];

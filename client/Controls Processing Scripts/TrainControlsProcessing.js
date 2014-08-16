@@ -1,4 +1,21 @@
-﻿var upgradeClick = function (e) {
+﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
+/// <reference path="http://underscorejs.org/underscore.js" /> 
+/// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
+/// <reference path="../libraries/raphael-pan-zoom.js" /> 
+/// <reference path="../libraries/d3.js" /> 
+/// <reference path="../Globals.js" /> 
+/// <reference path="../Utility Scripts/Utilities.js" /> 
+/// <reference path="../Utility Scripts/DOMChecker.js" /> 
+/// <reference path="../Utility Scripts/DOMRefresh.js" /> 
+/// <reference path="../Utility Scripts/ServerInterface.js" /> 
+/// <reference path="../Initialization Scripts/Initialization.js" /> 
+/// <reference path="../Initialization Scripts/GameInit.js" /> 
+/// <reference path="../Controls Processing Scripts/DialogStages.js" /> 
+/// <reference path="../Controls Processing Scripts/BuildControlsProcessing.js" /> 
+/// <reference path="../Controls Processing Scripts/LoadControlsProcessing.js" /> 
+
+var upgradeClick = function (e) {
     var data = e.data;
     for (var i = 0; i < lastStatusMessage.players.length; i++)
         if (lastStatusMessage.players[i].pid == pid) {
@@ -19,7 +36,10 @@
                     trains.splice(i, 1);
                 }
             }
-            if (trains.length > 1) {
+            if (trains.length == 1) {
+                upgradeDialogStageTwo(trains[0], true);
+            }
+            else if (trains.length > 1) {
                 $('#upgradeDialog').append('<ul/>');
                 for (var i = 0; i < player.trains.length; i++) {
                     if (!trains.contains(player.trains[i]))
