@@ -24,6 +24,7 @@ public class Player {
 	private Card[] cards;
 	private int spendings;
 	private int movesMade;
+	private String rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	
@@ -42,6 +43,7 @@ public class Player {
 		this.name = name;
 		this.color = color;
 		spendings = 0;
+		rentingFrom = "";
 		nextPlayer = next;
 		readyToStart = false;
 		readyToEnd = false;
@@ -60,7 +62,24 @@ public class Player {
 		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
-		if(l.isNeighbor(next) && (rail.connects(l, next) || l.isSameCity(next))) trains[t].moveTrain(next);
+		if(l.isNeighbor(next)){
+			if(rail.connects(l, next) || l.isSameCity(next)) trains[t].moveTrain(next);
+			else {
+				String s = rail.anyConnects(l, next);
+				if(s.equals("")) throw new GameException("InvalidMove");
+				if(!rentingFrom.equals(s)){
+					rentingFrom = s;
+					money -= 4;
+					for(Player p = nextPlayer; p != this; p.getNextPlayer()){
+						if(p.name.equals(s)){
+							p.money += 4;
+							break;
+						}
+					}
+				}
+				trains[t].moveTrain(next);
+			}
+		}
 		else throw new GameException("InvalidMove");
 		if(rail.connectsByFerry(l, next)){
 			if(movesMade == 0){
@@ -161,6 +180,7 @@ public class Player {
 		money -= spendings;
 		spendings = 0;
 		movesMade = 0;
+		rentingFrom = "";
 		return nextPlayer;
 	}
 	
