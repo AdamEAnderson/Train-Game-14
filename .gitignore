@@ -1,2 +1,12 @@
 /.metadata/
 /.DS_Store
+TrainGame14.csproj
+TrainGame14.csproj.user
+TrainGame14.sln
+Web.Debug.config
+Web.Release.config
+Web.config
+TrainGame14.v12.suo
+bin
+obj
+Properties
