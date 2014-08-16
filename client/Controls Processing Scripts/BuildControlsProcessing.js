@@ -59,6 +59,7 @@
         verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
         milepostEdgesBuilt.push({ x1: lastMilepost.x, y1: lastMilepost.y, x2: currentMilepost.x, y2: currentMilepost.y });
         moneySpentThisBuild += milepostCost;
+        refreshMoneySpent(moneySpent + moneySpentThisBuild);
         console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);
     };
     $('#milepostsGroup > *:not(path)').click(milepostsClick);

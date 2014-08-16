@@ -97,7 +97,12 @@ var refreshRails = function (players) {
     }
 };
 
-var refreshMoney = function (money) {
-    $('#money').empty();
-    $('#money').append('<span>' + money + '</span>');
+var refreshMoney = function(money) {
+	$('#moneyTotalNumber').empty();
+	$('#moneyTotalNumber').append('<span>' + money + '</span>');
+}
+
+var refreshMoneySpent = function(moneySpent) {
+	$('#moneySpentNumber').empty();
+	$('#moneySpentNumber').append('<span>' + moneySpent + '</span>');
 }

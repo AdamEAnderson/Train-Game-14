@@ -60,7 +60,8 @@ div.train > p:not(:last-child) { border-bottom: 1px solid black; }
 {
 	display: inline-block;
 	vertical-align: top;
-	width: 200px;
+	width: 160px;
+	height: 160px;
 	font-size: 1.8em;
 	margin-right: 5px;
 	margin-top:2px;
@@ -93,13 +94,15 @@ div.train > p:not(:last-child) { border-bottom: 1px solid black; }
 #moneyTotalNumber 
 {
 	position: relative;
-	top: -50%;
-	left: 50%;
+	top: -70%;
+	color: blue;
+	text-align: center;
 }
 
 #moneySpentNumber 
 {
 	position: relative;
-	top: -50%;
-	left: 50%;
+	top: -70%;
+	color: blue;
+	text-align: center;
 }

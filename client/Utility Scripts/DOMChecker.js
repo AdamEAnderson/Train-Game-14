@@ -75,4 +75,5 @@ var checkBuildMoney = function () {
     else {
         $('#build').button('option', 'disabled', false);
     }
+	refreshMoneySpent(moneySpent + moneySpentThisBuild);
 };
