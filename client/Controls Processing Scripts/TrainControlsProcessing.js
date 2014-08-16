@@ -119,7 +119,12 @@ var moveClick = function (e) {
             return;
         var valid = false;
         for (var j = 0; j < edgesBuiltFinal.length; j++) {
-            edgeBuilt = edgesBuiltFinal[j];
+            var edgeBuilt = edgesBuiltFinal[j];
+            if ((milepost.x == edgeBuilt.x1 && milepost.y == edgeBuilt.y1 && edgeBuilt.x2 == edge.x && edgeBuilt.y2 == edge.y) || (edge.x == edgeBuilt.x1 && edge.y == edgeBuilt.y1 && edgeBuilt.x2 == milepost.x && edgeBuilt.y2 == milepost.y))
+                valid = true;
+        }
+        for (var k = 0; k < otherPlayersEdgesBuilt.length; k++) {
+            var edgeBuilt = otherPlayersEdgesBuilt[k];
             if ((milepost.x == edgeBuilt.x1 && milepost.y == edgeBuilt.y1 && edgeBuilt.x2 == edge.x && edgeBuilt.y2 == edge.y) || (edge.x == edgeBuilt.x1 && edge.y == edgeBuilt.y1 && edgeBuilt.x2 == milepost.x && edgeBuilt.y2 == milepost.y))
                 valid = true;
         }

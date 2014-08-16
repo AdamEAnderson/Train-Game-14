@@ -40,3 +40,18 @@ var findPid = function (players, pid) {
             return players[i];
     return null;
 };
+
+//Post
+var post = function (data, callback) {
+    $.ajax({
+        type: "POST",
+        url: server,
+        data: JSON.stringify(data),
+        success: callback,
+        error: function (xhr, textStatus, errorThrown) {
+            console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
+        },
+        dataType: 'json'
+    });
+
+};

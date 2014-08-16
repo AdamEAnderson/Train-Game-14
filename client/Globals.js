@@ -27,6 +27,7 @@ var verticesBuilt;
 var verticesBuiltFinal = [];
 var milepostEdgesBuilt;
 var edgesBuiltFinal = [];
+var otherPlayersEdgesBuilt = [];
 var movesMade;
 var movesMadeThisTurn = [];
 var edgesBuilt;
@@ -60,19 +61,4 @@ var join = function (/* path segments */) {
     if (parts[0] === "") newParts.unshift("");
     // Turn back into a single string path.
     return newParts.join("/") || (newParts.length ? "/" : ".");
-};
-
-//Post
-var post = function (data, callback) {
-    $.ajax({
-        type: "POST",
-        url: server,
-        data: JSON.stringify(data),
-        success: callback,
-        error: function (xhr, textStatus, errorThrown) {
-            console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
-        },
-        dataType: 'json'
-    });
-
 };

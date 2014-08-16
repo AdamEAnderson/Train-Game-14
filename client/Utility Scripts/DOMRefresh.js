@@ -67,6 +67,7 @@ var refreshTrainLocations = function (players) {
 };
 
 var refreshRails = function (players) {
+    otherPlayersEdgesBuilt = [];
     for (var i = 0; i < players.length; i++) {
         if (players[i].pid == pid)
             continue;
@@ -102,6 +103,7 @@ var refreshRails = function (players) {
                     m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
                 }
                 drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, players[i].pid);
+                otherPlayersEdgesBuilt.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
             }
         }
     }
