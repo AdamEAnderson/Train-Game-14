@@ -2,8 +2,9 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    height: 90%;
+    height: calc(90% - 5px);
     width: 30%;
+    overflow: scroll;
 }
 
 #hand {
@@ -57,8 +58,18 @@ div.train > p:first-child {
 
 div.train > p {
     margin: 5px 0;
+    min-height: 30px;
 }
 
+	div.train > p > span {
+    	vertical-align: middle;
+    	alignment-baseline: middle;
+	}
+	
+	div.train > p > img {
+		float: right;
+	}
+	
     div.train > p:not(:last-child) {
         border-bottom: 1px solid black;
     }

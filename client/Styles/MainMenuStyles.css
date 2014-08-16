@@ -43,6 +43,10 @@
     font-size: .8em;
 }
 
+#mainMenu  {
+    padding-left: 10px;
+}
+
 #mainMenu select {
     display: block;
 }

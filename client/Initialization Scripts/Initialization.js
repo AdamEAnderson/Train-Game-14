@@ -162,7 +162,7 @@ var enterLobby = function () {
     else {
         // join/resume: we'll make the map once we have gotten a status message 
         // and know the geography
-        setInterval('statusGet()', 2000);
+        setInterval('statusGet()', 250);
     }
 }
 

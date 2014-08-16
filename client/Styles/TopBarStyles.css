@@ -50,4 +50,5 @@
     overflow: hidden;
     width: 100%;
     height: 10%;
+    border-bottom: 1px solid #aaa;
 }
