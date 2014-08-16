@@ -434,6 +434,20 @@ public class TrainServer {
 		game.endTurn(data.pid);
 	}
 
+	static class ResignData {
+		String gid;
+		String pid;
+	}
+	
+	synchronized static public void resign(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		ResignData data = gson.fromJson(requestText, ResignData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.resign(data.pid);
+	}
+	
 	static class EndGame {
 		public String gid;
 		public String pid;

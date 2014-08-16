@@ -141,6 +141,13 @@ interface AbstractGame {
 	 */
 	void endTurn(String player) throws GameException;
 	
+	/** Player leaves the game permanently.
+	 * 
+	 * @param player
+	 * @throws GameException
+	 */
+	void resign(String player) throws GameException;
+	
 	/** Game is over.
 	 * @param pid		Player whose train is being moved
 	 * @throws GameException
