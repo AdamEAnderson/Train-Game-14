@@ -1,0 +1,105 @@
+﻿#handAndTrains
+{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	height: 90%;
+	width: 30%;
+}
+
+#hand
+{
+	margin-left: 4px;
+	margin-right: 4px;
+	display: inline-block;
+}
+
+.card
+{
+	display: inline-block;
+	border: 2px solid black;
+	border-radius: 3px;
+	width: 220px;
+	margin-right: 5px;
+	margin-top:2px;
+}
+
+.trip { margin: 2px; }
+.trip > p { margin: 0px; }
+div.trip > p:not(:last-child) { border-bottom: 1px solid black; }
+
+#trains
+{
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 4px;
+}
+
+.train
+{
+	display: inline-block;
+	border: 2px solid black;
+	width: 100px;
+	padding: 2px;
+	border-radius: 3px;
+	margin-right: 5px;
+	margin-top:2px;
+}
+
+div.train > p:first-child
+{
+	color: blue;
+	font-size: 1.8em;
+	text-align: center;
+}
+
+div.train > p { margin: 5px 0; }
+div.train > p:not(:last-child) { border-bottom: 1px solid black; }
+
+#money
+{
+	display: inline-block;
+	vertical-align: top;
+	width: 200px;
+	font-size: 1.8em;
+	margin-right: 5px;
+	margin-top:2px;
+}
+
+#moneyTotal
+{
+	height: 50%;
+	width: 100%;
+}
+
+#moneyTotalIcon
+{
+	height: 100%;
+	width: 100%;
+}
+
+#moneySpent
+{
+	height: 50%;
+	width: 100%;
+}
+
+#moneySpentIcon
+{
+	height: 100%;
+	width: 100%;
+}
+
+#moneyTotalNumber 
+{
+	position: relative;
+	top: -50%;
+	left: 50%;
+}
+
+#moneySpentNumber 
+{
+	position: relative;
+	top: -50%;
+	left: 50%;
+}
