@@ -28,6 +28,7 @@ public class Player {
 	private ArrayList<String> rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
+	private boolean turnInProgress;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
@@ -50,6 +51,7 @@ public class Player {
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
+		turnInProgress = true;
 		if (trains[t].getLocation() == null) 
 			trains[t].moveTrain(m);
 		else 
@@ -58,6 +60,7 @@ public class Player {
 	}
 	
 	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {
+		turnInProgress = true;
 		if(moves.isEmpty()) return;
 		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
@@ -94,6 +97,7 @@ public class Player {
 	}
 	
 	public void upgradeTrain(int t, UpgradeType u) throws GameException {
+		turnInProgress = true;
 		if(spendings > 0) throw new GameException("ExceededAllowance");
 		switch (u) {
 			case SPEED:
@@ -108,6 +112,7 @@ public class Player {
 	}
 	
 	public void buildTrack(Queue<Milepost> mileposts) throws GameException {
+		turnInProgress = true;
 		if(mileposts.isEmpty()) return;
 		Milepost origin = mileposts.poll();
 		if(mileposts.isEmpty()) return;
@@ -147,16 +152,21 @@ public class Player {
 	}
 	
 	public void pickupLoad(int t, String load) throws GameException{
+		turnInProgress = true;
 		trains[t].addLoad(load);
 	}
 	
-	public void dropLoad(int t, String load) throws GameException{ trains[t].dropLoad(load); }
+	public void dropLoad(int t, String load) throws GameException{ 
+		turnInProgress = true;
+		trains[t].dropLoad(load); 
+	}
 	
 	/** Delivers a load on the given card.
 	 * @param index is the location of the card in the player's hand, array-wise
 	 * @param next is the card drawn to replace that one
 	 */
 	public void deliverLoad(int cIndex, int tIndex, Card next) throws GameException {
+		turnInProgress = true;
 		Card c = cards[cIndex];
 		Trip t = canDeliver(tIndex, c);
 		if(t == null) throw new GameException("InvalidDelivery");
@@ -171,6 +181,7 @@ public class Player {
 	}
 	
 	private Trip canDeliver(int ti, Card c){
+		turnInProgress = true;
 		if(trains[ti] == null) return null;
 		City city = trains[ti].getLocation().city;
 		if(city == null) return null;
@@ -186,6 +197,7 @@ public class Player {
 		spendings = 0;
 		movesMade = 0;
 		rentingFrom.clear();
+		turnInProgress = false;
 		return nextPlayer;
 	}
 	
@@ -196,6 +208,8 @@ public class Player {
 	public void readyToEnd(boolean ready) { readyToEnd = ready;}
 	
 	public boolean readyToEnd() { return readyToEnd; }
+	
+	public boolean turnInProgress() { return turnInProgress; }
 	
 	public void resetNextPlayer(Player p){ nextPlayer = p; }
 	
@@ -231,7 +245,7 @@ public class Player {
 	}
 	
 	/** Call this from test code only!! Just here for debugging */
-	public void testReplaceCards(Card[] cards)  {
+	public void turnInCards(Card[] cards)  {
 		this.cards = cards;
 	}
 }

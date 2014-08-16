@@ -54,7 +54,7 @@ public class GameTest {
         Card cards[] = new Card[handSize];
         for (int i = 0; i < handSize; ++i)
         	cards[i] = new Card(trips);
-        game.getActivePlayer().testReplaceCards(cards);
+        game.getActivePlayer().turnInCards(cards);
         
         skipPastBuildingTurns(game);
 
@@ -151,7 +151,7 @@ public class GameTest {
         Card cards[] = new Card[handSize];
         for (int j = 0; j < handSize; ++j)
         	cards[j] = new Card(trips);
-        game.getActivePlayer().testReplaceCards(cards);
+        game.getActivePlayer().turnInCards(cards);
         game.pickupLoad(activePlayer, 0, "Diamonds");
         game.pickupLoad(activePlayer, 0, "Arms");
         game.pickupLoad(activePlayer, 1, "Gold");
