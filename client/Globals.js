@@ -5,40 +5,43 @@
 /// <reference path="libraries/raphael-pan-zoom.js" /> 
 /// <reference path="libraries/d3.js" /> 
 
-var paper, panZoom;
+//Globals
+var paper, panZoom; //Raphael svg and pan-zoom plug-in objects
+//Polyfill for location.origin
 if (!window.location.origin) {
     window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 }
-var server = location.origin.replace(/\:[0-9]+/, '') + ':8080';
-var pid, gid;
-var lastStatus;
-var lastStatusMessage;
-var yourTurn;
-var gameData;
-var mapHeight, mapWidth;
-var mileposts = {};
-var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE', 'FOREST', 'CHUNNEL'];
-var geography;
-var started = false;
-var placedTrain = false;
-var moneySpent = 0;
-var moneySpentThisBuild = 0;
-var verticesBuilt;
-var verticesBuiltFinal = [];
-var milepostEdgesBuilt;
-var edgesBuiltFinal = [];
-var otherPlayersEdgesBuilt = [];
-var movesMade;
-var movesMadeThisTurn = [];
-var edgesBuilt;
-var placeTrainLocations;
-var trainLocations = [];
+var server = location.origin.replace(/\:[0-9]+/, '') + ':8080'; //Defines java server URL
+var pid, gid; //Player ID and game ID
+var lastStatus; //Number that matches the transaction number of the last status message processed
+var lastStatusMessage; //The last status message processed
+var yourTurn; //Boolean for if it is your turn
+var gameData; //Data that is sent from the server on newGame or joinGame that contains map and game information
+var mapViewboxHeight, mapViewboxWidth; //Width and height of the background map svg
+var mileposts = {}; //Object containing milepost svgs loaded through ajax on initialization
+var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE', 'FOREST', 'CHUNNEL']; //List of milepost svg needed
+var geography; //The name of the map that is being played
+var started = false; //Boolean for if the game has been started
+var placedTrain = false; //Boolean for if the player has placed all trains
+var moneySpent = 0; //Integer for money spent during the players turn
+var moneySpentThisBuild = 0; //Integer for money spent while building
+var verticesBuilt; //Array for mileposts built while building
+var verticesBuiltFinal = []; //Array for mileposts built and confirmed by server
+var milepostEdgesBuilt; //Array for edges built while building
+var edgesBuiltFinal = []; //Array for edges built and confirmed by server
+var otherPlayersEdgesBuilt = []; //Array for edges built by other players
+var movesMade; //Array for all moves made while moving
+var movesMadeThisTurn = []; //Array for al moves made this turn confirmed by server
+var edgesBuilt; //Array of all jQuery elements of edges drawn
+var placeTrainLocations; //Array of objects where index corresponds to train index and objects have a milepost and a train property
+var trainLocations = []; //Array of objects where index corresponds to train index and object are mileposts
 
+//Adds a clone function to the array prototype that deep-copies the array
 Array.prototype.clone = function () {
     return this.slice(0);
 };
 
-//Join paths
+//Join path URIs
 var join = function (/* path segments */) {
     // Split the inputs into a list of path commands.
     var parts = [];
