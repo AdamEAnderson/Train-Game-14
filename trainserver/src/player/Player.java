@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import reference.*;
 import train.GameException;
+import train.RuleSet;
+import map.Ferry;
 import map.Milepost;
 
 
@@ -27,15 +29,15 @@ public class Player {
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
-	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
-			Player next, Map<Milepost, Set<Milepost>> globalRail){
-		trains = new Train[numTrain];
-		for (int i = 0; i < numTrain; ++i) {
+	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
+			Player next, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries){
+		trains = new Train[ruleSet.numTrains];
+		for (int i = 0; i < ruleSet.numTrains; ++i) {
 			trains[i] = new Train();
 			trains[i].index(i);
 		}
-		money = startMoney;
-		rail = new Rail(globalRail);
+		money = ruleSet.startingMoney;
+		rail = new Rail(globalRail, globalFerries, name);
 		cards = hand;
 		this.name = name;
 		this.color = color;
@@ -98,7 +100,7 @@ public class Player {
 		}
 		
 		// Cannot build over track that has already been built
-		if(rail.anyConnects(origin, next)) {
+		if(rail.anyConnects(origin, next) != "") {
 			log.warn("Track is already built there ({}, {}) and ({}, {})", origin.x, origin.y, next.x, next.y);
 			throw new GameException("InvalidTrack");
 		}

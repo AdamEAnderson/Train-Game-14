@@ -14,71 +14,96 @@ public class Rail {
 	
 	private Map<Milepost, Set<Milepost>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
-	private Map<Milepost, Set<Milepost>> allTracks; //same object per game; holds everyone's tracks
-	private Map<Milepost, Ferry> ferries;
+	private Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
+	private Map<Milepost, Ferry> allFerries;
+	private String pid;
 	
-	Rail(Map<Milepost, Set<Milepost>> all){
-		allTracks = all;
+	Rail(Map<Milepost, Set<Track>> allTracks, Map<Milepost, Ferry> allFerries, String pid){
+		this.allTracks = allTracks;
 		tracks = new HashMap<Milepost, Set<Milepost>>();
-		ferries = new HashMap<Milepost, Ferry>();
+		this.allFerries = allFerries;
+		this.pid = pid;
 	}
 	
-	public Map<Milepost, Set<Milepost>> getRail(){
-		return tracks;
-	}
+	public Map<Milepost, Set<Milepost>> getRail(){return tracks;}
 	
-	boolean contains(Milepost m){
-		return tracks.containsKey(m);
-	}
+	boolean contains(Milepost m){return tracks.containsKey(m);}
 	
 	/** Returns whether this rail connects these two mileposts.
 	 *  When the two mileposts are not neighbors, the answer is always false.
 	 */
-	boolean connects(Milepost one, Milepost two){
-		return tracks.get(one).contains(two);
-	}
+	boolean connects(Milepost one, Milepost two){return tracks.get(one).contains(two);}
 	
 	boolean connectsByFerry(Milepost one, Milepost two){
-		return (ferries.containsKey(one) ? ferries.get(one).destination.equals(two) : false);
+		return (allFerries.containsKey(one) ? allFerries.get(one).destination.equals(two) : false);
 	}
 	
-	boolean anyConnects(Milepost one, Milepost two){
-		Set<Milepost> dests = allTracks.get(one);
-		return dests != null && allTracks.get(one).contains(two);
-	}
-	
-	static void addTrack(Map<Milepost, Set<Milepost>> tracks, Milepost origin, Milepost next) {
-		if(!tracks.containsKey(origin)){
-			tracks.put(origin, new HashSet<Milepost>());
+	String anyConnects(Milepost one, Milepost two){
+		Set<Track> tracks = allTracks.get(one);
+		if(tracks == null) return "";
+		for(Track t : tracks){
+			for(Milepost m : t.dests){
+				if(m.equals(two)) return t.pid;
+			}
 		}
-		tracks.get(origin).add(next);
-		if(!tracks.containsKey(next)){
-			tracks.put(next, new HashSet<Milepost>());
-		}
-		tracks.get(next).add(origin);
+		return "";
 	}
 	
-	static void removeTrack(Map<Milepost, Set<Milepost>> tracks, Milepost one, Milepost two){
+	private void addTrack(Milepost one, Milepost two) {
+		if(!tracks.containsKey(one)){
+			tracks.put(one, new HashSet<Milepost>());
+		}
+		tracks.get(one).add(two);
+	}
+	
+	private void addAllTrack(Milepost one, Milepost two){
+		if(!allTracks.containsKey(one)){
+			allTracks.put(one, new HashSet<Track>());
+		}
+		for(Track t : allTracks.get(one)){
+			if(t.pid.equals(pid)){
+				t.add(two);
+				return;
+			}
+		}
+		allTracks.get(one).add(new Track(pid));
+		for(Track t : allTracks.get(one)){
+			if(t.pid.equals(pid)){
+				t.add(two);
+				return;
+			}
+		}
+	}
+	
+	private void removeTrack(Milepost one, Milepost two){
 		Set<Milepost> s = tracks.get(one);
 		s.remove(two);
-		s = tracks.get(two);
-		s.remove(one);
 	}
 
+	private void removeAllTrack(Milepost one, Milepost two){
+		for(Track t : allTracks.get(one)){
+			if(t.pid.equals(pid)){
+				t.remove(two);
+			}
+		}
+	}
+	
 	/** Adds the given track to the player's rails, if and only if the track can be legally built.
 	 * @param origin: the milepost already attached to the rail; next is where
 	 * you build towards.
 	 * @return the cost of the build
 	 */
 	int build(Milepost origin, Milepost next) throws GameException {
-		addTrack(tracks, origin, next);
-		addTrack(allTracks, origin, next);
+		addTrack(origin, next);
+		addTrack(next, origin);
+		addAllTrack(origin, next);
+		addAllTrack(next, origin);
 		Edge e = getEdge(origin, next);
 		if(e instanceof Ferry){
 			Edge back = getEdge(next, origin);
 			if(back instanceof Ferry){
-				ferries.put(origin, (Ferry) e);
-				ferries.put(next, (Ferry) back);
+				allFerries.put(origin, (Ferry) e);
+				allFerries.put(next, (Ferry) back);
 			}
 			else {
 				erase(origin, next);
@@ -98,11 +123,24 @@ public class Rail {
 		return null;
 	}
 	
-	
-	/** Erases the track between these neighboring mileposts
-	 */
 	void erase(Milepost one, Milepost two){
-		removeTrack(tracks, one, two);
-		removeTrack(allTracks, one, two);
+		removeTrack(one, two);
+		removeTrack(two, one);
+		removeAllTrack(one, two);
+		removeAllTrack(two, one);
+	}
+	
+	public class Track {
+		final String pid;
+		Set<Milepost> dests;
+		
+		Track(String p){
+			pid = p;
+			dests = new HashSet<Milepost>();
+		}
+		
+		void add(Milepost m){dests.add(m);}
+		
+		void remove(Milepost m){dests.remove(m);}
 	}
 }

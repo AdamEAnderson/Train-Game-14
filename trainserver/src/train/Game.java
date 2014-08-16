@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.Set;
 
+import map.Ferry;
 import map.Milepost;
 import map.MilepostId;
 import map.TrainMap;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import player.Player;
+import player.Rail;
 import reference.Card;
 import reference.UpgradeType;
 
@@ -29,7 +31,8 @@ public class Game implements AbstractGame {
 	private List<Player> players;
 	private Player active;
 	private Player last;
-	private Map<Milepost, Set<Milepost>> globalRail;
+	private Map<Milepost, Set<Rail.Track>> globalRail;
+	private Map<Milepost, Ferry> globalFerry;
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
 	private boolean joinable;	// game has not yet started
 	private boolean ended; // game has ended
@@ -48,7 +51,8 @@ public class Game implements AbstractGame {
 		this.ruleSet = ruleSet;
 		transaction = 1;
 		players = new ArrayList<Player>();
-		globalRail = new HashMap<Milepost, Set<Milepost>>();
+		globalRail = new HashMap<Milepost, Set<Rail.Track>>();
+		globalFerry = new HashMap<Milepost, Ferry>();
 		turns = 0;
 		joinable = true;
 	}
@@ -79,7 +83,7 @@ public class Game implements AbstractGame {
 			hand[i] = deck.poll();
 		}
 		Player nextPlayer = (players.size() == 0) ? null : players.get(players.size() - 1);
-		Player p = new Player(ruleSet.startingMoney, ruleSet.numTrains, hand, pid, color, nextPlayer, globalRail); 
+		Player p = new Player(ruleSet, hand, pid, color, nextPlayer, globalRail, globalFerry); 
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 		active = p;
