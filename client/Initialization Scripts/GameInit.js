@@ -24,13 +24,13 @@
         //Open confirm box for them and make sure they want to resign
         //If they do, post to the server telling it to resign this player
     });
-    $('#turnControls').append('<button id="build">Build</button>').find('button:last').click(data,buildClick);
-    $('#turnControls').append('<button id="upgrade">Upgrade</button>').find('button:last').click(data,upgradeClick);
+    $('#turnControls').append('<button id="build">Build</button>').find('button:last').click(data, buildClick);
+    $('#turnControls').append('<button id="upgrade">Upgrade</button>').find('button:last').click(data, upgradeClick);
     $('#turnControls').append($('<button id="move">Move</button>').hide().click(data, moveClick));
-    $('#turnControls').append($('<button id="deliver">Deliver</button>').hide().click(data,deliverClick));
-    $('#turnControls').append($('<button id="pickup">Pickup</button>').hide().click(data,pickupClick));
-    $('#turnControls').append($('<button id="dump">Dump</button>').hide().click(data,dumpClick));
-    $('#turnControls').append($('<button id="placeTrain">Place Train</button>').hide().click(data,placeTrainClick));
+    $('#turnControls').append($('<button id="deliver">Deliver</button>').hide().click(data, deliverClick));
+    $('#turnControls').append($('<button id="pickup">Pickup</button>').hide().click(data, pickupClick));
+    $('#turnControls').append($('<button id="dump">Dump</button>').hide().click(data, dumpClick));
+    $('#turnControls').append($('<button id="placeTrain">Place Train</button>').hide().click(data, placeTrainClick));
     $('#turnControls').append('<button id="endTurn">End Turn</button>').find('button:last').click(endTurn);
     $('#turnControls').buttonset();
     $('#turnControls').buttonset('option', 'disabled', data.activeid != pid)
