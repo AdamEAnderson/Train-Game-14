@@ -162,7 +162,12 @@ public class Player {
 		if(t == null) throw new GameException("InvalidDelivery");
 		trains[tIndex].dropLoad(t.load);
 		cards[cIndex] = next; 
-		money += t.cost;
+		int delivery = t.cost;
+		if(money < 0){
+			delivery += 2 * money;
+			money = 0;
+		}
+		money += delivery;
 	}
 	
 	private Trip canDeliver(int ti, Card c){
