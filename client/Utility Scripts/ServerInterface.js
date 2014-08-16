@@ -1,4 +1,15 @@
-﻿//Tells server we've joined a game
+﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
+/// <reference path="http://underscorejs.org/underscore.js" /> 
+/// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
+/// <reference path="../libraries/raphael-pan-zoom.js" /> 
+/// <reference path="../libraries/d3.js" /> 
+/// <reference path="../Globals.js" /> 
+/// <reference path="../Utility Scripts/Utilities.js" /> 
+/// <reference path="../Utility Scripts/DOMChecker.js" /> 
+/// <reference path="../Utility Scripts/DOMRefresh.js" /> 
+
+//Tells server we've joined a game
 var joinGame = function (GID, color, handle) {
     post({ messageType: 'joinGame', gid: GID, color: color, pid: handle }, function (data) {
         gameData = data;
