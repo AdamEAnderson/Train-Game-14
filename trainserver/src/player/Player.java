@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import reference.*;
 import train.GameException;
+import train.RuleSet;
+import map.Ferry;
 import map.Milepost;
 
 
@@ -22,24 +24,26 @@ public class Player {
 	private Card[] cards;
 	private int spendings;
 	private int movesMade;
+	private String rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
-	public Player(int startMoney, int numTrain, Card[] hand, String name, String color, 
-			Player next, Map<Milepost, Set<Milepost>> globalRail){
-		trains = new Train[numTrain];
-		for (int i = 0; i < numTrain; ++i) {
+	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
+			Player next, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries){
+		trains = new Train[ruleSet.numTrains];
+		for (int i = 0; i < ruleSet.numTrains; ++i) {
 			trains[i] = new Train();
 			trains[i].index(i);
 		}
-		money = startMoney;
-		rail = new Rail(globalRail);
+		money = ruleSet.startingMoney;
+		rail = new Rail(globalRail, globalFerries, name);
 		cards = hand;
 		this.name = name;
 		this.color = color;
 		spendings = 0;
+		rentingFrom = "";
 		nextPlayer = next;
 		readyToStart = false;
 		readyToEnd = false;
@@ -58,7 +62,24 @@ public class Player {
 		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
-		if(l.isNeighbor(next) && (rail.connects(l, next) || l.isSameCity(next))) trains[t].moveTrain(next);
+		if(l.isNeighbor(next)){
+			if(rail.connects(l, next) || l.isSameCity(next)) trains[t].moveTrain(next);
+			else {
+				String s = rail.anyConnects(l, next);
+				if(s.equals("")) throw new GameException("InvalidMove");
+				if(!rentingFrom.equals(s)){
+					rentingFrom = s;
+					money -= 4;
+					for(Player p = nextPlayer; p != this; p.getNextPlayer()){
+						if(p.name.equals(s)){
+							p.money += 4;
+							break;
+						}
+					}
+				}
+				trains[t].moveTrain(next);
+			}
+		}
 		else throw new GameException("InvalidMove");
 		if(rail.connectsByFerry(l, next)){
 			if(movesMade == 0){
@@ -98,7 +119,7 @@ public class Player {
 		}
 		
 		// Cannot build over track that has already been built
-		if(rail.anyConnects(origin, next)) {
+		if(rail.anyConnects(origin, next) != "") {
 			log.warn("Track is already built there ({}, {}) and ({}, {})", origin.x, origin.y, next.x, next.y);
 			throw new GameException("InvalidTrack");
 		}
@@ -159,6 +180,7 @@ public class Player {
 		money -= spendings;
 		spendings = 0;
 		movesMade = 0;
+		rentingFrom = "";
 		return nextPlayer;
 	}
 	
