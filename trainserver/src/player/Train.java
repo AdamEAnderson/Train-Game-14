@@ -9,32 +9,22 @@ public class Train {
 	private int capacity; //2 or 3
 	private String[] loads; //length the same as the capacity
 	private Milepost loc;
-	private int index;	// where train is in array
+	private final int index;	// where train is in array
 	
-	public Train(){
+	public Train(int newIndex){
 		speed = 12;
 		capacity = 2;
 		loads = new String[2];
 		loc = null;
-		index = 0;
+		index = newIndex;
 	}
-	
-	public void index(int newIndex)
-	{
-		this.index = newIndex;
-	}
-	
-	public int index() {
-		return index;
-	}
+		
+	public int index() {return index;}
 	
 	/** Moves the train to the given location.
 	 * Does no checks for the legality of the move.
 	 */
-	void moveTrain(Milepost location)
-	{ 
-		loc = location;
-	}
+	void moveTrain(Milepost location){ loc = location;}
 	
 	public void upgradeSpeed() throws GameException {
 		if(speed < 20){

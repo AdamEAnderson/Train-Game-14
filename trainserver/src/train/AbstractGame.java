@@ -123,6 +123,14 @@ interface AbstractGame {
 	 */
 	void dumpLoad(String player, int train, String load) throws GameException;
 	
+	/** Player exchanges their turn for the chance to turn in 
+	 * their entire hand for a new set of cards
+	 * 
+	 * @param player
+	 * @throws GameException 
+	 */
+	void turnInCards(String player) throws GameException;
+	
 	/** Player declares their turn is over.
 	 * @param pid		Player whose train is being moved
 	 * @throws GameException

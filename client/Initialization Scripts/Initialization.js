@@ -113,8 +113,8 @@ var initMap = function (geography) {
             }
             var viewBox = $(d).find('svg').attr('viewBox').split(' ');
             //$('#map > svg').attr('viewBox',$(d).find('svg').attr('viewBox'));
-            mapWidth = viewBox[2];
-            mapHeight = viewBox[3];
+            mapViewboxWidth = viewBox[2];
+            mapViewboxHeight = viewBox[3];
             paper.setViewBox(viewBox[0], viewBox[1], viewBox[2], viewBox[3]);
             paper.setSize($('#map').width(), $('#map').height());
             panZoom = paper.panzoom({ dragModifier: 5, initialZoom: 0, initialPosition: { x: 0, y: 0 }, width: viewBox[2], height: viewBox[3] });
@@ -162,7 +162,7 @@ var enterLobby = function () {
     else {
         // join/resume: we'll make the map once we have gotten a status message 
         // and know the geography
-        setInterval('statusGet()', 2000);
+        setInterval('statusGet()', 250);
     }
 }
 

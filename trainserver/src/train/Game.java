@@ -196,6 +196,19 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
+	public void turnInCards(String player) throws GameException {
+		checkActive(player);
+		if(active.turnInProgress()) 
+			throw new GameException("TurnAlreadyStarted");
+		Card[] cards = new Card[ruleSet.handSize];
+		for(int i = 0; i < cards.length; i++){
+			cards[i] = deck.poll();
+		}
+		active.turnInCards(cards);
+		endTurn(player);
+	}
+	
+	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={})", pid);
 		boolean last = (active == getLastPlayer());
@@ -272,4 +285,7 @@ public class Game implements AbstractGame {
 	private void checkBuilding() throws GameException{
 		if(turns < 3) throw new GameException("InvalidMove");
 	}
+
+	
+	
 }

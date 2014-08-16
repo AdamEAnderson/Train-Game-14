@@ -7,19 +7,23 @@
 /// <reference path="../Globals.js" /> 
 /// <reference path="../Utility Scripts/Utilities.js" /> 
 
+//Checks for whether or not to hide the button for deliver, pickup, and dump
 var checkLoadButtons = function (players) {
     var shownPickup = false;
     var shownDump = false;
+    //Loops through all of the players trains
     for (var i = 0; i < findPid(players, pid).trains.length; i++) {
         var train = findPid(players, pid).trains[i];
         if (!train.loc || !trainLocations[i])
             continue;
+        //If the player has a load, show the dump button
         for (var j = 0; j < train.loads.length; j++) {
             if (train.loads[j] != null) {
                 $('#dump').show();
                 shownDump = true;
             }
         }
+        //If the player is in a city, check for deliver and pickup
         var milepost = gameData.mapData.orderedMileposts[(parseInt(trainLocations[i].y) * gameData.mapData.mpWidth) + parseInt(trainLocations[i].x)];
         if (milepost.type == 'MAJORCITY' || milepost.type == 'CITY') {
             if (milepost.city.loads) {
@@ -37,6 +41,7 @@ var checkLoadButtons = function (players) {
     }
 }
 
+//Check for whether the player can deliver a load, and if so shows a button for it
 var checkDeliver = function (milepost, player, train) {
     for (var i = 0; i < player.hand.length; i++) {
         for (var j = 0; j < player.hand[i].trips.length; j++) {
@@ -54,6 +59,7 @@ var checkDeliver = function (milepost, player, train) {
     $('#deliver').hide();
 };
 
+//Enables or disables the move button based on the speed of your train and the moves the player has made this turn
 var checkMoveButton = function () {
     var player = findPid(lastStatusMessage.players, pid);
     var shown = false;
@@ -71,6 +77,7 @@ var checkMoveButton = function () {
         $('#move').button('option', 'disabled', true);
 };
 
+//Checks whether or not to enable the build button based on the money the player has spent this turn
 var checkBuildMoney = function () {
     if (moneySpent > 0) {
         $('#upgrade').button('option', 'disabled', true);

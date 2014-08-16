@@ -16,6 +16,7 @@ var processGames = function (data) {
     $('#gamePicker').menu('refresh');
 };
 
+//Draws an edge of track between x1,y1 and x2,y2 in the color of a player with ID PID
 var drawLineBetweenMileposts = function (x1, y1, x2, y2, PID) {
     $('#pid' + PID).append($(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr({ x1: x1, y1: y1, x2: x2, y2: y2 }).css({ 'stroke-width': '4px', 'stroke': findPid(lastStatusMessage.players, PID).color }));
     if (PID == pid) {
@@ -26,7 +27,7 @@ var drawLineBetweenMileposts = function (x1, y1, x2, y2, PID) {
 // Return true if the milepost is top left of major city.
 // Top left will have preceding milepost not major city, following milepost is 
 // major city, and two rows below is not major city.
-// NOTE: incomplete major cities could mess this logic up!!
+// NOTE: incomplete major cities could mess this logic up
 var firstMajorCityMilepost = function (mp) {
     return ((mp < 0 || gameData.mapData.orderedMileposts[mp - 1].type != 'MAJORCITY') &&
 		 gameData.mapData.orderedMileposts[mp + 1].type == 'MAJORCITY' &&
@@ -34,6 +35,7 @@ var firstMajorCityMilepost = function (mp) {
 		 gameData.mapData.orderedMileposts[mp + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY');
 };
 
+//Given an array of players out of the status message returns the object of the player with ID PID
 var findPid = function (players, pid) {
     for (var i = 0; i < players.length; i++)
         if (players[i].pid == pid)
@@ -41,7 +43,7 @@ var findPid = function (players, pid) {
     return null;
 };
 
-//Post
+//Sends a HTTP POST request to the server with data data and calls callback when complete
 var post = function (data, callback) {
     $.ajax({
         type: "POST",
@@ -53,5 +55,4 @@ var post = function (data, callback) {
         },
         dataType: 'json'
     });
-
 };
