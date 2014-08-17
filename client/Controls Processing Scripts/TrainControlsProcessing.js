@@ -156,6 +156,7 @@ var moveClick = function (e) {
         }
         $('#train' + pid + train).remove();
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+		refreshMovesMade();
     });
     $('#acceptBuild').click(function () {
         for (var i = 0; i < movesMade.length; i++) {
@@ -204,6 +205,7 @@ var moveClick = function (e) {
         $('#placeControls').hide();
         $('#turnControls').show();
         $('#endControls').show();
+        refreshMovesMade();
     });
 };
 
