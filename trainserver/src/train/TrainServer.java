@@ -113,7 +113,7 @@ public class TrainServer {
 		if(game.getLastPlayer() == null) {
 			status.activeid = "";
 			status.lastid = "";
-		} else {
+		} else if (game.getActivePlayer() != null) {
 			status.activeid = game.getActivePlayer().name;
 			status.lastid = game.getLastPlayer().name;
 		}
@@ -439,7 +439,7 @@ public class TrainServer {
 		String pid;
 	}
 	
-	synchronized static public void resign(String requestText) throws GameException {
+	synchronized static public void resignGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		ResignData data = gson.fromJson(requestText, ResignData.class);
 		Game game = games.get(data.gid);
