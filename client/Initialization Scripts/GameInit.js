@@ -38,6 +38,7 @@ var startedGame = function (data) {
     $('#resign').click(function () {
         //Open confirm box for them and make sure they want to resign
         //If they do, post to the server telling it to resign this player
+        resignClick();
     });
     $('#turnControls').append('<button id="build">Build</button>').find('button:last').click(data, buildClick);
     $('#turnControls').append('<button id="upgrade">Upgrade</button>').find('button:last').click(data, upgradeClick);

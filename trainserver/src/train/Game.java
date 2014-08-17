@@ -197,6 +197,7 @@ public class Game implements AbstractGame {
 
 	@Override
 	public void turnInCards(String player) throws GameException {
+		log.info("turnInCards requestText: pid={}", player);
 		checkActive(player);
 		if(active.turnInProgress()) 
 			throw new GameException("TurnAlreadyStarted");
@@ -239,7 +240,13 @@ public class Game implements AbstractGame {
 			endTurn(active.getPid());
 	}
 
-	public void resign(String pid) throws GameException { getPlayer(pid).resign(); }
+	public void resign(String pid) throws GameException 
+	{ 
+		log.info("resign requestText: pid={}", pid);
+		if (getPlayer(pid) == active)
+			endTurn(pid);
+		getPlayer(pid).resign(); 
+	}
 	
 	@Override
 	public void endGame(String pid, boolean ready) throws GameException {

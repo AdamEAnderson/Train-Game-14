@@ -188,6 +188,34 @@ public class GameTest {
         game.endGame("Adam", true);
 	}
 	
+	@Test
+	public void testResign() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        log.info("newGame response {}", responseMessage);
+	        String gid = responseMessage.substring(8, 16);
+	        Game game = TrainServer.getGame(gid);
+	        assertTrue(game != null);
+	        game.joinGame("Sandra", "green");
+	        skipPastBuildingTurns(game);
+	        String resignedPlayer = game.getActivePlayer().name;
+	        game.resign(resignedPlayer);
+	        
+	        // Player now should be the other one
+	        assertFalse(resignedPlayer.equals(game.getActivePlayer().name));
+	        game.endTurn(game.getActivePlayer().name);
+	        // Player should still be the other one
+	        assertFalse(resignedPlayer.equals(game.getActivePlayer().name));
+	        
+	        game.endGame("Adam", true);
+	        game.endGame("Sandra", true);
+		} catch (GameException e) {
+			e.printStackTrace();
+			fail("Unexpected GameException");
+		}
+	}
+	
 	/** Test that normal building works as expected */
 	@Test
 	public void testBuild() throws GameException {

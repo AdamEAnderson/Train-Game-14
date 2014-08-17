@@ -37,3 +37,17 @@ var loadsClick = function(e) {
     	$('#loadsDialog > table').append('<tr><td><img width=30px height=30px src=' + iconPNG + '/><td>' + key + '</td><td>' + gameData.loadset[key].join(', ') + '</td></tr>');
     }
 };
+
+var resignClick = function() {
+    $('#turnControls').hide();
+    $('#endControls').hide();
+    $('#okControls').show();
+    $('#acceptBuild').click(function() {
+		resignGame();
+		$('#okControls').hide();
+	});
+		$('#cancelBuild').click(function() {
+		$('#okControls').hide();
+	});
+};
+
