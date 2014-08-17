@@ -84,7 +84,13 @@ public class Player {
 				break;
 			}
 		}
-		if(owner == null) throw new GameException("InvalidMove");
+		if(owner == null){
+			if(origin.isSameCity(next)) {
+				trains[t].moveTrain(next);
+				return;
+			}
+			throw new GameException("InvalidMove");
+		}
 		if(!rentingFrom.contains(ownerID)){
 			rentingFrom.add(ownerID);
 			money -= 4;
@@ -135,6 +141,11 @@ public class Player {
 		
 		// We can only start building from the end of our track, or from a major city
 		if(!rail.contains(origin) && origin.type != Milepost.Type.MAJORCITY){
+			throw new GameException("InvalidTrack");
+		}
+		
+		// Cannot build through a major city
+		if(origin.isSameCity(next)){
 			throw new GameException("InvalidTrack");
 		}
 		
