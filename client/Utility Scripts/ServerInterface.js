@@ -89,7 +89,9 @@ var moveTrain = function (train, vertices) {
             movesMade = undefined;
         },
         error: function (xhr, textStatus, errorThrown) {
+            console.log('Move error: ' + xhr.responseText);
             if (xhr.responseText.toLowerCase().contains('invalidmove')) {
+                var player = findPid(lastStatusMessage.players, pid);
                 var milepost = vertices[-1];
                 trainLocations[train] = milepost;
                 var mpsvg = { x: 0, y: 0 };
