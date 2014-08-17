@@ -40,7 +40,7 @@ var refreshMovesMade = function () {
 		if (movesMade != undefined)
 			countMovesMade += movesMade[t].length;
 		if ($('#trains').children().eq(t).children().length < 2) // move counter not yet created
-			$('#trains').children().eq(t).append("<div/>");
+			$('#trains').children().eq(t).append('<div class="moveCounter"/>');
 		var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
 		moveCounterJS.empty();
 		moveCounterJS.append('<p><span>' + countMovesMade + '</span></p>');

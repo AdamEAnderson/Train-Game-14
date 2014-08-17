@@ -26,8 +26,9 @@
     margin: 2px;
 }
 
-    .trip > p {
+    .trip > table > tbody > tr > td {
         margin: 0px;
+	    font-size: 1.2em;
     }
 
 div.trip > p:not(:last-child) {
@@ -64,6 +65,7 @@ div.trainCard > p {
 	div.trainCard > p > span {
     	vertical-align: middle;
     	alignment-baseline: middle;
+	    font-size: 1.2em;
 	}
 	
 	div.trainCard > p > img {
@@ -74,7 +76,7 @@ div.trainCard > p {
         border-bottom: 1px solid black;
     }
 
-div.train > div > p {
+.moveCounter > p {
 	text-align:center;
     font-size: 1.8em;
     line-height: 1em;
