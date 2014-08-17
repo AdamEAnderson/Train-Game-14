@@ -77,6 +77,92 @@ var buildClick = function (e) {
         refreshMoneySpent(moneySpent + moneySpentThisBuild);
         console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);
     };
+    var milepostsKeyUp = function (e) {
+        if (verticesBuilt.length == 0)
+            return;
+        var key = e.key;
+        var player = findPid(lastStatusMessage.players, pid);
+        var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
+        var index = hexKeys.indexOf(key);
+        if (index == -1)
+            return;
+        var milepost = verticesBuilt[verticesBuilt.length - 1];
+        milepost = gameData.mapData.orderedMileposts[(parseInt(milepost.y) * gameData.mapData.mpWidth) + parseInt(milepost.x)];
+        var edges = [];
+        if (milepost.y % 2 == 0) {
+            edges[0] = { x: milepost.x - 1, y: milepost.y };
+            edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
+            edges[2] = { x: milepost.x, y: milepost.y - 1 };
+            edges[3] = { x: milepost.x + 1, y: milepost.y };
+            edges[4] = { x: milepost.x, y: milepost.y + 1 };
+            edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
+        }
+        else {
+            edges[0] = { x: milepost.x - 1, y: milepost.y };
+            edges[1] = { x: milepost.x, y: milepost.y - 1 };
+            edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
+            edges[3] = { x: milepost.x + 1, y: milepost.y };
+            edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
+            edges[5] = { x: milepost.x, y: milepost.y + 1 };
+        }
+        for (var i = 0; i < edges.length; i++) {
+            if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
+                edges[i] = undefined;
+        }
+
+        /*-------------------------------------------------------------------------------*/
+
+        var lastMilepost = milepost;
+        var currentMilepost = edges[index];
+        if (currentMilepost == undefined)
+            return;
+        currentMilepost = gameData.mapData.orderedMileposts[(parseInt(currentMilepost.y) * gameData.mapData.mpWidth) + parseInt(currentMilepost.x)];
+        var isValidMilepost = false;
+        var milepostCost;
+        for (var i = 0; i < lastMilepost.edges.length; i++) {
+            if (lastMilepost.edges[i].x == currentMilepost.x && lastMilepost.edges[i].y == currentMilepost.y) {
+                isValidMilepost = true;
+                milepostCost = lastMilepost.edges[i].cost;
+                break;
+            }
+        }
+        if (isValidMilepost == false)
+            return;
+        var lastX, lastY;
+        if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'circle') {
+            lastX = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('cx');
+            lastY = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('cy');
+        }
+        else if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
+            var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+            var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
+            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+        }
+        var currentX, currentY;
+        if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'circle') {
+            currentX = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('cx');
+            currentY = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('cy');
+        }
+        else if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'g') {
+            var translate = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+            var bbox = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y))[0].getBBox();
+            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+        }
+        if (!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
+            return;
+        if (20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)
+            return;
+        drawLineBetweenMileposts(lastX, lastY, currentX, currentY, pid);
+        verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
+        milepostEdgesBuilt.push({ x1: lastMilepost.x, y1: lastMilepost.y, x2: currentMilepost.x, y2: currentMilepost.y });
+        moneySpentThisBuild += milepostCost;
+        refreshMoneySpent(moneySpent + moneySpentThisBuild);
+        console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);
+
+    };
+    $(document).keyup(milepostsKeyUp);
     $('#milepostsGroup > *:not(path)').click(milepostsClick);
     var acceptBuild = function () {
         builtTrack(verticesBuilt, edgesBuilt, moneySpentThisBuild, milepostEdgesBuilt);
