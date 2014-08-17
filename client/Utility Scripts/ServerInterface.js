@@ -142,6 +142,11 @@ var endTurn = function () {
     $('#turnControls').buttonset('option', 'disabled', true);
 };
 
+//Tells server I quit
+var resignGame = function () {
+    post({ messageType: 'resignGame', pid: pid, gid: gid });
+};
+
 //Tells server our game is done(from host)
 var endGame = function (checked) {
     post({ messageType: 'endGame', pid: pid, gid: gid, ready: checked });
