@@ -47,6 +47,7 @@ public final class TrainMap {
 	 * f - forest milepost
 	 * j - jungle milepost
 	 * u - chunnel milepost
+	 * y - placeholder for a ferry edge - milepost does not exist here
 	 * cName - city milepost, where Name is name of the city
 	 * ccName - major city milepost, where Name is name of the city
 	 * 
@@ -54,14 +55,14 @@ public final class TrainMap {
 	 * @throws IOException  
 	 * @throws GameException 
 	 */
-	public TrainMap(BufferedReader mapReader, BufferedReader riverReader, 
-			BufferedReader seaReader, Map<String, City> cities) throws IOException, GameException {
+	public TrainMap(BufferedReader mapReader, BufferedReader riverReader, BufferedReader seaReader, 
+			BufferedReader ferryReader, Map<String, City> cities) throws IOException, GameException {
 		milepostIndex = new HashMap<MilepostId, Milepost>();
 		cityLocations = new HashMap<String, MilepostId>();
 		serializeData = new SerializeData();
 
 		generateMileposts(mapReader, cities);
-		generateEdges(riverReader, seaReader);
+		generateEdges(riverReader, seaReader, ferryReader);
 	}
 	
 	public SerializeData getSerializeData() {
@@ -90,6 +91,9 @@ public final class TrainMap {
 				case "b":
 				case "l":	/* unbuildable lake equivalent to blank */
 					mpType = Milepost.Type.BLANK;
+					break;
+				case "y":
+					mpType = Milepost.Type.FERRY;
 					break;
 				case "d":
 					mpType = Milepost.Type.DESERT;
@@ -163,7 +167,7 @@ public final class TrainMap {
 	
 	private Edge generateEdge(Milepost source, MilepostId destinationId,
 			Map<MilepostId, Set<MilepostId>> riverCrossings,
-			Map<MilepostId, Set<MilepostId>> seaCrossings) {
+			Map<MilepostId, Set<MilepostId>> seaCrossings, Map<MilepostId, Set<MilepostId>> ferryCrossings) {
 		Edge edge = null;
 		Milepost destination = milepostIndex.get(destinationId);
 		MilepostId sourceId = new MilepostId(source.x, source.y);
@@ -172,7 +176,20 @@ public final class TrainMap {
 			log.debug("River crossing ({}, {} to ({}, {})", source.x, source.y, destinationId.x, destinationId.y);
 		boolean isSeaCrossing = isCrossing(sourceId, destinationId, seaCrossings);
 		
-		if (destination != null && destination.type != Milepost.Type.BLANK) {
+		if(destination == null) return null;
+		
+		if(destination.type == Milepost.Type.FERRY && ferryCrossings.containsKey(sourceId)){
+				Set<MilepostId> dests = ferryCrossings.get(sourceId);
+				MilepostId destId = null;
+				for(MilepostId itr : dests){
+					Milepost dest = milepostIndex.get(itr);
+					destId = itr;
+					edge = new Ferry(dest);
+					break;
+				}
+				dests.remove(destId);
+				return edge;	
+		} else if (destination.type != Milepost.Type.BLANK) {
 			edge = new Edge(destination, isRiverCrossing, isSeaCrossing);
 			log.debug("Generating edge from milepost [{}, {}] to milepost [{},{}], cost {}", source.y, source.x,
 					destination.y, destination.x, edge.cost);
@@ -209,29 +226,31 @@ public final class TrainMap {
 		return crossings;
 	}
 	
-	private void generateEdges(BufferedReader riverReader, BufferedReader seaReader) throws IOException, GameException {
+	private void generateEdges(BufferedReader riverReader, BufferedReader seaReader, BufferedReader ferryReader) 
+				throws IOException, GameException {
 		Map<MilepostId, Set<MilepostId>> riverCrossings = readCrossings(riverReader);
 		Map<MilepostId, Set<MilepostId>> seaInletCrossings = readCrossings(seaReader);
+		Map<MilepostId, Set<MilepostId>> ferryCrossings = readCrossings(ferryReader);
 		
 		for (MilepostId mpId: milepostIndex.keySet())  {
 			Milepost mp = milepostIndex.get(mpId);
 			Edge[] edges = new Edge[6];
 			if (mp.type != Milepost.Type.BLANK) {
 				if (mp.y % 2 == 0) {	// even row 
-					edges[0] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y - 1), riverCrossings, seaInletCrossings);	// NE
-					edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings);		// E
-					edges[2] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y + 1), riverCrossings, seaInletCrossings);	// SE
-					edges[3] = generateEdge(mp, new MilepostId(mp.x, mp.y + 1), riverCrossings, seaInletCrossings);		// SW
-					edges[4] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y), riverCrossings, seaInletCrossings);		// W
-					edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings);		// NW
+					edges[0] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);	// NE
+					edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings, ferryCrossings);		// E
+					edges[2] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y + 1), riverCrossings, seaInletCrossings, ferryCrossings);	// SE
+					edges[3] = generateEdge(mp, new MilepostId(mp.x, mp.y + 1), riverCrossings, seaInletCrossings, ferryCrossings);		// SW
+					edges[4] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y), riverCrossings, seaInletCrossings, ferryCrossings);		// W
+					edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);		// NW
 				} 
 				else { 	// odd row
-					edges[0] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y - 1), riverCrossings, seaInletCrossings);	// NE
-					edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings);		// E
-					edges[2] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y + 1), riverCrossings, seaInletCrossings);	// SE
-					edges[3] = generateEdge(mp, new MilepostId(mp.x, mp.y + 1), riverCrossings, seaInletCrossings);		// SW
-					edges[4] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y), riverCrossings, seaInletCrossings);		// W
-					edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings);		// NW
+					edges[0] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);	// NE
+					edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings, ferryCrossings);		// E
+					edges[2] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y + 1), riverCrossings, seaInletCrossings, ferryCrossings);	// SE
+					edges[3] = generateEdge(mp, new MilepostId(mp.x, mp.y + 1), riverCrossings, seaInletCrossings, ferryCrossings);		// SW
+					edges[4] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y), riverCrossings, seaInletCrossings, ferryCrossings);		// W
+					edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);		// NW
 					}
 				}
 			mp.updateEdges(edges);

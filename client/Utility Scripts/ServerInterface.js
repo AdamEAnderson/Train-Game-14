@@ -148,7 +148,9 @@ var endTurn = function () {
 
 //Tells server I quit
 var resignGame = function () {
-    post({ messageType: 'resignGame', pid: pid, gid: gid });
+    post({ messageType: 'resignGame', pid: pid, gid: gid }, function () {
+        window.location.reload(true);
+    });
 };
 
 //Tells server our game is done(from host)
@@ -172,7 +174,7 @@ var newGame = function (color, handle, gameGeo) {
 
 //Gets a status response from the server
 var statusGet = function () {
-    setTimeout(200, statusGet);
+    //setTimeout(200, statusGet);
 
     //Request status from server
     //requestData = gid ? {messageType:'statusUpdate', pid:pid, gid:gid} : {messageType:'statusUpdate', pid:pid};

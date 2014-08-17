@@ -12,7 +12,7 @@ public class Milepost {
 		//type: only City or MajorCity if hasCity not null
 	
 	public enum Type {
-		CITY, MAJORCITY, NORMAL, BLANK, DESERT, MOUNTAIN, ALPINE, JUNGLE, FOREST, CHUNNEL
+		CITY, MAJORCITY, NORMAL, BLANK, DESERT, MOUNTAIN, ALPINE, JUNGLE, FOREST, CHUNNEL, FERRY
 	}
 
 	Milepost(int x, int y, Type type){
