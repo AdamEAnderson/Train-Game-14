@@ -406,6 +406,20 @@ public class TrainServer {
 		game.dumpLoad(data.pid, data.train, data.load);
 	}
 
+	static class TurnInCardsData{
+		public String gid;
+		public String pid;
+	}
+	
+	synchronized static public void turnInCards(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		TurnInCardsData data = gson.fromJson(requestText, TurnInCardsData.class);
+		Game game = games.get(data.gid);
+		if(game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.turnInCards(data.pid);
+	}
+	
 	static class EndTurnData {
 		public String gid;
 		public String pid;
@@ -420,6 +434,20 @@ public class TrainServer {
 		game.endTurn(data.pid);
 	}
 
+	static class ResignData {
+		String gid;
+		String pid;
+	}
+	
+	synchronized static public void resign(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		ResignData data = gson.fromJson(requestText, ResignData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.resign(data.pid);
+	}
+	
 	static class EndGame {
 		public String gid;
 		public String pid;
