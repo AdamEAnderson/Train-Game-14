@@ -60,6 +60,7 @@ var refreshTrainLocations = function (players) {
         for (var j = 0; j < players[i].trains.length; j++) {
             if (!players[i].trains[j].loc)
                 continue;
+            $(document.getElementById('trains' + players[i].pid + j)).remove();
             var milepost = JSON.parse(players[i].trains[j].loc);
             var mpsvg = { x: 0, y: 0 };
             var mpjQ = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y));
