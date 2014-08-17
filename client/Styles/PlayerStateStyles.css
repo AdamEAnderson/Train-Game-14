@@ -40,7 +40,7 @@ div.trip > p:not(:last-child) {
     margin-left: 4px;
 }
 
-.train {
+.trainCard {
     display: inline-block;
     border: 2px solid black;
     width: 100px;
@@ -50,29 +50,36 @@ div.trip > p:not(:last-child) {
     margin-top: 2px;
 }
 
-div.train > p:first-child {
+div.trainCard > p:first-child {
     color: blue;
     font-size: 1.8em;
     text-align: center;
 }
 
-div.train > p {
+div.trainCard > p {
     margin: 5px 0;
     min-height: 30px;
 }
 
-	div.train > p > span {
+	div.trainCard > p > span {
     	vertical-align: middle;
     	alignment-baseline: middle;
 	}
 	
-	div.train > p > img {
+	div.trainCard > p > img {
 		float: right;
 	}
 	
-    div.train > p:not(:last-child) {
+    div.trainCard > p:not(:last-child) {
         border-bottom: 1px solid black;
     }
+
+div.train > div > p {
+	text-align:center;
+    font-size: 1.8em;
+    line-height: 1em;
+    margin-top:0;
+}
 
 #money {
     display: inline-block;
