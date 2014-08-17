@@ -19,7 +19,7 @@ var processStatus = function (data) {
         }
         me = findPid(data.players, pid);
         refreshCards(me.hand);
-        refreshTrains(me.trains);
+        refreshTrains(me.trains, data.activeid && data.activeid == pid);
         refreshMoney(me.money);
         if (data.activeid && data.activeid == pid) {
             yourTurn = true;
