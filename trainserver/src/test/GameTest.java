@@ -198,6 +198,8 @@ public class GameTest {
 	        Game game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Sandra", "green");
+	        game.startGame("Sandra", true);
+	        game.startGame("Adam", true);
 	        skipPastBuildingTurns(game);
 	        String resignedPlayer = game.getActivePlayer().name;
 	        game.resign(resignedPlayer);

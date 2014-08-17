@@ -212,7 +212,7 @@ public class Game implements AbstractGame {
 	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={})", pid);
-		boolean last = (active == getLastPlayer());
+		boolean last = (active.equals(getLastPlayer()));
 		Player p = active.endTurn();
 		switch(turns){
 		case 0:
@@ -240,10 +240,9 @@ public class Game implements AbstractGame {
 			endTurn(active.getPid());
 	}
 
-	public void resign(String pid) throws GameException 
-	{ 
+	public void resign(String pid) throws GameException { 
 		log.info("resign requestText: pid={}", pid);
-		if (getPlayer(pid) == active)
+		if (getPlayer(pid).equals(active))
 			endTurn(pid);
 		getPlayer(pid).resign(); 
 	}
