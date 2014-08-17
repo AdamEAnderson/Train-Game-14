@@ -57,7 +57,11 @@ var startedGame = function (data) {
     $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'track'));
     $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'trainsDisplay'));
     for (var i = 0; i < data.players.length; i++) {
+        if (data.players[i].pid == pid)
+            continue;
         $('#track').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'pid' + data.players[i].pid));
         $('#trainsDisplay').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'trains' + data.players[i].pid));
     }
+    $('#track').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'pid' + pid));
+    $('#trainsDisplay').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'trains' + pid));
 };
