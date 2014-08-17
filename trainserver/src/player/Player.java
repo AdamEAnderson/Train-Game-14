@@ -214,7 +214,7 @@ public class Player {
 	
 	public boolean turnInProgress() { return turnInProgress; }
 	
-	public void resign() {hasResigned = false; }
+	public void resign() {hasResigned = true; }
 	
 	public boolean hasResigned() {return hasResigned; }
 	
@@ -235,6 +235,15 @@ public class Player {
 	public Train[] getTrains(){ return trains; }
 	
 	public Rail getRail(){ return rail; }
+	
+	@Override 
+	public boolean equals(Object obj){
+		if(obj instanceof Player){
+			Player p = (Player)obj;
+			return p.name.equals(name);
+		}
+		return false;
+	}
 	
 	/** Returns the money offered for the highest-paying trip in this players
 	 * hand of cards.

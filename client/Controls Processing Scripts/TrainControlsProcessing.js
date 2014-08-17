@@ -83,7 +83,12 @@ var moveClick = function (e) {
         var key = e.key;
         var player = findPid(lastStatusMessage.players, pid);
         var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
-        var index = hexKeys.indexOf(key);
+        var hexKeyCodes = [71, 89, 85, 74, 78, 66];
+        var index;
+        if (key)
+            index = hexKeys.indexOf(key);
+        else
+            index = hexKeyCodes.indexOf(e.which);
         if (index == -1)
             return;
         var train = findPid(data.players, pid).trains.length == 1 ? 0 : parseInt($($('#placeControls > .ui-state-active').children()).first().text().replace('Train ', '')) - 1;
@@ -157,6 +162,7 @@ var moveClick = function (e) {
             moveTrain(i, movesMade[i]);
         }
         checkMoveButton();
+        checkLoadButtons(lastStatusMessage.players);
         $(this).off('click');
         $('#acceptBuild').off('click');
         $(document).off('keyup');
@@ -190,6 +196,7 @@ var moveClick = function (e) {
         }
         movesMade = undefined;
         checkMoveButton();
+        checkLoadButtons(lastStatusMessage.players);
         $(this).off('click');
         $('#acceptBuild').off('click');
         $(document).off('keyup');
