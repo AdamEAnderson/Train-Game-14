@@ -234,8 +234,13 @@ public class Game implements AbstractGame {
 		}
 			
 		++transaction;
+		
+		if(active.hasResigned())
+			endTurn(active.getPid());
 	}
 
+	public void resign(String pid) throws GameException { getPlayer(pid).resign(); }
+	
 	@Override
 	public void endGame(String pid, boolean ready) throws GameException {
 		log.info("endGame(pid={}, ready={})", pid, ready);

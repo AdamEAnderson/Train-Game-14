@@ -30,6 +30,8 @@ var startedGame = function (data) {
     }
     $('#endControls').append('<input type="checkbox" id="endGame"><label for="endGame">End Game</label></input>');
     $('#endControls').append('<button id="resign">Resign</button>');
+    $('#endControls').append('<button id="loads">Loads</button>').find('button:last').click(data,loadsClick);
+    
     $('#endGame').change(function () {
         endGame($('#endGame')[0].checked);
     });

@@ -116,7 +116,7 @@ var moveTrain = function (train, vertices) {
 };
 
 var deliverLoad = function (train, load, card) {
-    post({ messageType: 'deliverLoad', train: train, load: load, card: card });
+    post({ messageType: 'deliverLoad', train: train, load: load, card: card, pid:pid, gid:gid });
 };
 
 //Tells server we've started our train

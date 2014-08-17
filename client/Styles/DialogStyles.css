@@ -52,3 +52,36 @@
         border: 1px solid #888 !important;
         border-radius: 1px;
     }
+
+#loadsDialog { /*JQuery UI dialog for displaying loads*/
+    width: auto;
+    height: auto;
+}
+
+#loadsDialog table {/*Table that contains the Loads to City key */
+	border: 1px solid #DFDFDF;
+	background-color: #F9F9F9;
+	width: 100%;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	font-family: Arial,"Bitstream Vera Sans",Helvetica,Verdana,sans-serif;
+	color: #333;
+    margin-bottom:30px;
+}
+
+#loadsDialog table td, #helpDialog table th {/*Each cell in loadsDialogs table*/
+	border-top-color: white;
+    
+    border: 1px solid rgba(223,223,223,0.75);
+	border-bottom: 1px solid #DFDFDF;
+	color: #555;
+}
+
+#loadsDialog table td {/*Each normal cell in loadsDialogs table*/
+	font-size: 12px;
+	padding: 4px 7px 2px;
+	vertical-align: top;
+    border: 1px solid #DFDFDF;
+}
+

@@ -29,6 +29,7 @@ public class Player {
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	private boolean turnInProgress;
+	private boolean hasResigned;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
@@ -48,6 +49,8 @@ public class Player {
 		nextPlayer = next;
 		readyToStart = false;
 		readyToEnd = false;
+		turnInProgress = false;
+		hasResigned = false;
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
@@ -210,6 +213,10 @@ public class Player {
 	public boolean readyToEnd() { return readyToEnd; }
 	
 	public boolean turnInProgress() { return turnInProgress; }
+	
+	public void resign() {hasResigned = false; }
+	
+	public boolean hasResigned() {return hasResigned; }
 	
 	public void resetNextPlayer(Player p){ nextPlayer = p; }
 	

@@ -17,14 +17,19 @@
 var deliverClick = function (e) {
     var data = e.data;
     var deliveries = [];
+    var player = findPid(lastStatusMessage.players,pid);
     for (var i = 0; i < player.hand.length; i++) {
         for (var j = 0; j < player.hand[i].trips.length; j++) {
             var trip = player.hand[i].trips[j];
-            if (trip.dest == milepost.city.name) {
-                for (var k = 0; k < train.loads.length; k++) {
-                    if (train.loads[k] == trip.load) {
-                        deliveries.push({ train: k, load: trip.load, city: trip.dest, card: i });
-                    }
+            for(var l = 0; l < player.trains.length; l++){
+            	var milepost = JSON.parse(player.trains[l].loc);
+            	if (trip.dest == milepost.city.name) {
+            		var train = player.trains[l];
+                	for (var k = 0; k < train.loads.length; k++) {
+                    	if (train.loads[k] == trip.load) {
+                    	    deliveries.push({ train: k, load: trip.load, city: trip.dest, card: i });
+                    	}
+                	}
                 }
             }
         }
