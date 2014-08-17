@@ -169,6 +169,7 @@ var buildClick = function (e) {
         $('#acceptBuild').off('click');
         $('#cancelBuild').off('click');
         $('#milepostsGroup > *:not(path)').off('click', milepostsClick);
+        $(document).off('keyup', milepostsKeyUp);
         $('#okControls').hide();
         $('#turnControls').show();
         $('#endControls').show();
@@ -184,6 +185,7 @@ var buildClick = function (e) {
         $('#acceptBuild').off('click');
         $('#cancelBuild').off('click');
         $('#milepostsGroup > *:not(path)').off('click', milepostsClick);
+        $(document).off('keyup', milepostsKeyUp);
         $('#okControls').hide();
         $('#turnControls').show();
         $('#endControls').show();
