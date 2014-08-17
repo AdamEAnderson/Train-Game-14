@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import map.Milepost;
 import map.MilepostId;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import player.Player;
 import player.Train;
-
 import reference.Card;
 import reference.City;
 import reference.UpgradeType;
@@ -208,7 +208,7 @@ public class TrainServer {
 		response.cities = gameData.cities.values();
 		response.geography = gameData.geography;
 		// Convert from loads to set of cities to loads to set of city names
-		response.loadset = new HashMap<String, Set<String>>();
+		response.loadset = new TreeMap<String, Set<String>>();
 		for (String load: gameData.loads.keySet()) {
 			Set<String> cities = new HashSet<String>();
 			for (City city:gameData.loads.get(load))
