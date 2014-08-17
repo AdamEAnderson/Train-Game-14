@@ -30,6 +30,7 @@ var processStatus = function (data) {
         else if (data.activeid && data.activeid != pid) {
             yourTurn = false;
             $('#turnControls').buttonset('option', 'disabled', true);
+			$('#moneySpent').hide();
         }
         lastStatusMessage = data;
         lastStatus = data.transaction;

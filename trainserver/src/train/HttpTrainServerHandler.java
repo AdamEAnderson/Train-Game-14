@@ -51,8 +51,10 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String DELIVER_LOAD = "deliverLoad";
 	private final static String DUMP_LOAD = "dumpLoad";
 	private final static String MOVE_TRAIN = "moveTrain";
+	private final static String TURN_IN_CARDS = "turnInCards";
 	private final static String END_TURN = "endTurn";
 	private final static String END_GAME = "endGame";
+	private final static String RESIGN_GAME = "resignGame";
 	
 	private final static String LIST = "list";
 	private final static String STATUS = "status";
@@ -180,11 +182,17 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 				case DUMP_LOAD:
 					TrainServer.dumpLoad(message.jsonMessage);
 					break;
+				case TURN_IN_CARDS:
+					TrainServer.turnInCards(message.jsonMessage);
+					break;
 				case END_TURN:
 					TrainServer.endTurn(message.jsonMessage);
 					break;
 				case END_GAME:
 					TrainServer.endGame(message.jsonMessage);
+					break;
+				case RESIGN_GAME:
+					TrainServer.resignGame(message.jsonMessage);
 					break;
 				case LIST:
 					buf.append(TrainServer.list(message.jsonMessage));
