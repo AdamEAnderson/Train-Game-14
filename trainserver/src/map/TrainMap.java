@@ -235,7 +235,7 @@ public final class TrainMap {
 		for (MilepostId mpId: milepostIndex.keySet())  {
 			Milepost mp = milepostIndex.get(mpId);
 			Edge[] edges = new Edge[6];
-			if (mp.type != Milepost.Type.BLANK) {
+			if (mp.type != Milepost.Type.BLANK && mp.type != Milepost.Type.FERRY) {
 				if (mp.y % 2 == 0) {	// even row 
 					edges[0] = generateEdge(mp, new MilepostId(mp.x - 1, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);	// NE
 					edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings, ferryCrossings);		// E
