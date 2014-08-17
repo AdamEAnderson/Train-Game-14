@@ -68,36 +68,47 @@ public class Player {
 		if(movesMade >= trains[t].getSpeed()) throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
 		Milepost next = moves.poll();
-		if(l.isNeighbor(next)){
-			if(rail.connects(l, next) || l.isSameCity(next)) trains[t].moveTrain(next);
-			else {
-				String s = rail.anyConnects(l, next);
-				if(s.equals("")) throw new GameException("InvalidMove");
-				if(!rentingFrom.contains(s)){
-					rentingFrom.add(s);
-					money -= 4;
-					for(Player p = nextPlayer; p != this; p.getNextPlayer()){
-						if(p.name.equals(s)){
-							p.money += 4;
-							break;
-						}
-					}
-				}
-				trains[t].moveTrain(next);
-			}
-		}
-		else throw new GameException("InvalidMove");
-		if(rail.connectsByFerry(l, next)){
-			if(movesMade == 0){
-				movesMade = (trains[t].getSpeed())/2;
-			} else{
-				trains[t].moveTrain(l);
-				throw new GameException("InvalidMove");
-			}
-		}
+		if(next == null) return;
+		moveMileposts(t, l, next);
 		movesMade++;
 		moveTrain(t, moves);
 	}
+	
+	private void moveMileposts(int t, Milepost origin, Milepost next) throws GameException{
+		String ownerID = rail.anyConnects(origin, next);
+		Player owner = null;
+		if(ownerID.equals(name)) owner = this;
+		for(Player p = nextPlayer; p != this; p = p.nextPlayer){
+			if(p.name.equals(ownerID)){
+				owner = p;
+				break;
+			}
+		}
+		if(owner == null) throw new GameException("InvalidMove");
+		if(!rentingFrom.contains(ownerID)){
+			rentingFrom.add(ownerID);
+			money -= 4;
+			owner.money += 4;
+		}
+		
+		if(rail.connectsByFerry(origin, next)){
+			moveFerry(t, origin, next);
+		} else{
+			trains[t].moveTrain(next);
+		}
+	}
+	
+	
+	private void moveFerry(int t, Milepost origin, Milepost next) throws GameException{
+		if(movesMade == 0){
+			movesMade = (trains[t].getSpeed())/2;
+			trains[t].moveTrain(next);
+		} else{
+			trains[t].moveTrain(origin);
+			throw new GameException("InvalidMove");
+		}
+	}
+	
 	
 	public void upgradeTrain(int t, UpgradeType u) throws GameException {
 		turnInProgress = true;
@@ -113,6 +124,7 @@ public class Player {
 		spendings += 20;
 		
 	}
+	
 	
 	public void buildTrack(Queue<Milepost> mileposts) throws GameException {
 		turnInProgress = true;
@@ -154,15 +166,18 @@ public class Player {
 		buildTrack(mileposts);
 	}
 	
+	
 	public void pickupLoad(int t, String load) throws GameException{
 		turnInProgress = true;
 		trains[t].addLoad(load);
 	}
 	
+	
 	public void dropLoad(int t, String load) throws GameException{ 
 		turnInProgress = true;
 		trains[t].dropLoad(load); 
 	}
+	
 	
 	/** Delivers a load on the given card.
 	 * @param index is the location of the card in the player's hand, array-wise
@@ -204,6 +219,12 @@ public class Player {
 		return nextPlayer;
 	}
 	
+	public void resign() {
+		hasResigned = true;
+		readyToEnd = true;
+		turnInProgress = false;
+	}
+	
 	public void readyToStart(boolean ready) { readyToStart = ready;}
 	
 	public boolean readyToStart() { return readyToStart; }
@@ -213,8 +234,6 @@ public class Player {
 	public boolean readyToEnd() { return readyToEnd; }
 	
 	public boolean turnInProgress() { return turnInProgress; }
-	
-	public void resign() {hasResigned = true; }
 	
 	public boolean hasResigned() {return hasResigned; }
 	
@@ -261,7 +280,5 @@ public class Player {
 	}
 	
 	/** Call this from test code only!! Just here for debugging */
-	public void turnInCards(Card[] cards)  {
-		this.cards = cards;
-	}
+	public void turnInCards(Card[] cards)  { this.cards = cards; }
 }

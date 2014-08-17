@@ -94,6 +94,7 @@ public class Rail {
 	 * @return the cost of the build
 	 */
 	int build(Milepost origin, Milepost next) throws GameException {
+		if(!origin.isNeighbor(next)) throw new GameException("InvalidTrack");
 		addTrack(origin, next);
 		addTrack(next, origin);
 		addAllTrack(origin, next);
