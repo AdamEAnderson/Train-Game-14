@@ -33,23 +33,42 @@ var refreshCards = function (cards) {
     }
 };
 
-var refreshTrains = function (trains) {
+var refreshMovesMade = function () {
+	var countMovesMade = 0;
+	for (var t = 0; t < movesMadeThisTurn.length; ++t) {
+		countMovesMade = movesMadeThisTurn[t];
+		if (movesMade != undefined)
+			countMovesMade += movesMade[t].length;
+		if ($('#trains').children().eq(t).children().length < 2) // move counter not yet created
+			$('#trains').children().eq(t).append("<div/>");
+		var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
+		moveCounterJS.empty();
+		moveCounterJS.append('<p><span>' + countMovesMade + '</span></p>');
+    }
+}
+
+var refreshTrains = function (trains, myturn) {
     $('#trains').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var t = 0; t < trains.length; ++t) {
         $('#trains').append('<div class="train"/>');
-        $('#trains').children().eq(t).append('<p><span>' + trains[t].speed + '</span></p>');
+        var train = $('#trains').children().eq(t);
+        train.append('<div class="trainCard"/>');
+        var trainCard = train.children().eq(t);
+        trainCard.append('<p><span>' + trains[t].speed + '</span></p>');
         for (var l = 0; l < trains[t].loads.length; ++l) {
         	var load = trains[t].loads[l];
         	if (!load) {
         		load = " ";
-            	$('#trains').children().eq(t).append('<p><span>' + load + '</span></p>');
+            	trainCard.append('<p><span>' + load + '</span></p>');
             }
         	else {
 		    	var iconPNG = iconPath +  "/" + load + '.png';
-            	$('#trains').children().eq(t).append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src=' + iconPNG + '/></p>');
+            	trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src=' + iconPNG + '/></p>');
             }
         }
+        if (myturn) 
+        	refreshMovesMade();
     }
 };
 
