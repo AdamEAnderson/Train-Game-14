@@ -100,7 +100,7 @@ var refreshRails = function (players) {
                 }
                 else {
                     var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                    var bbox = m1jQ.getBBox();
+                    var bbox = m1jQ[0].getBBox();
                     m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
                     m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
                 }
@@ -110,7 +110,7 @@ var refreshRails = function (players) {
                 }
                 else {
                     var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                    var bbox = m2jQ.getBBox();
+                    var bbox = m2jQ[0].getBBox();
                     m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
                     m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
                 }
@@ -129,4 +129,5 @@ var refreshMoney = function(money) {
 var refreshMoneySpent = function(moneySpent) {
 	$('#moneySpentNumber').empty();
 	$('#moneySpentNumber').append('<span>' + moneySpent + '</span>');
+	$('#moneySpent').show();
 }
