@@ -82,7 +82,7 @@ public class Milepost {
 	}
 
 	public boolean isSameCity(Milepost next) {
-		return this.city.equals(next.city);
+		return this.city == null ? false : this.city.equals(next.city);
 	}
 	
 }
