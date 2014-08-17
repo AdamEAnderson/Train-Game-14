@@ -85,6 +85,7 @@ var moveTrain = function (train, vertices) {
         data: JSON.stringify(data),
         success: function () {
             movesMadeThisTurn[train] += vertices.length;
+            checkLoadButtons(lastStatusMessage.players);
             movesMade = undefined;
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -105,6 +106,7 @@ var moveTrain = function (train, vertices) {
                 }
                 $('#train' + pid + train).remove();
                 $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+                checkLoadButtons(lastStatusMessage.players);
                 movesMade = undefined;
                 checksMoveButton();
             }
