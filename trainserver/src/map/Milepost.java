@@ -70,11 +70,13 @@ public class Milepost {
 		builder.append(",\"edges\":[");
 		boolean firstEdge = true;
 		for (Edge edge: edges) {
+			if (!firstEdge)	// prevent trailing comma. yuck. don't see a better way to do this right now
+				builder.append(",");
+			firstEdge = false;
 			if (edge != null) {
-				if (!firstEdge)	// prevent trailing comma. yuck. don't see a better way to do this right now
-					builder.append(",");
-				firstEdge = false;
 				builder.append("{" + "\"x\":" + edge.destination.x + "," + "\"y\":" + edge.destination.y + ",\"cost\":" + edge.cost + "}");
+			}else {
+				builder.append("null");
 			}
 		}
 		builder.append("]}");
