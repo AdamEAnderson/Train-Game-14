@@ -91,10 +91,10 @@ public class Player {
 			}
 			throw new GameException("InvalidMove");
 		}
-		if(!rentingFrom.contains(ownerID)){
+		if(!rentingFrom.contains(ownerID) && !ownerID.equals(name)){
 			rentingFrom.add(ownerID);
 			money -= 4;
-			owner.money += 4;
+			owner.deposit(4);
 		}
 		
 		if(rail.connectsByFerry(origin, next)){
@@ -201,12 +201,7 @@ public class Player {
 		if(t == null) throw new GameException("InvalidDelivery");
 		trains[tIndex].dropLoad(t.load);
 		cards[cIndex] = next; 
-		int delivery = t.cost;
-		if(money < 0){
-			delivery += 2 * money;
-			money = 0;
-		}
-		money += delivery;
+		deposit(t.cost);
 	}
 	
 	private Trip canDeliver(int ti, Card c){
@@ -234,6 +229,14 @@ public class Player {
 		hasResigned = true;
 		readyToEnd = true;
 		turnInProgress = false;
+	}
+	
+	private void deposit(int deposit){ 
+		if(money < 0) {
+			deposit += 2 *  money;
+			money = 0;
+		}
+		money += deposit;
 	}
 	
 	public void readyToStart(boolean ready) { readyToStart = ready;}
