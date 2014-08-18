@@ -1271,7 +1271,7 @@
 	
 		<text transform="matrix(1 0 0 1 495.2031 727.4355)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Ghana</text>
 	
-		<text transform="matrix(1 0 0 1 389.8916 732.4458)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Côte d’Ivoire</text>
+		<text transform="matrix(1 0 0 1 389.8916 732.4453)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Côte d’Ivoire</text>
 	
 		<text transform="matrix(1 0 0 1 339.3306 421.0879)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Mauritania</text>
 	
@@ -1303,9 +1303,9 @@
 	
 		<text transform="matrix(1 0 0 1 877.3735 297.9922)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Libya</text>
 	
-		<text transform="matrix(1 0 0 1 1255.8301 190.748)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Israel</text>
+		<text transform="matrix(1 0 0 1 1255.8301 194.3027)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Israel</text>
 	
-		<text transform="matrix(1 0 0 1 1161.6621 322.8652)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Egypt</text>
+		<text transform="matrix(1 0 0 1 1161.6621 320.8652)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Egypt</text>
 	
 		<text transform="matrix(1 0 0 1 1130.2461 633.1699)" opacity="0.5" fill="none" stroke="#D4BA19" stroke-width="0.25" enable-background="new    " font-family="'Helvetica'" font-size="14">Sudan</text>
 	
@@ -1405,6 +1405,7 @@
 		<text transform="matrix(1 0 0 1 1100.3311 1561.4297)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">92</text>
 		<text transform="matrix(1 0 0 1 1103.4277 1569.3232)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">238.02891</text>
 	</g>
+	<line fill="none" stroke="#D4BA19" stroke-width="0.25" x1="1347.065" y1="128.314" x2="1347.754" y2="102.806"/>
 </g>
 <g id="Guides">
 </g>
@@ -1430,9 +1431,9 @@
 	<text transform="matrix(1 0 0 1 858.9126 176.0703)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Tripoli</text>
 	<text transform="matrix(1 0 0 1 821.2251 655.6333)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Ndjamena</text>
 	<text transform="matrix(1 0 0 1 990.6025 176.0703)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Bingazi</text>
-	<text transform="matrix(1 0 0 1 1132.7871 196.6953)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Alexandria</text>
+	<text transform="matrix(1 0 0 1 1132.7871 195.1992)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Alexandria</text>
 	<text transform="matrix(1 0 0 1 1156.6621 298.4458)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Cairo</text>
-	<text transform="matrix(1 0 0 1 1326.1621 197.2578)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Yerushalayim</text>
+	<text transform="matrix(1 0 0 1 1326.1621 195.1992)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Yerushalayim</text>
 	<text transform="matrix(1 0 0 1 1220.0996 373.3833)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Luxor</text>
 	<text transform="matrix(1 0 0 1 1456.123 423.8467)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Makkah</text>
 	<text transform="matrix(1 0 0 1 1216.6621 551.3833)" fill="#D2232A" font-family="'Helvetica'" font-size="18.75">Khartoum</text>
@@ -2597,17 +2598,17 @@
 		
 			<rect x="422.391" y="841.095" fill="none" stroke="#FAC826" stroke-width="0.25" stroke-miterlimit="10" width="11.516" height="13.637"/>
 		
-			<text transform="matrix(1 0 0 1 425.5776 848.519)" fill="#FAC826" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Au</text>
-		<text transform="matrix(1 0 0 1 423.3428 842.6519)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">79</text>
-		<text transform="matrix(1 0 0 1 426.6997 850.5454)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">196.966569</text>
+			<text transform="matrix(1 0 0 1 425.5771 848.5186)" fill="#FAC826" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Au</text>
+		<text transform="matrix(1 0 0 1 423.3428 842.6514)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">79</text>
+		<text transform="matrix(1 0 0 1 426.6992 850.5449)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">196.966569</text>
 	</g>
 	<g>
 		
 			<rect x="1278.399" y="873.847" fill="none" stroke="#FAC826" stroke-width="0.25" stroke-miterlimit="10" width="11.516" height="13.637"/>
 		
-			<text transform="matrix(1 0 0 1 1281.5859 881.272)" fill="#FAC826" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Au</text>
-		<text transform="matrix(1 0 0 1 1279.3516 875.4048)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">79</text>
-		<text transform="matrix(1 0 0 1 1282.709 883.2983)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">196.966569</text>
+			<text transform="matrix(1 0 0 1 1281.5859 881.2715)" fill="#FAC826" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Au</text>
+		<text transform="matrix(1 0 0 1 1279.3516 875.4043)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">79</text>
+		<text transform="matrix(1 0 0 1 1282.709 883.2979)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">196.966569</text>
 	</g>
 	<g>
 		<path fill="#FFFFFF" stroke="#231F20" stroke-width="0.1" d="M387.441,182.421c0,0.647-0.521,1.167-1.167,1.167
@@ -2785,7 +2786,7 @@
 			<ellipse fill="#231F20" stroke="#231F20" stroke-width="0.1" cx="1162.854" cy="907.342" rx="4.859" ry="6.48"/>
 			<path fill="none" d="M1161.291,900.854c-2.684,0-4.993,2.841-4.795,6.48c0.195,3.573,2.027,6.48,5.035,6.48
 				c2.685,0,4.859-2.9,4.859-6.48S1163.976,900.854,1161.291,900.854z"/>
-			<text transform="matrix(0.0278 0.9996 -0.9996 0.0278 1156.4727 906.5586)"><tspan x="0" y="0" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5">G</tspan><tspan x="1.227" y="-0.013" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-6.172">o</tspan><tspan x="2.126" y="-0.113" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-11.185">o</tspan><tspan x="3.015" y="-0.291" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-16.848">d</tspan><tspan x="3.876" y="-0.555" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-23.03">y</tspan><tspan x="4.655" y="-0.888" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-30.508">e</tspan><tspan x="5.457" y="-1.4" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-40.402">a</tspan><tspan x="6.162" y="-2.027" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-49.517">r</tspan><tspan x="6.542" y="-2.481" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-56.569"> </tspan></text>
+			<text transform="matrix(0.0278 0.9996 -0.9996 0.0278 1156.4727 906.5596)"><tspan x="0" y="0" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5">G</tspan><tspan x="1.226" y="-0.013" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-6.172">o</tspan><tspan x="2.126" y="-0.113" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-11.185">o</tspan><tspan x="3.014" y="-0.291" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-16.848">d</tspan><tspan x="3.875" y="-0.555" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-23.03">y</tspan><tspan x="4.654" y="-0.888" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-30.508">e</tspan><tspan x="5.456" y="-1.4" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-40.402">a</tspan><tspan x="6.162" y="-2.027" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-49.517">r</tspan><tspan x="6.541" y="-2.481" fill="#231F20" stroke="#FFFFFF" stroke-width="0.1" font-family="'Helvetica'" font-size="1.5" rotate="-56.569"> </tspan></text>
 			<ellipse fill="#FFFFFF" stroke="#231F20" stroke-width="0.1" cx="1161.233" cy="907.344" rx="2.431" ry="3.238"/>
 			<path fill="#696E78" stroke="#231F20" stroke-width="0.1" d="M1161.811,904.214c-1.027-0.222-1.845-0.395-2.703,1.542
 				c-0.524,1.183-0.474,3.035,0.485,3.973c0.971,0.948,0.971,0.948,2.079,0.784c-1.629-1.279-1.998-3.253-1.217-5.039
@@ -3153,26 +3154,26 @@
 			668.668,773.167 668.785,773.167 668.574,772.047 667.99,770.888 		"/>
 	</g>
 	<g>
-		<path fill="#231F20" stroke="#231F20" stroke-width="0.25" d="M1263.425,1640.751c-0.129,0.088-1.123-0.654-1.751-1.184
-			c-0.629-0.531-1.682,0.541-1.64,0.382c0.146-0.552,1.27-1.243,1.896-0.712C1262.562,1639.768,1263.92,1640.422,1263.425,1640.751z
+		<path fill="#231F20" stroke="#231F20" stroke-width="0.25" d="M1290.925,1586.928c-0.129,0.088-1.123-0.654-1.751-1.184
+			c-0.629-0.531-1.682,0.541-1.64,0.382c0.146-0.552,1.27-1.243,1.896-0.712C1290.062,1585.944,1291.42,1586.599,1290.925,1586.928z
 			"/>
-		<path fill="#FFFFFF" stroke="#231F20" stroke-width="0.25" d="M1263.945,1641.776c-0.064-0.643,0.188-1.293,0.116-1.936
+		<path fill="#FFFFFF" stroke="#231F20" stroke-width="0.25" d="M1291.445,1587.953c-0.064-0.643,0.188-1.293,0.116-1.936
 			c-0.109-0.959-0.109-1.232-0.485-1.232c-0.18,0-0.038-0.251-0.125-0.081c-0.14,0.269-0.072,0.808-0.083,1.101
 			c-0.028,0.707-0.041,1.418-0.057,2.123"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1263.734,1641.354c-0.114-0.16-0.294-0.232-0.478-0.154"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1263.837,1640.776c-0.129-0.148-0.31-0.225-0.474-0.159"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1263.734,1640.196c-0.165-0.088-0.314-0.048-0.423,0.107"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1263.785,1639.825c-0.201,0.021-0.394,0.082-0.582,0.158"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1263.785,1639.402c-0.16-0.195-0.327-0.195-0.422,0.056"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.05" d="M1263.734,1638.826c-0.109-0.108-0.212-0.171-0.361-0.149
+		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1291.234,1587.531c-0.114-0.16-0.294-0.232-0.478-0.154"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1291.337,1586.953c-0.129-0.148-0.31-0.225-0.474-0.159"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1291.234,1586.373c-0.165-0.088-0.314-0.048-0.423,0.107"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1291.285,1586.002c-0.201,0.021-0.394,0.082-0.582,0.158"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.15" d="M1291.285,1585.579c-0.16-0.195-0.327-0.195-0.422,0.056"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.05" d="M1291.234,1585.003c-0.109-0.108-0.212-0.171-0.361-0.149
 			c-0.015,0.052,0,0.098-0.01,0.149"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.05" d="M1263.952,1638.455c-0.096-0.071-0.466-0.078-0.538,0"/>
-		<path fill="#231F20" stroke="#231F20" stroke-width="0.25" d="M1263.656,1643.95c-0.129,0.242-1.555-1.875-2.945-2.607
-			c-1.396-0.73-2.542-0.236-2.794-0.354c-0.252-0.114,2.147-0.776,3.54-0.046C1262.849,1641.673,1263.785,1643.703,1263.656,1643.95
-			z"/>
-		<path fill="#231F20" stroke="#231F20" stroke-width="0.45" d="M1267.238,1642.392c0.163,0.119-1.388-1.251-2.276-0.061
-			c-0.891,1.189-1.144,3.223-1.303,3.104c-0.159-0.123-0.175-2.354,0.716-3.544S1267.079,1642.269,1267.238,1642.392z"/>
-		<path fill="#231F20" stroke="#231F20" stroke-width="0.25" d="M1263.52,1649.502c-0.024-1.376-0.126-7.726-0.161-7.726
+		<path fill="none" stroke="#231F20" stroke-width="0.05" d="M1291.452,1584.632c-0.096-0.071-0.466-0.078-0.538,0"/>
+		<path fill="#231F20" stroke="#231F20" stroke-width="0.25" d="M1291.156,1590.127c-0.129,0.242-1.555-1.875-2.945-2.607
+			c-1.396-0.73-2.542-0.236-2.794-0.354c-0.252-0.114,2.147-0.776,3.54-0.046C1290.349,1587.85,1291.285,1589.88,1291.156,1590.127z
+			"/>
+		<path fill="#231F20" stroke="#231F20" stroke-width="0.45" d="M1294.738,1588.568c0.163,0.119-1.388-1.251-2.276-0.061
+			c-0.891,1.189-1.144,3.223-1.303,3.104c-0.159-0.123-0.175-2.354,0.716-3.544S1294.579,1588.445,1294.738,1588.568z"/>
+		<path fill="#231F20" stroke="#231F20" stroke-width="0.25" d="M1291.02,1595.679c-0.024-1.376-0.126-7.726-0.161-7.726
 			c0.046-0.062,0.01,0,0.051,0c-0.021,0,0.536,0,0.525,0c0.077,0-0.077,0.052-0.047,0.113c-0.035,0-0.005,6.638,0.011,7.72"/>
 	</g>
 	<g>
@@ -3321,9 +3322,9 @@
 			784.653,528.79 		"/>
 		<rect x="778.267" y="516.156" fill="none" stroke="#231F20" stroke-width="0.1" width="11.516" height="13.637"/>
 		
-			<text transform="matrix(1 0 0 1 782.5552 524.1211)" fill="#FDDB00" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">U</text>
+			<text transform="matrix(1 0 0 1 782.5552 524.1216)" fill="#FDDB00" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">U</text>
 		<text transform="matrix(1 0 0 1 779.6309 517.9839)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">92</text>
-		<text transform="matrix(1 0 0 1 782.7275 525.8779)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">238.02891</text>
+		<text transform="matrix(1 0 0 1 782.7275 525.8784)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">238.02891</text>
 	</g>
 	<g>
 		<g>
@@ -3402,22 +3403,22 @@
 		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M938.669,1710.039c0,0,0.794-0.771,2.247-0.745"/>
 	</g>
 	<g>
-		<ellipse fill="none" stroke="#231F20" stroke-width="0.1" cx="727.348" cy="62.047" rx="2.391" ry="0.341"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M724.92,74.595c0.43,0.142,1.602,1.188,4.843,0.096"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M724.957,62.047c-0.085-0.256-1.15,3.783-0.457,4.46
+		<ellipse fill="none" stroke="#231F20" stroke-width="0.1" cx="724.348" cy="62.047" rx="2.391" ry="0.341"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M721.92,74.595c0.43,0.142,1.602,1.188,4.843,0.096"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M721.957,62.047c-0.085-0.256-1.15,3.783-0.457,4.46
 			c0.885,0.863,1.245,1.216,1.85,1.704c0,0,0.824,0.683,0.767,2.018c-0.047,1.101,0.003,3.28-0.8,3.701"/>
-		<path fill="#611F50" stroke="#231F20" stroke-width="0.1" d="M730.241,64.774c0.101,0.034,0.032,0.248,0.027,0.451
+		<path fill="#611F50" stroke="#231F20" stroke-width="0.1" d="M727.241,64.774c0.101,0.034,0.032,0.248,0.027,0.451
 			c-0.008,0.294,0.064,0.727-0.076,1.281c-0.282,1.11-1.285,0.939-1.878,1.704c0,0-0.407,0.361-0.623,1.072l-0.692-0.028
 			c-0.213-0.729-0.661-1.044-0.661-1.044c-0.771-0.84-1.381-0.687-1.82-1.704c-0.357-0.827-0.107-1.905-0.05-1.732
-			C724.468,64.774,727.349,63.805,730.241,64.774z"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M726.999,69.274c-0.024-0.074,0.259,0.155,0.699,0"/>
-		<path fill="#611F50" stroke="#231F20" stroke-width="0.1" d="M724.468,64.774c-0.203,0.057,4.466,0.9,5.745,0"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M728.329,74.028c-0.625-0.407-0.7-2.661-0.749-3.8
+			C721.468,64.774,724.349,63.805,727.241,64.774z"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M723.999,69.274c-0.024-0.074,0.259,0.155,0.699,0"/>
+		<path fill="#611F50" stroke="#231F20" stroke-width="0.1" d="M721.468,64.774c-0.203,0.057,4.466,0.9,5.745,0"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M725.329,74.028c-0.625-0.407-0.7-2.661-0.749-3.8
 			c-0.057-1.335,0.729-2.018,0.729-2.018c0.47-0.641,1.489-0.653,1.887-1.704c0.344-0.907-0.371-4.716-0.457-4.46"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M727.531,73.872c0.633,0.066,1.372,0.285,2.208,0.76
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M724.531,73.872c0.633,0.066,1.372,0.285,2.208,0.76
 			c0.076,0.043,0.043,0.06-0.062,0.056"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M727.167,73.85c0.117,0.002,0.238,0.009,0.364,0.022"/>
-		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M724.92,74.595c0,0,0.794-0.771,2.247-0.745"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M724.167,73.85c0.117,0.002,0.238,0.009,0.364,0.022"/>
+		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M721.92,74.595c0,0,0.794-0.771,2.247-0.745"/>
 	</g>
 	<g>
 		<ellipse fill="none" stroke="#231F20" stroke-width="0.1" cx="822.429" cy="62.047" rx="2.391" ry="0.341"/>
@@ -3436,6 +3437,81 @@
 			c0.076,0.043,0.043,0.06-0.062,0.056"/>
 		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M822.248,73.85c0.117,0.002,0.238,0.009,0.364,0.022"/>
 		<path fill="none" stroke="#231F20" stroke-width="0.1" d="M820,74.595c0,0,0.794-0.771,2.247-0.745"/>
+	</g>
+	<g>
+		<polyline fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" points="737,72.837 737.375,74.403 
+			740.242,74.403 740.633,72.837 		"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="737.617" cy="74.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="737.867" cy="74.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="739.725" cy="74.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="739.975" cy="74.403" r="0.125"/>
+		<path fill="#B8B1B4" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" d="M737.1,72.837
+			c0.145-0.024,0.152-0.186,0.32-0.173c0.051,0.004,0.107,0.027,0.125-0.04c0.051,0.08,0.033,0.121,0.121,0.069
+			c0.047-0.028,0.064-0.084,0.127-0.086c0.064-0.002,0.111,0.065,0.17,0.074c0.061,0.008,0.094-0.056,0.143-0.033
+			c0.004-0.021,0.023-0.04,0.027-0.059c0.041,0.159,0.141,0.033,0.23,0.001c-0.006,0.042-0.02,0.09-0.008,0.127
+			c0.131-0.108,0.217-0.306,0.303-0.047c0.049-0.069,0.1-0.07,0.148-0.124c0.055-0.061,0.049-0.161,0.16-0.141
+			c0.07,0.012,0.082,0.052,0.162,0.037c0.053-0.01,0.121-0.029,0.17-0.055c0.057-0.029,0.033-0.049,0.098-0.035
+			c0.047,0.01,0.113,0.066,0.143,0.104c0.02,0.027,0.02,0.064,0.047,0.088c0.02,0.019,0.059,0.012,0.076,0.028
+			c0.039,0.037,0.031,0.088,0.055,0.138c0.062-0.121,0.156-0.04,0.24-0.105c0.074-0.061,0.027-0.162,0.119-0.105
+			c0.051,0.032,0.188,0.225,0.252,0.121c-0.031,0.05,0.002,0.197,0.045,0.234c0.027,0.022,0.207-0.044,0.229-0.051
+			c0.008,0.016,0.027,0.034,0.031,0.049"/>
+		<text transform="matrix(1 0 0 1 738.1987 73.9531)" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="1.125">Fe</text>
+		
+			<rect x="733.059" y="62.254" fill="none" stroke="#BAB2B6" stroke-width="0.25" stroke-miterlimit="10" width="11.516" height="13.637"/>
+		
+			<text transform="matrix(1 0 0 1 736.6846 69.6787)" fill="#BAB2B6" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Fe</text>
+		<text transform="matrix(1 0 0 1 734.1885 63.8115)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">26</text>
+		<text transform="matrix(1 0 0 1 737.9766 71.7051)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">55.845</text>
+	</g>
+	<g>
+		<polyline fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" points="257,797.837 257.375,799.403 
+			260.242,799.403 260.633,797.837 		"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="257.617" cy="799.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="257.867" cy="799.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="259.725" cy="799.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="259.975" cy="799.403" r="0.125"/>
+		<path fill="#B8B1B4" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" d="M257.1,797.837
+			c0.145-0.024,0.152-0.186,0.32-0.173c0.051,0.004,0.107,0.027,0.125-0.04c0.051,0.08,0.033,0.121,0.121,0.069
+			c0.047-0.028,0.064-0.084,0.127-0.086c0.064-0.002,0.111,0.065,0.17,0.074c0.061,0.008,0.094-0.056,0.143-0.033
+			c0.004-0.021,0.023-0.04,0.027-0.059c0.041,0.159,0.141,0.033,0.23,0.001c-0.006,0.042-0.02,0.09-0.008,0.127
+			c0.131-0.108,0.217-0.306,0.303-0.047c0.049-0.069,0.1-0.07,0.148-0.124c0.055-0.061,0.049-0.161,0.16-0.141
+			c0.07,0.012,0.082,0.052,0.162,0.037c0.053-0.01,0.121-0.029,0.17-0.055c0.057-0.029,0.033-0.049,0.098-0.035
+			c0.047,0.01,0.113,0.066,0.143,0.104c0.02,0.027,0.02,0.064,0.047,0.088c0.02,0.019,0.059,0.012,0.076,0.028
+			c0.039,0.037,0.031,0.088,0.055,0.138c0.062-0.121,0.156-0.04,0.24-0.105c0.074-0.061,0.027-0.162,0.119-0.105
+			c0.051,0.032,0.188,0.225,0.252,0.121c-0.031,0.05,0.002,0.197,0.045,0.234c0.027,0.022,0.207-0.044,0.229-0.051
+			c0.008,0.016,0.027,0.034,0.031,0.049"/>
+		<text transform="matrix(1 0 0 1 258.1987 798.9531)" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="1.125">Fe</text>
+		
+			<rect x="253.059" y="787.254" fill="none" stroke="#BAB2B6" stroke-width="0.25" stroke-miterlimit="10" width="11.516" height="13.637"/>
+		
+			<text transform="matrix(1 0 0 1 256.6846 794.6787)" fill="#BAB2B6" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Fe</text>
+		<text transform="matrix(1 0 0 1 254.1885 788.8115)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">26</text>
+		<text transform="matrix(1 0 0 1 257.9766 796.7051)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">55.845</text>
+	</g>
+	<g>
+		<polyline fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" points="963,1243.837 963.375,1245.403 
+			966.242,1245.403 966.633,1243.837 		"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="963.617" cy="1245.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="963.867" cy="1245.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="965.725" cy="1245.403" r="0.125"/>
+		<circle fill="#231F20" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" cx="965.975" cy="1245.403" r="0.125"/>
+		<path fill="#B8B1B4" stroke="#231F20" stroke-width="0.1" stroke-miterlimit="10" d="M963.1,1243.837
+			c0.145-0.024,0.152-0.186,0.32-0.173c0.051,0.004,0.107,0.027,0.125-0.04c0.051,0.08,0.033,0.121,0.121,0.069
+			c0.047-0.028,0.064-0.084,0.127-0.086c0.064-0.002,0.111,0.065,0.17,0.074c0.061,0.008,0.094-0.056,0.143-0.033
+			c0.004-0.021,0.023-0.04,0.027-0.059c0.041,0.159,0.141,0.033,0.23,0.001c-0.006,0.042-0.02,0.09-0.008,0.127
+			c0.131-0.108,0.217-0.306,0.303-0.047c0.049-0.069,0.1-0.07,0.148-0.124c0.055-0.061,0.049-0.161,0.16-0.141
+			c0.07,0.012,0.082,0.052,0.162,0.037c0.053-0.01,0.121-0.029,0.17-0.055c0.057-0.029,0.033-0.049,0.098-0.035
+			c0.047,0.01,0.113,0.066,0.143,0.104c0.02,0.027,0.02,0.064,0.047,0.088c0.02,0.019,0.059,0.012,0.076,0.028
+			c0.039,0.037,0.031,0.088,0.055,0.138c0.062-0.121,0.156-0.04,0.24-0.105c0.074-0.061,0.027-0.162,0.119-0.105
+			c0.051,0.032,0.188,0.225,0.252,0.121c-0.031,0.05,0.002,0.197,0.045,0.234c0.027,0.022,0.207-0.044,0.229-0.051
+			c0.008,0.016,0.027,0.034,0.031,0.049"/>
+		<text transform="matrix(1 0 0 1 964.1992 1244.9531)" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="1.125">Fe</text>
+		
+			<rect x="959.059" y="1233.254" fill="none" stroke="#BAB2B6" stroke-width="0.25" stroke-miterlimit="10" width="11.516" height="13.638"/>
+		
+			<text transform="matrix(1 0 0 1 962.6846 1240.6787)" fill="#BAB2B6" stroke="#231F20" stroke-width="0.1" font-family="'Calibri-Bold'" font-size="4.5">Fe</text>
+		<text transform="matrix(1 0 0 1 960.1885 1234.8115)" fill="#231F20" font-family="'Calibri-Bold'" font-size="1.2">26</text>
+		<text transform="matrix(1 0 0 1 963.9766 1242.7051)" fill="#231F20" font-family="'Calibri-Bold'" font-size="0.6">55.845</text>
 	</g>
 </g>
 </svg>

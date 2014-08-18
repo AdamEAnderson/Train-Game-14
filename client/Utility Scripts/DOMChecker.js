@@ -26,7 +26,7 @@ var checkLoadButtons = function (players) {
         //If the player is in a city, check for deliver and pickup
         var milepost = gameData.mapData.orderedMileposts[(parseInt(trainLocations[i].y) * gameData.mapData.mpWidth) + parseInt(trainLocations[i].x)];
         if (milepost.type == 'MAJORCITY' || milepost.type == 'CITY') {
-            if (milepost.city.loads) {
+            if (milepost.city.loads && milepost.city.loads.length > 0) {
                 $('#pickup').show();
                 shownPickup = true;
             }
