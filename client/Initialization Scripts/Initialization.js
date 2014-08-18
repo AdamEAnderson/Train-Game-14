@@ -206,6 +206,7 @@ var drawMileposts = function () {
                     milepostsGroup.push(paper.circle(x, y, 3).attr({ 'fill': '#000', 'stroke-width': '0px' }));
                     $('#milepostsGroup > circle:last').attr('id', 'milepost' + w.toString() + ',' + h.toString());
                     break;
+                case 'FERRY':
                 case 'BLANK':
                     break;
                 default:
