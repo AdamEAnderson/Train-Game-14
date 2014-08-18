@@ -90,7 +90,7 @@ var refreshTrainLocations = function (players) {
             }
             else {
                 var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
+                var bbox = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y))[0].getBBox();
                 mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
                 mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
             }
