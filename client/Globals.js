@@ -19,7 +19,6 @@ var yourTurn; //Boolean for if it is your turn
 var gameData; //Data that is sent from the server on newGame or joinGame that contains map and game information
 var mapViewboxHeight, mapViewboxWidth; //Width and height of the background map svg
 var mileposts = {}; //Object containing milepost svgs loaded through ajax on initialization
-var milepostsNeeded = ['DESERT', 'MOUNTAIN', 'ALPINE', 'JUNGLE', 'FOREST', 'CHUNNEL']; //List of milepost svg needed
 var geography; //The name of the map that is being played
 var started = false; //Boolean for if the game has been started
 var placedTrain = false; //Boolean for if the player has placed all trains

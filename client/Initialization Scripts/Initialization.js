@@ -91,15 +91,6 @@ $(document).ready(function () {
     //statusGet();
 });
 
-milepostsNeeded.forEach(function (e) {
-    $.ajax({
-        url: location.origin + join(location.pathname, '../../data/mileposts/' + e.toLowerCase() + '.svg'),
-        success: function (d) {
-            mileposts[e] = d;
-        }
-    });
-});
-
 var initMap = function (geography) {
     var mapFile = '../../data/' + geography + '/map.svg';
     $.ajax({
@@ -213,14 +204,20 @@ var drawMileposts = function () {
                     break;
                 default:
                     var size = 20;
-                    var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
-                    //var jQ = $('<image width="20" height="20" xlink:href=""/>');
+                    //var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
+                    var path = location.origin + join(location.pathname, '../../data/mileposts/' + gameData.mapData.orderedMileposts[mp].type.toLowerCase() + '.png');
+                    var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'image')).attr({ 'x': 0, 'y': 0, 'width': size, 'height': size });
+                    //var pathAttr = document.createAttributeNS('http://www.w3.org/1999/xlink', 'href');
+                    //pathAttr.value = path;
+                    //jQ[0].attributes.setNamedItemNS(pathAttr);
+                    jQ[0].setAttributeNS('http://www.w3.org/1999/xlink', 'href', path);
                     var mpjQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                     $('#milepostsGroup').append(mpjQ.append(jQ));
                     var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
-                    var scale = 0.035;
+                    var scale = 1;
                     x -= (bbox.width / 2) * scale;
                     y -= (bbox.height / 2) * scale;
+                    //mpjQ.attr('transform', 'translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id', 'milepost' + w + ',' + h);
                     mpjQ.attr('transform', 'translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id', 'milepost' + w + ',' + h);
                     break;
             }
