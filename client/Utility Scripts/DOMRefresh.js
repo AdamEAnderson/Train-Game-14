@@ -20,7 +20,7 @@ var refreshCards = function (cards) {
     $('#hand').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var c = 0; c < cards.length; ++c) {
-        $('#hand').append('<div class="card"/>');
+        $('#hand').append($('<div class="card"/>').draggable());
         card = cards[c];
         for (var t = 0; t < card.trips.length; ++t) {
 		    var iconPNG = iconPath +  "/" + card.trips[t].load + '.png';
@@ -52,7 +52,7 @@ var refreshTrains = function (trains, myturn) {
     $('#trains').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var t = 0; t < trains.length; ++t) {
-        $('#trains').append('<div class="train"/>');
+        $('#trains').append($('<div class="train"/>').draggable());
         var train = $('#trains').children().eq(t);
         train.append('<div class="trainCard"/>');
         var trainCard = train.children().eq(t);
