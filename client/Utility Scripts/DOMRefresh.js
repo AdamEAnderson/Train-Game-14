@@ -20,7 +20,7 @@ var refreshCards = function (cards) {
     $('#hand').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var c = 0; c < cards.length; ++c) {
-        $('#hand').append('<div class="card"/>');
+        $('#hand').append($('<div class="card"/>').draggable());
         card = cards[c];
         for (var t = 0; t < card.trips.length; ++t) {
 		    var iconPNG = iconPath +  "/" + card.trips[t].load + '.png';
@@ -33,7 +33,7 @@ var refreshCards = function (cards) {
     }
 };
 
-var refreshMovesMade = function () {
+var refreshMovesRemaining = function (trains) {
 	var countMovesMade = 0;
 	for (var t = 0; t < movesMadeThisTurn.length; ++t) {
 		countMovesMade = movesMadeThisTurn[t];
@@ -43,7 +43,8 @@ var refreshMovesMade = function () {
 			$('#trains').children().eq(t).append('<div class="moveCounter"/>');
 		var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
 		moveCounterJS.empty();
-		moveCounterJS.append('<p><span>' + countMovesMade + '</span></p>');
+		var movesRemaining = trains[t].speed - countMovesMade;
+		moveCounterJS.append('<p><span>' + movesRemaining + '</span></p>');
     }
 }
 
@@ -51,7 +52,7 @@ var refreshTrains = function (trains, myturn) {
     $('#trains').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var t = 0; t < trains.length; ++t) {
-        $('#trains').append('<div class="train"/>');
+        $('#trains').append($('<div class="train"/>').draggable());
         var train = $('#trains').children().eq(t);
         train.append('<div class="trainCard"/>');
         var trainCard = train.children().eq(t);
@@ -68,7 +69,7 @@ var refreshTrains = function (trains, myturn) {
             }
         }
         if (myturn) 
-        	refreshMovesMade();
+        	refreshMovesRemaining(trains);
     }
 };
 
@@ -89,7 +90,7 @@ var refreshTrainLocations = function (players) {
             }
             else {
                 var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
+                var bbox = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y))[0].getBBox();
                 mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
                 mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
             }

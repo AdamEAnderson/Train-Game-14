@@ -23,10 +23,13 @@ var buildClick = function (e) {
     edgesBuilt = [];
     milepostEdgesBuilt = [];
     var milepostsClick = function () {
+        var player = findPid(lastStatusMessage.players, pid);
         if (verticesBuilt.length == 0) {
             var currentMilepost = $(this).attr('id').replace('milepost', '').split(',');
             currentMilepost = gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])];
             verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
+            var mpsvg = findMilepost(currentMilepost.x, currentMilepost.y);
+            $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 2, 'fill': player.color }));
             return;
         }
         var lastMilepost = verticesBuilt[verticesBuilt.length - 1];
@@ -71,6 +74,8 @@ var buildClick = function (e) {
         if (20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)
             return;
         drawLineBetweenMileposts(lastX, lastY, currentX, currentY, pid);
+        $(document.getElementById('buildCursor')).remove();
+        $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': currentX, 'cy': currentY, 'r': 2, 'fill': player.color }));
         verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
         milepostEdgesBuilt.push({ x1: lastMilepost.x, y1: lastMilepost.y, x2: currentMilepost.x, y2: currentMilepost.y });
         moneySpentThisBuild += milepostCost;
@@ -160,16 +165,28 @@ var buildClick = function (e) {
         if (20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)
             return;
         drawLineBetweenMileposts(lastX, lastY, currentX, currentY, pid);
+        $(document.getElementById('buildCursor')).remove();
+        $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': currentX, 'cy': currentY, 'r': 2, 'fill': player.color }));
         verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
         milepostEdgesBuilt.push({ x1: lastMilepost.x, y1: lastMilepost.y, x2: currentMilepost.x, y2: currentMilepost.y });
         moneySpentThisBuild += milepostCost;
         refreshMoneySpent(moneySpent + moneySpentThisBuild);
         console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);
-
     };
+    var buildCursor = function () {
+        if (!document.getElementById('buildCursor'))
+            return;
+        if ($(document.getElementById('buildCursor')).css('display') == 'none')
+            $(document.getElementById('buildCursor')).show();
+        else
+            $(document.getElementById('buildCursor')).hide();
+    };
+    setInterval(buildCursor, 500);
     $(document).keyup(milepostsKeyUp);
     $('#milepostsGroup > *:not(path)').click(milepostsClick);
     var acceptBuild = function () {
+        clearInterval(buildCursor);
+        $(document.getElementById('buildCursor')).remove();
         builtTrack(verticesBuilt, edgesBuilt, moneySpentThisBuild, milepostEdgesBuilt);
         $('#acceptBuild').off('click');
         $('#cancelBuild').off('click');
@@ -187,6 +204,8 @@ var buildClick = function (e) {
     };
     $('#acceptBuild').click(acceptBuild);
     var cancelBuild = function () {
+        clearInterval(buildCursor);
+        $(document.getElementById('buildCursor')).remove();
         $('#acceptBuild').off('click');
         $('#cancelBuild').off('click');
         $('#milepostsGroup > *:not(path)').off('click', milepostsClick);

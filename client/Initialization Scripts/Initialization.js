@@ -146,6 +146,8 @@ var enterLobby = function () {
     $('#lobby').append('<div id="map"/>');
     var moneyPNG = location.origin + join(location.pathname, '../../data/' + geography + '/money.png');
     $('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"><div id="moneyTotal"><img id="moneyTotalIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div><div id="moneySpent" style="display:none"><img id="moneySpentIcon" src="' + moneyPNG + '"/><div id="moneySpentNumber"/></div></div>');
+    $('#moneyTotal').draggable();
+    $('#moneySpent').draggable();
     $('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
     $('#lobbyMenuJUI').menu();
     $('#controls').append('<input id="startGame" type="checkbox"><label for="startGame">Start Game</label></input>');
@@ -210,7 +212,9 @@ var drawMileposts = function () {
                 case 'BLANK':
                     break;
                 default:
+                    var size = 20;
                     var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
+                    //var jQ = $('<image width="20" height="20" xlink:href=""/>');
                     var mpjQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                     $('#milepostsGroup').append(mpjQ.append(jQ));
                     var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
