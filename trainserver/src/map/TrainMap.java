@@ -177,7 +177,6 @@ public final class TrainMap {
 		boolean isSeaCrossing = isCrossing(sourceId, destinationId, seaCrossings);
 		
 		if(destination == null) return null;
-		
 		if(destination.type == Milepost.Type.FERRY && ferryCrossings.containsKey(sourceId)){
 				Set<MilepostId> dests = ferryCrossings.get(sourceId);
 				MilepostId destId = null;
