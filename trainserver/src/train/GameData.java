@@ -196,8 +196,10 @@ public class GameData {
 	}
 	
 	/** Read in the data for the map, which includes the basic milepost information,
-	 * in the map.csv file, the river crossings list, and sea inlets and lakes
-	 * crossing list. Cost for building from each milepost to its connecting mileposts
+	 * in the map.csv file, the river crossings list, sea inlets and lakes
+	 * crossing list, and ferry crossings list. 
+	 * 
+	 * Cost for building from each milepost to its connecting mileposts
 	 * are calculated using the milespost types in the map file, and adding in the 
 	 * extra cost if the track crosses either a river or sea inlet/lake.
 	 * 
@@ -212,7 +214,8 @@ public class GameData {
 			BufferedReader mapDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "map.csv")));
 			BufferedReader riverDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "rivers.csv")));
 			BufferedReader seaDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "seas.csv")));
-			map = new TrainMap(mapDataReader, riverDataReader, seaDataReader, cities);
+			BufferedReader ferryDataReader = new BufferedReader(new FileReader(getDataFile(gameType, "ferries.csv")));
+			map = new TrainMap(mapDataReader, riverDataReader, seaDataReader, ferryDataReader, cities);
 			mapDataReader.close();
 			riverDataReader.close();
 			seaDataReader.close();
