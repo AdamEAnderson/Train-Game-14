@@ -33,7 +33,7 @@ var refreshCards = function (cards) {
     }
 };
 
-var refreshMovesMade = function () {
+var refreshMovesRemaining = function (trains) {
 	var countMovesMade = 0;
 	for (var t = 0; t < movesMadeThisTurn.length; ++t) {
 		countMovesMade = movesMadeThisTurn[t];
@@ -43,7 +43,8 @@ var refreshMovesMade = function () {
 			$('#trains').children().eq(t).append('<div class="moveCounter"/>');
 		var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
 		moveCounterJS.empty();
-		moveCounterJS.append('<p><span>' + countMovesMade + '</span></p>');
+		var movesRemaining = trains[t].speed - countMovesMade;
+		moveCounterJS.append('<p><span>' + movesRemaining + '</span></p>');
     }
 }
 
@@ -68,7 +69,7 @@ var refreshTrains = function (trains, myturn) {
             }
         }
         if (myturn) 
-        	refreshMovesMade();
+        	refreshMovesRemaining(trains);
     }
 };
 

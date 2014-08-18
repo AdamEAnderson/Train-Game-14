@@ -210,7 +210,9 @@ var drawMileposts = function () {
                 case 'BLANK':
                     break;
                 default:
+                    var size = 20;
                     var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
+                    //var jQ = $('<image width="20" height="20" xlink:href=""/>');
                     var mpjQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                     $('#milepostsGroup').append(mpjQ.append(jQ));
                     var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');

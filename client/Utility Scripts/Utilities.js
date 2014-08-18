@@ -43,6 +43,22 @@ var findPid = function (players, pid) {
     return null;
 };
 
+var findMilepost = function (x, y) {
+    var mpsvg = { x: 0, y: 0 };
+    var mpjQ = $(document.getElementById('milepost' + x + ',' + y));
+    if (mpjQ.prop('tagName') == 'circle') {
+        mpsvg.x = mpjQ.attr('cx');
+        mpsvg.y = mpjQ.attr('cy');
+    }
+    else {
+        var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+        var bbox = mpjQ[0].getBBox();
+        mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+        mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+    }
+    return mpsvg;
+};
+
 //Sends a HTTP POST request to the server with data data and calls callback when complete
 var post = function (data, callback) {
     $.ajax({

@@ -141,7 +141,7 @@ public class TrainServer {
 			p = p.getNextPlayer();
 		}while(p != game.getActivePlayer());
 		
-		statusCache = gsonBuilder.create().toJson(status);
+		statusCache = gsonBuilder.serializeNulls().create().toJson(status);
 		statusGid = gid;
 		statusTransaction = game.transaction();
 		
@@ -216,7 +216,7 @@ public class TrainServer {
 			response.loadset.put(load, cities);
 		}
 		response.gid = gid;
-		return gsonBuilder.create().toJson(response);
+		return gsonBuilder.serializeNulls().create().toJson(response);
 	}
 	
 	synchronized static public String newGame(String requestText) throws GameException {			
