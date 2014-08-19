@@ -266,7 +266,7 @@ public class Game implements AbstractGame {
 		++transaction;
 	}
 
-	private Player getPlayer(String pid) throws GameException {
+	Player getPlayer(String pid) throws GameException {
 		for(Player p : players){
 			if (p.getPid().equals(pid)) return p;
 		}
