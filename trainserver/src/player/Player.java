@@ -232,11 +232,20 @@ public class Player {
 	}
 	
 	private void deposit(int deposit){ 
-		if(money < 0) {
-			deposit += 2 *  money;
-			money = 0;
+		if(deposit < 0) {
+			money += deposit; 
+			return;
 		}
-		money += deposit;
+		if(money < 0){
+			if((-2) * money > deposit){
+				money += deposit / 2;
+			} else{
+				deposit += 2 * money;
+				money = deposit;
+			}
+		} else {
+			money += deposit;
+		}
 	}
 	
 	public void readyToStart(boolean ready) { readyToStart = ready;}

@@ -110,6 +110,14 @@ public class TrainServer {
 		status.ended = game.isOver();
 		status.turns = game.getTurns();
 		Player p = game.getActivePlayer();
+		if(p == null){
+			status.activeid = "";
+			status.lastid = "";
+			statusCache = gsonBuilder.serializeNulls().create().toJson(status);
+			statusGid = gid;
+			statusTransaction = game.transaction();
+			return statusCache;
+		}
 		if(game.getLastPlayer() == null) {
 			status.activeid = "";
 			status.lastid = "";
