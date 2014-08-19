@@ -40,15 +40,24 @@ $(document).ready(function () {
             if (data.item.label == "New") {
                 $('#gamePicker').empty();
                 $('#gamePicker-button').hide();
+                $('#colorPicker').prev().show();
+                $('#colorPicker').next().show();
+                $('#geographyPicker-label').show();
+                $('#geographyPicker-button').show();
             }
             else {
                 $('#gamePicker-button').show().css('display', 'block');
                 $('#geographyPicker-label').hide();
                 $('#geographyPicker-button').hide();
+                $('#colorPicker').prev().show();
+                $('#colorPicker').next().show();
                 if (data.item.label == "Join")
                     gameOption = "joinable";
-                else
+                else {
                     gameOption = "resumeable";
+                    $('#colorPicker').prev().hide();
+                    $('#colorPicker').next().hide();
+                }
                 //Populate games list menu
                 requestData = { messageType: 'list', listType: gameOption };
                 $.ajax({
