@@ -82,6 +82,7 @@ $(document).ready(function () {
                 joinGame(document.getElementById("gamePicker").value,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
             } else if (document.getElementById("actionPicker").value == "Resume") {
+                resumeGame(document.getElementById("gamePicker").value, $('#handlePicker').val());
             }
         }
     });
@@ -229,4 +230,54 @@ var drawMileposts = function () {
         var currentMilepost = $(this).attr('id').replace('milepost', '').split(',');
         console.log(gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])]);
     });
-}
+};
+
+var processResume = function (data) {
+    lastStatusMessage = data;
+    var player = findPid(data.players, pid);
+    for (var i = 0; i < player.trains.length; i++) {
+        if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
+            continue;
+        var milepost = JSON.parse(player.trains[i].loc);
+        trainLocations[i] = { x: milepost.x, y: milepost.y };
+        var mpsvg = findMilepost(milepost.x, milepost.y);
+        $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + i, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+    }
+    $('#pid' + pid).empty();
+    var rail = player.rail;
+    for (var key in rail) {
+        var builtEdges = rail[key];
+        for (var k = 0; k < builtEdges.length; k++) {
+            var m1 = builtEdges[k];
+            var m2 = JSON.parse(key);
+            var m1jQ = $(document.getElementById('milepost' + m1.x + ',' + m1.y));
+            var m2jQ = $(document.getElementById('milepost' + m2.x + ',' + m2.y));
+            var m1svg = { x: 0, y: 0 };
+            var m2svg = { x: 0, y: 0 };
+            if (m1jQ.prop('tagName') == 'circle') {
+                m1svg.x = m1jQ.attr('cx');
+                m1svg.y = m1jQ.attr('cy');
+            }
+            else {
+                var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+                var bbox = m1jQ[0].getBBox();
+                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            }
+            if (m2jQ.prop('tagName') == 'circle') {
+                m2svg.x = m2jQ.attr('cx');
+                m2svg.y = m2jQ.attr('cy');
+            }
+            else {
+                var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+                var bbox = m2jQ[0].getBBox();
+                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
+                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            }
+            drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
+            edgesBuiltFinal.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
+            verticesBuiltFinal.push(m1, m2);
+        }
+    }
+    justResumed = false;
+};

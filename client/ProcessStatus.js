@@ -17,10 +17,12 @@ var processStatus = function (data) {
             refreshRails(data.players);
             refreshTrainLocations(data.players);
         }
-        me = findPid(data.players, pid);
+        var me = findPid(data.players, pid);
         refreshCards(me.hand);
         refreshTrains(me.trains, data.activeid && data.activeid == pid);
         refreshMoney(me.money);
+        if (justResumed)
+            processResume(data);
         if (data.activeid && data.activeid == pid) {
             yourTurn = true;
             $('#turnControls').buttonset('option', 'disabled', false);
@@ -32,6 +34,7 @@ var processStatus = function (data) {
             $('#turnControls').buttonset('option', 'disabled', true);
 			$('#moneySpent').hide();
         }
+
         lastStatusMessage = data;
         lastStatus = data.transaction;
     }

@@ -22,6 +22,7 @@ var mileposts = {}; //Object containing milepost svgs loaded through ajax on ini
 var geography; //The name of the map that is being played
 var started = false; //Boolean for if the game has been started
 var placedTrain = false; //Boolean for if the player has placed all trains
+var justResumed = false;
 var moneySpent = 0; //Integer for money spent during the players turn
 var moneySpentThisBuild = 0; //Integer for money spent while building
 var verticesBuilt; //Array for mileposts built while building
