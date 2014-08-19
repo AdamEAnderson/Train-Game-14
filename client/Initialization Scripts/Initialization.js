@@ -40,15 +40,24 @@ $(document).ready(function () {
             if (data.item.label == "New") {
                 $('#gamePicker').empty();
                 $('#gamePicker-button').hide();
+                $('#colorPicker').prev().show();
+                $('#colorPicker').next().show();
+                $('#geographyPicker-label').show();
+                $('#geographyPicker-button').show();
             }
             else {
                 $('#gamePicker-button').show().css('display', 'block');
                 $('#geographyPicker-label').hide();
                 $('#geographyPicker-button').hide();
+                $('#colorPicker').prev().show();
+                $('#colorPicker').next().show();
                 if (data.item.label == "Join")
                     gameOption = "joinable";
-                else
+                else {
                     gameOption = "resumeable";
+                    $('#colorPicker').prev().hide();
+                    $('#colorPicker').next().hide();
+                }
                 //Populate games list menu
                 requestData = { messageType: 'list', listType: gameOption };
                 $.ajax({
@@ -124,7 +133,7 @@ var initMap = function (geography) {
             $('#lobby').show();
             panZoom.enable();
             drawMileposts();
-            setInterval('statusGet()', 1000);
+            setInterval('statusGet()', 250);
         },
         error: function (a, b, c) {
             console.log('error:' + arguments.toString());
@@ -261,8 +270,8 @@ var processResume = function (data) {
             else {
                 var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                 var bbox = m1jQ[0].getBBox();
-                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
             }
             if (m2jQ.prop('tagName') == 'circle') {
                 m2svg.x = m2jQ.attr('cx');
@@ -271,8 +280,8 @@ var processResume = function (data) {
             else {
                 var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                 var bbox = m2jQ[0].getBBox();
-                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
             }
             drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
             edgesBuiltFinal.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
