@@ -133,7 +133,7 @@ var initMap = function (geography) {
             $('#lobby').show();
             panZoom.enable();
             drawMileposts();
-            setInterval('statusGet()', 1000);
+            setInterval('statusGet()', 250);
         },
         error: function (a, b, c) {
             console.log('error:' + arguments.toString());
