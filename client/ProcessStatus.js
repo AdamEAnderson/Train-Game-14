@@ -4,6 +4,8 @@ var processStatus = function (data) {
         if (!started && data.joinable == false) {
             startedGame(data);
         }
+        if (justResumed)
+            processResume(data);
         if (!geography && data.geography) {
             geography = data.geography;
             initMap(data.geography);
@@ -21,8 +23,6 @@ var processStatus = function (data) {
         refreshCards(me.hand);
         refreshTrains(me.trains, data.activeid && data.activeid == pid);
         refreshMoney(me.money);
-        if (justResumed)
-            processResume(data);
         if (data.activeid && data.activeid == pid) {
             yourTurn = true;
             $('#turnControls').buttonset('option', 'disabled', false);
