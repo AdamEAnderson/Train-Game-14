@@ -4,12 +4,25 @@ package map;
 public class Edge {
 	public final Milepost destination;
 	public final int cost;
+	
+	Edge(Milepost dest, int cost){
+		destination = dest;
+		this.cost = cost;
+	}
 
 	Edge(Milepost destination, boolean river, boolean lake){
 		this.destination = destination;
+		int cost = generateCost(destination.type);
+		if (river) 
+			cost += 2;
+		if (lake) 
+			cost += 3;
+		this.cost = cost;
+	}
+	
+	static int generateCost(Milepost.Type type){
 		int temp;
-		
-		switch (destination.type) {
+		switch (type) {
 			case BLANK:
 				temp = Integer.MAX_VALUE;
 				break;
@@ -37,13 +50,7 @@ public class Edge {
 			default:
 				temp = 1;
 			}
-		
-		if (river) 
-			temp += 2;
-		if (lake) 
-			temp += 3;
-		
-		cost = temp;
+		return temp;
 	}
 
 	// Serialize as a set of json-encoded milepostIds
