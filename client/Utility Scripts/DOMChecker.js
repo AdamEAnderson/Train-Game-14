@@ -68,7 +68,7 @@ var checkMoveButton = function () {
             $('#move').button('option', 'disabled', false);
             shown = true;
         }
-        else if (!movesMade && movesMadeThisTurn < player.trains[i].speed) {
+        else if (!movesMade && movesMadeThisTurn[i] < player.trains[i].speed) {
             $('#move').button('option', 'disabled', false);
             shown = true;
         }
