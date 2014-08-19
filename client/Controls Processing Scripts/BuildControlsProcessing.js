@@ -57,8 +57,8 @@ var buildClick = function (e) {
         else if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
             var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         var currentX, currentY;
         if ($(this).prop("tagName") == 'circle') {
@@ -68,8 +68,8 @@ var buildClick = function (e) {
         else if ($(this).prop("tagName") == 'g') {
             var translate = $(this).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(this)[0].getBBox();
-            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         if (!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
             return;
@@ -153,8 +153,8 @@ var buildClick = function (e) {
         else if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
             var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         var currentX, currentY;
         if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'circle') {
@@ -164,8 +164,8 @@ var buildClick = function (e) {
         else if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'g') {
             var translate = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y))[0].getBBox();
-            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         if (!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
             return;

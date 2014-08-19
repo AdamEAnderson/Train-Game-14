@@ -261,8 +261,8 @@ var processResume = function (data) {
             else {
                 var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                 var bbox = m1jQ[0].getBBox();
-                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
             }
             if (m2jQ.prop('tagName') == 'circle') {
                 m2svg.x = m2jQ.attr('cx');
@@ -271,8 +271,8 @@ var processResume = function (data) {
             else {
                 var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                 var bbox = m2jQ[0].getBBox();
-                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
             }
             drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
             edgesBuiltFinal.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });

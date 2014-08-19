@@ -155,8 +155,8 @@ var moveClick = function (e) {
         else {
             var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = mpjQ[0].getBBox();
-            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         $('#train' + pid + train).remove();
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
@@ -192,8 +192,8 @@ var moveClick = function (e) {
                 else {
                     var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                     var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-                    mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                    mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                    mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                    mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
                 }
                 $('#train' + pid + train).remove();
                 $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
@@ -234,8 +234,8 @@ var placeTrainClick = function (e) {
         else {
             var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': findPid(data.players, pid).color }));
         if (placeTrainLocations.length == findPid(data.players, pid).trains.length)

@@ -53,8 +53,8 @@ var findMilepost = function (x, y) {
     else {
         var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
         var bbox = mpjQ[0].getBBox();
-        mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-        mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+        mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+        mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
     }
     return mpsvg;
 };
