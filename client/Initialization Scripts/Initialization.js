@@ -279,5 +279,9 @@ var processResume = function (data) {
             verticesBuiltFinal.push(m1, m2);
         }
     }
+    $('#move').show();
+    $('#drop').show();
+    checkMoveButton();
+    checkLoadButtons(lastStatusMessage.players);
     justResumed = false;
 };
