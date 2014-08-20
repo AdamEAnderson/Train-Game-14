@@ -34,7 +34,7 @@ var deliverClick = function (e) {
             }
         }
     }
-    $('#lobby').append('<div id="deliverDialog" title="Deliver a load" />').find('div:last').dialog({
+    $('#gameDisplay').append('<div id="deliverDialog" title="Deliver a load" />').find('div:last').dialog({
         dialogClass: "no-close",
         buttons: [{
             text: "Cancel",
@@ -99,7 +99,7 @@ var pickupClick = function (e) {
     }
     if (validTrains.length == 0)
         return;
-    $('#lobby').append('<div id="pickupDialog" title="Pickup a load" />').find('div:last').dialog({
+    $('#gameDisplay').append('<div id="pickupDialog" title="Pickup a load" />').find('div:last').dialog({
         dialogClass: "no-close",
         buttons: [{
             text: "Cancel",
@@ -150,7 +150,7 @@ var dumpClick = function (e) {
     }
     if (validTrains.length == 0)
         return;
-    $('#lobby').append('<div id="dumpDialog" title="Dump a load" />').find('div:last').dialog({
+    $('#gameDisplay').append('<div id="dumpDialog" title="Dump a load" />').find('div:last').dialog({
         dialogClass: "no-close",
         buttons: [{
             text: "Cancel",

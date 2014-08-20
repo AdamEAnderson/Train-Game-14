@@ -15,7 +15,7 @@
 
 var loadsClick = function (e) {
     var data = e.data;
-    $('#lobby').append('<div id="loadsDialog" title="Loads Key" />').find('div:last').dialog({
+    $('#gameDisplay').append('<div id="loadsDialog" title="Loads Key" />').find('div:last').dialog({
         buttons: [{
             text: "Close",
             click: function () {

@@ -12,6 +12,7 @@
 //Tells server we've joined a game
 var joinGame = function (GID, color, handle) {
     post({ messageType: 'joinGame', gid: GID, color: color, pid: handle }, function (data) {
+        $('#loading').show();
         gameData = data;
         gid = GID;
         pid = handle;
@@ -19,13 +20,14 @@ var joinGame = function (GID, color, handle) {
             gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
         geography = data.geography;
         console.log("join game: " + gid);
-        enterLobby();
+        enterGame();
     });
 };
 
 //Tells server to resume a game
 var resumeGame = function (GID, handle) {
     post({ messageType: 'resumeGame', gid: GID, pid: handle }, function (data) {
+        $('#loading').show();
         gameData = data.gameData;
         gid = GID;
         pid = handle;
@@ -34,7 +36,7 @@ var resumeGame = function (GID, handle) {
             gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
         geography = gameData.geography;
         console.log("resume game: " + gid);
-        enterLobby();
+        enterGame();
     });
     pid = handle;
 };
@@ -161,6 +163,7 @@ var endGame = function (checked) {
 
 var newGame = function (color, handle, gameGeo) {
     post({ messageType: 'newGame', color: color, pid: handle, gameType: gameGeo }, function (data) {
+        $('#loading').show();
         gameData = data;
         for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i) {
             gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
@@ -169,7 +172,7 @@ var newGame = function (color, handle, gameGeo) {
         pid = handle;
         geography = gameGeo;
         console.log("new game: " + gid);
-        enterLobby();
+        enterGame();
     });
 };
 

@@ -20,7 +20,7 @@ var upgradeClick = function (e) {
     for (var i = 0; i < lastStatusMessage.players.length; i++)
         if (lastStatusMessage.players[i].pid == pid) {
             var player = lastStatusMessage.players[i];
-            $('#lobby').append('<div id="upgradeDialog" title="Upgrade Your Train" />').find('div:last').dialog({
+            $('#gameDisplay').append('<div id="upgradeDialog" title="Upgrade Your Train" />').find('div:last').dialog({
                 dialogClass: "no-close",
                 buttons: [{
                     text: "Cancel",

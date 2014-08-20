@@ -130,7 +130,7 @@ var initMap = function (geography) {
                 panZoom.zoomOut(1);
             });
             $('#mainMenu').hide();
-            $('#lobby').show();
+            $('#gameDisplay').show();
             panZoom.enable();
             drawMileposts();
             setInterval('statusGet()', 250);
@@ -141,16 +141,15 @@ var initMap = function (geography) {
     });
 }
 
-var enterLobby = function () {
-    $('#lobby').append('<ul id="lobbyMenuJUI"/>');
-    $('#lobby').append($('<div id="topBar"/>').append('<div id="players"/>', '<div id="controls"/>'));
-    $('#lobby').append('<div id="map"/>');
+var enterGame = function () {
+    $('#mainMenu').empty();
+    $('#gameDisplay').append($('<div id="topBar"/>').append('<div id="players"/>', '<div id="controls"/>'));
+    $('#gameDisplay').append('<div id="map"/>');
     var moneyPNG = location.origin + join(location.pathname, '../../data/' + geography + '/money.png');
-    $('#lobby').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"><div id="moneyTotal"><img id="moneyTotalIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div><div id="moneySpent" style="display:none"><img id="moneySpentIcon" src="' + moneyPNG + '"/><div id="moneySpentNumber"/></div></div>');
+    $('#gameDisplay').append('<div id="handAndTrains"><div id="hand"/><div id="trains"/><div id="money"><div id="moneyTotal"><img id="moneyTotalIcon" src="' + moneyPNG + '"/><div id="moneyTotalNumber"/></div><div id="moneySpent" style="display:none"><img id="moneySpentIcon" src="' + moneyPNG + '"/><div id="moneySpentNumber"/></div></div>');
     $('#moneyTotal').draggable();
     $('#moneySpent').draggable();
-    $('#lobby').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
-    $('#lobbyMenuJUI').menu();
+    $('#gameDisplay').append('<div id="mapControls"><a id="up" href="javascript:;"></a><a id="down" href="javascript:;"></a></div>');
     $('#controls').append('<input id="startGame" type="checkbox"><label for="startGame">Start Game</label></input>');
     $('#controls').buttonset();
     $('#startGame').change(function () {
@@ -239,12 +238,14 @@ var drawMileposts = function () {
         var currentMilepost = $(this).attr('id').replace('milepost', '').split(',');
         console.log(gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])]);
     });
+    $('#loading').hide();
 };
 
 var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);
     for (var i = 0; i < player.trains.length; i++) {
+        //movesMadeThisTurn[i] = 
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
         var milepost = JSON.parse(player.trains[i].loc);
@@ -252,6 +253,8 @@ var processResume = function (data) {
         var mpsvg = findMilepost(milepost.x, milepost.y);
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + i, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
     }
+    moneySpent = player.spendings;
+    checkBuildMoney();
     $('#pid' + pid).empty();
     var rail = player.rail;
     for (var key in rail) {

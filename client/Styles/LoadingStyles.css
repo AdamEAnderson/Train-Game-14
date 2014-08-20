@@ -1,0 +1,9 @@
+﻿#loading {
+    height:100%;
+    width:100%;
+}
+
+    #loading > p {
+        font-size:12em;
+        text-align:center;
+    }
