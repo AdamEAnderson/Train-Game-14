@@ -6,4 +6,15 @@
     #loading > p {
         font-size:12em;
         text-align:center;
+        margin:0;
     }
+
+    #loading > div {
+        margin-left:30%;
+        margin-right:30%;
+        margin-top:20px;
+    }
+
+        #loading > div > div {
+            display:block !important;
+        }

@@ -13,6 +13,7 @@
 var joinGame = function (GID, color, handle) {
     post({ messageType: 'joinGame', gid: GID, color: color, pid: handle }, function (data) {
         $('#loading').show();
+        loading = true;
         gameData = data;
         gid = GID;
         pid = handle;
@@ -28,7 +29,9 @@ var joinGame = function (GID, color, handle) {
 var resumeGame = function (GID, handle) {
     post({ messageType: 'resumeGame', gid: GID, pid: handle }, function (data) {
         $('#loading').show();
+        loading = true;
         gameData = data.gameData;
+        //gameData = data;
         gid = GID;
         pid = handle;
         justResumed = true;
@@ -164,6 +167,7 @@ var endGame = function (checked) {
 var newGame = function (color, handle, gameGeo) {
     post({ messageType: 'newGame', color: color, pid: handle, gameType: gameGeo }, function (data) {
         $('#loading').show();
+        loading = true;
         gameData = data;
         for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i) {
             gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);

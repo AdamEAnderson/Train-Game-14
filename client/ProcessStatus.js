@@ -37,5 +37,12 @@ var processStatus = function (data) {
 
         lastStatusMessage = data;
         lastStatus = data.transaction;
+
+        if (loading) {
+            $("#loadingBar .ui-progressbar-value").animate({ width: '100%' }, 'fast');
+            $('#loading').hide();
+            $('#loading').empty();
+            $('#gameDisplay').show();
+        }
     }
 };

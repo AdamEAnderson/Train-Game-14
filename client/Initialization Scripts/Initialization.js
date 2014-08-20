@@ -22,11 +22,8 @@ $(document).ready(function () {
 
     //Init main menu
     $('#mainMenu').append('<h3 id="joinGameText">Train Game</h3>');
-    //$('#mainMenu').append('<ul id="mainMenuJUI"><li>Join</li><li>New</li><li>Resume</li></ul>');
-    //for(var i = 0; i < 10; i++){
-    //$('#mainMenuJUI').append('<li>'+i+'</li>');
-    //}
-    //$('#mainMenuJUI').menu();
+    $('#loading').append('<div id="loadingBar" />');
+    $('#loadingBar').progressbar();
     $('#mainMenu').append('<select id="actionPicker"><option>New</option><option>Join</option><option>Resume</option></select>');
     $('#mainMenu').append('<select id="gamePicker"/>');
     $('#mainMenu').append('<h4 style="margin:10px 0px 5px 75px;">Handle</h4>');
@@ -130,7 +127,6 @@ var initMap = function (geography) {
                 panZoom.zoomOut(1);
             });
             $('#mainMenu').hide();
-            $('#gameDisplay').show();
             panZoom.enable();
             drawMileposts();
             setInterval('statusGet()', 250);
@@ -159,6 +155,7 @@ var enterGame = function () {
     $('#map').resize(function () {
         paper.setSize($('#map').width(), $('#map').height());
     });
+    $("#loadingBar .ui-progressbar-value").css({ width: '33%' });
     if (geography)
         initMap(geography);
     else {
@@ -224,8 +221,8 @@ var drawMileposts = function () {
                     $('#milepostsGroup').append(mpjQ.append(jQ));
                     var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
                     var scale = 1;
-                    x -= (bbox.width / 2) * scale;
-                    y -= (bbox.height / 2) * scale;
+                    x -= (size / 2) * scale;
+                    y -= (size / 2) * scale;
                     //mpjQ.attr('transform', 'translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id', 'milepost' + w + ',' + h);
                     mpjQ.attr('transform', 'translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id', 'milepost' + w + ',' + h);
                     break;
@@ -238,14 +235,14 @@ var drawMileposts = function () {
         var currentMilepost = $(this).attr('id').replace('milepost', '').split(',');
         console.log(gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])]);
     });
-    $('#loading').hide();
+    $("#loadingBar .ui-progressbar-value").animate({ width: '66%' }, 'fast');
 };
 
 var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);
     for (var i = 0; i < player.trains.length; i++) {
-        //movesMadeThisTurn[i] = 
+        //movesMadeThisTurn[i] = player.trains[i].movesMade;
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
         var milepost = JSON.parse(player.trains[i].loc);
