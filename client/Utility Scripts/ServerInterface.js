@@ -26,7 +26,7 @@ var joinGame = function (GID, color, handle) {
 //Tells server to resume a game
 var resumeGame = function (GID, handle) {
     post({ messageType: 'resumeGame', gid: GID, pid: handle }, function (data) {
-        gameData = data;
+        gameData = data.gameData;
         gid = GID;
         pid = handle;
         justResumed = true;
