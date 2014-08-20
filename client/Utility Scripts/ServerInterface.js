@@ -32,7 +32,7 @@ var resumeGame = function (GID, handle) {
         justResumed = true;
         for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
             gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
-        geography = data.geography;
+        geography = gameData.geography;
         console.log("resume game: " + gid);
         enterLobby();
     });
