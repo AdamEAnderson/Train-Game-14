@@ -282,7 +282,7 @@ public class Game implements AbstractGame {
 		return null;
 	}
 	
-	List<Player> getPlayers(){ return players; }
+	public List<Player> getPlayers(){ return players; }
 	
 	boolean getJoinable() {return joinable;}
 	

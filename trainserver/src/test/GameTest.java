@@ -1,6 +1,10 @@
 package test;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import map.MilepostId;
 
 import org.junit.Test;
@@ -601,20 +605,77 @@ public class GameTest {
 		} 
 	}
 	
-	/*@Test
-	public void testRental() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-		Game game = null;;
+	/** Test moving a train without having placed it */
+	@Test
+	public void testMoveNoPlace() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.joinGame("Tom", "black");
-	        game.joinGame("Katya", "blue");
-	        game.startGame("Tom", true);
-	        game.startGame("Katya", true);
-	        game.startGame("Adam", true);
+	        game.joinGame("Tim", "black");
+	        game.joinGame("Ann", "green");
+	        startGame(game);
+
+	        // First player builds from Dakar to Abidjan
+	        MilepostId[] buildMileposts;
+	        buildMileposts = new MilepostId[]{ 
+	        	new MilepostId(2,20),
+	        	new MilepostId(2,21),
+	        	new MilepostId(3,22),
+	        	new MilepostId(3,23),
+	        	new MilepostId(4,24),
+	        	new MilepostId(4,25),
+	        	new MilepostId(5,26),
+	        	new MilepostId(5,27),
+	        	new MilepostId(6,27),
+	        	new MilepostId(7,27),
+	        	new MilepostId(8,27), 
+	        	new MilepostId(9,27), 
+	        	//new MilepostId(10,27),
+	        };
+        	game.buildTrack(game.getActivePlayer().name, buildMileposts);
+        	game.endTurn(game.getActivePlayer().name);
+
+        	skipPastBuildingTurns(game);
+        	
+        	// Move from Abidjan, skip placing train
+        	//game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(10,27));
+	        MilepostId[] moveMileposts;
+	        moveMileposts = new MilepostId[]{ 
+	        	new MilepostId(10,27),
+	        	new MilepostId(9,27), 
+	        	new MilepostId(8,27), 
+	        	new MilepostId(7,27),
+	        	new MilepostId(6,27),
+	        	new MilepostId(5,27),
+	        	new MilepostId(5,26),
+	        	new MilepostId(4,25),
+	        	new MilepostId(4,24),
+	        	new MilepostId(3,23),
+	        	new MilepostId(3,22),
+	        	new MilepostId(2,21),
+	        };
+        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			fail("Expected invalid move exception");
+		} catch (GameException e) {
+		} 
+	}
+	
+	@Test
+	public void testRental() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        assertTrue(game != null);
+	        game.joinGame("Tim", "black");
+	        game.joinGame("Ann", "green");
+	        startGame(game);
 
 	        // First player builds from Dakar to Abidjan
 	        MilepostId[] buildMileposts;
@@ -666,40 +727,114 @@ public class GameTest {
 
         	// Second player completes track to Kano
         	buildMileposts = new MilepostId[] {
+    			new MilepostId(14,21),
+    			new MilepostId(15,21),
+    			new MilepostId(16,21),
+    			new MilepostId(17,21),
+    			new MilepostId(18,21),
+    			new MilepostId(19,21),
+    			new MilepostId(20,21)
     		};
+        	game.buildTrack(game.getActivePlayer().name, buildMileposts);
+        	game.endTurn(game.getActivePlayer().name);
+
+        	// First player completes track to Abidjan
+        	buildMileposts = new MilepostId[] {
+	        	new MilepostId(9,27), 
+	        	new MilepostId(10,27)
+        	};
+        	game.buildTrack(game.getActivePlayer().name, buildMileposts);
+        	game.endTurn(game.getActivePlayer().name);
+
+        	skipPastBuildingTurns(game);
         	
+        	// First player starts train in Abidjan, heads to Dakar
+        	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(10,27));
+	        MilepostId[] moveMileposts;
+	        moveMileposts = new MilepostId[]{ 
+	        	new MilepostId(10,27),
+	        	new MilepostId(9,27), 
+	        	new MilepostId(8,27), 
+	        	new MilepostId(7,27),
+	        	new MilepostId(6,27),
+	        	new MilepostId(5,27),
+	        	new MilepostId(5,26),
+	        	new MilepostId(4,25),
+	        	new MilepostId(4,24),
+	        	new MilepostId(3,23),
+	        	new MilepostId(3,22),
+	        	new MilepostId(2,21),
+	        	//new MilepostId(2,20),
+	        };
+	        Player player1 = game.getActivePlayer();
+        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	game.endTurn(game.getActivePlayer().name);
+        	
+        	// Second player starts in Dakar, heads to Kano
+        	moveMileposts = new MilepostId[] {
+    			new MilepostId(3,20),
+    			new MilepostId(4,20),
+    			new MilepostId(5,20),
+    			new MilepostId(6,20),
+    			new MilepostId(7,20),
+    			new MilepostId(8,20),
+    			new MilepostId(9,20),
+    			new MilepostId(10,20),
+    			new MilepostId(11,20),
+    			new MilepostId(12,20),
+    			new MilepostId(13,20),
+    			new MilepostId(13,21),
+    			/*new MilepostId(14,21),
+    			new MilepostId(15,21),
+    			new MilepostId(16,21),
+    			new MilepostId(17,21),
+    			new MilepostId(18,21),
+    			new MilepostId(19,21),
+    			new MilepostId(20,21) */
+    		};
+	        Player player2 = game.getActivePlayer();
+	        game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,20));
+        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	game.endTurn(game.getActivePlayer().name);
+        	
+        	// Third player starts in Kano, heads to Dakar
+        	// Rents from second player
+        	// Check that third player pays rent, and second player receives rent
+        	moveMileposts = new MilepostId[] {
+    			new MilepostId(2,20),
+    			new MilepostId(3,20),
+    			new MilepostId(4,20),
+    			new MilepostId(5,20),
+    			new MilepostId(6,20),
+    			new MilepostId(7,20),
+    			new MilepostId(8,20),
+    			new MilepostId(9,20),
+    			new MilepostId(10,20),
+    			new MilepostId(11,20),
+    			new MilepostId(12,20),
+    			new MilepostId(13,20),
+    			new MilepostId(13,21),
+    			new MilepostId(14,21),
+    			new MilepostId(15,21),
+    			new MilepostId(16,21),
+    			new MilepostId(17,21),
+    			new MilepostId(18,21),
+    			new MilepostId(19,21),
+    		};
+        	Player player3 = game.getActivePlayer();
+        	int renterMoneyAtStartOfTurn = player3.getMoney();
+        	int landlordMoneyAtStartOfTurn = player2.getMoney();
+        	Arrays.sort(moveMileposts, Collections.reverseOrder());
+        	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20,21));
+        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	game.endTurn(game.getActivePlayer().name);
+        	assertEquals(renterMoneyAtStartOfTurn - 4, player3.getMoney());	// check that rent was deducted from total
+        	assertEquals(landlordMoneyAtStartOfTurn + 4, player2.getMoney()); // check that rent money is received
+        	endGame(game);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
-		} 
-        
-        // Build 
-        MilepostId[] moveMileposts;
-        moveMileposts = new MilepostId[]{ 
-        	new MilepostId(33,55),
-	        new MilepostId(33,54),
-	        new MilepostId(32,53),
-	        new MilepostId(31,53),
-	        new MilepostId(31,52),
-	        new MilepostId(30,52),
-	        new MilepostId(29,52),
-	        new MilepostId(28,52),
-	        new MilepostId(27,52),
-	        new MilepostId(26,51),
-	        new MilepostId(26,50),
-	        new MilepostId(25,49),
-        };
-
-		try {
-        	game.buildTrack(game.getActivePlayer().name, mileposts);
-			skipPastBuildingTurns(game);
-			game.placeTrain("Adam", 0, new MilepostId(34,56));
-			game.moveTrain("Adam", 0, moveMileposts);
-	        game.endGame("Adam", true);
-		} catch (GameException e) {
-			log.error("Unexpected exception {}", e);
-			fail("Unexpected exception");
-		} 
-	} */
+		}
+	} 
 	
 	private void skipPastBuildingTurns(Game game) throws GameException {
         // Skip past building turns
@@ -708,5 +843,15 @@ public class GameTest {
         	log.info("Active player is {}", p.name);
         	log.info("Turn count is {}", game.getTurns());
         }
+	}
+	
+	private void startGame(Game game) throws GameException {
+		for (Player p: game.getPlayers())
+			game.startGame(p.name, true);
+	}
+
+	private void endGame(Game game) throws GameException {
+		for (Player p: game.getPlayers())
+			game.endGame(p.name, true);
 	}
 }

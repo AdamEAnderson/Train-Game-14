@@ -65,9 +65,9 @@ public class Player {
 	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {
 		turnInProgress = true;
 		if(moves.isEmpty()) return;
-		if(movesMade >= trains[t].getSpeed()) 
-			throw new GameException("InvalidMove");
 		Milepost l = trains[t].getLocation();
+		if(movesMade >= trains[t].getSpeed() || l == null) 
+			throw new GameException("InvalidMove");
 		Milepost next = moves.poll();
 		if(next == null) return;
 		moveMileposts(t, l, next);
