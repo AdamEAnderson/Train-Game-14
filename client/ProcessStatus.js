@@ -4,6 +4,8 @@ var processStatus = function (data) {
         if (!started && data.joinable == false) {
             startedGame(data);
         }
+        if (justResumed)
+            processResume(data);
         if (!geography && data.geography) {
             geography = data.geography;
             initMap(data.geography);
@@ -17,7 +19,7 @@ var processStatus = function (data) {
             refreshRails(data.players);
             refreshTrainLocations(data.players);
         }
-        me = findPid(data.players, pid);
+        var me = findPid(data.players, pid);
         refreshCards(me.hand);
         refreshTrains(me.trains, data.activeid && data.activeid == pid);
         refreshMoney(me.money);
@@ -32,6 +34,7 @@ var processStatus = function (data) {
             $('#turnControls').buttonset('option', 'disabled', true);
 			$('#moneySpent').hide();
         }
+
         lastStatusMessage = data;
         lastStatus = data.transaction;
     }

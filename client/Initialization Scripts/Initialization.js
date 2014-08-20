@@ -40,15 +40,24 @@ $(document).ready(function () {
             if (data.item.label == "New") {
                 $('#gamePicker').empty();
                 $('#gamePicker-button').hide();
+                $('#colorPicker').prev().show();
+                $('#colorPicker').next().show();
+                $('#geographyPicker-label').show();
+                $('#geographyPicker-button').show();
             }
             else {
                 $('#gamePicker-button').show().css('display', 'block');
                 $('#geographyPicker-label').hide();
                 $('#geographyPicker-button').hide();
+                $('#colorPicker').prev().show();
+                $('#colorPicker').next().show();
                 if (data.item.label == "Join")
                     gameOption = "joinable";
-                else
+                else {
                     gameOption = "resumeable";
+                    $('#colorPicker').prev().hide();
+                    $('#colorPicker').next().hide();
+                }
                 //Populate games list menu
                 requestData = { messageType: 'list', listType: gameOption };
                 $.ajax({
@@ -82,6 +91,7 @@ $(document).ready(function () {
                 joinGame(document.getElementById("gamePicker").value,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
             } else if (document.getElementById("actionPicker").value == "Resume") {
+                resumeGame(document.getElementById("gamePicker").value, $('#handlePicker').val());
             }
         }
     });
@@ -89,15 +99,6 @@ $(document).ready(function () {
 
     lastStatus = 0;
     //statusGet();
-});
-
-milepostsNeeded.forEach(function (e) {
-    $.ajax({
-        url: location.origin + join(location.pathname, '../../data/mileposts/' + e.toLowerCase() + '.svg'),
-        success: function (d) {
-            mileposts[e] = d;
-        }
-    });
 });
 
 var initMap = function (geography) {
@@ -132,7 +133,7 @@ var initMap = function (geography) {
             $('#lobby').show();
             panZoom.enable();
             drawMileposts();
-            setInterval('statusGet()', 1000);
+            setInterval('statusGet()', 250);
         },
         error: function (a, b, c) {
             console.log('error:' + arguments.toString());
@@ -213,14 +214,20 @@ var drawMileposts = function () {
                     break;
                 default:
                     var size = 20;
-                    var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
-                    //var jQ = $('<image width="20" height="20" xlink:href=""/>');
+                    //var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
+                    var path = location.origin + join(location.pathname, '../../data/mileposts/' + gameData.mapData.orderedMileposts[mp].type.toLowerCase() + '.png');
+                    var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'image')).attr({ 'x': 0, 'y': 0, 'width': size, 'height': size });
+                    //var pathAttr = document.createAttributeNS('http://www.w3.org/1999/xlink', 'href');
+                    //pathAttr.value = path;
+                    //jQ[0].attributes.setNamedItemNS(pathAttr);
+                    jQ[0].setAttributeNS('http://www.w3.org/1999/xlink', 'href', path);
                     var mpjQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                     $('#milepostsGroup').append(mpjQ.append(jQ));
                     var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
-                    var scale = 0.035;
+                    var scale = 1;
                     x -= (bbox.width / 2) * scale;
                     y -= (bbox.height / 2) * scale;
+                    //mpjQ.attr('transform', 'translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id', 'milepost' + w + ',' + h);
                     mpjQ.attr('transform', 'translate(' + x + ',' + y + ') scale(' + scale + ')').attr('id', 'milepost' + w + ',' + h);
                     break;
             }
@@ -232,4 +239,58 @@ var drawMileposts = function () {
         var currentMilepost = $(this).attr('id').replace('milepost', '').split(',');
         console.log(gameData.mapData.orderedMileposts[(currentMilepost[1] * gameData.mapData.mpWidth) + parseInt(currentMilepost[0])]);
     });
-}
+};
+
+var processResume = function (data) {
+    lastStatusMessage = data;
+    var player = findPid(data.players, pid);
+    for (var i = 0; i < player.trains.length; i++) {
+        if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
+            continue;
+        var milepost = JSON.parse(player.trains[i].loc);
+        trainLocations[i] = { x: milepost.x, y: milepost.y };
+        var mpsvg = findMilepost(milepost.x, milepost.y);
+        $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + i, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+    }
+    $('#pid' + pid).empty();
+    var rail = player.rail;
+    for (var key in rail) {
+        var builtEdges = rail[key];
+        for (var k = 0; k < builtEdges.length; k++) {
+            var m1 = builtEdges[k];
+            var m2 = JSON.parse(key);
+            var m1jQ = $(document.getElementById('milepost' + m1.x + ',' + m1.y));
+            var m2jQ = $(document.getElementById('milepost' + m2.x + ',' + m2.y));
+            var m1svg = { x: 0, y: 0 };
+            var m2svg = { x: 0, y: 0 };
+            if (m1jQ.prop('tagName') == 'circle') {
+                m1svg.x = m1jQ.attr('cx');
+                m1svg.y = m1jQ.attr('cy');
+            }
+            else {
+                var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+                var bbox = m1jQ[0].getBBox();
+                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
+            }
+            if (m2jQ.prop('tagName') == 'circle') {
+                m2svg.x = m2jQ.attr('cx');
+                m2svg.y = m2jQ.attr('cy');
+            }
+            else {
+                var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
+                var bbox = m2jQ[0].getBBox();
+                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
+            }
+            drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
+            edgesBuiltFinal.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
+            verticesBuiltFinal.push(m1, m2);
+        }
+    }
+    $('#move').show();
+    $('#drop').show();
+    checkMoveButton();
+    checkLoadButtons(lastStatusMessage.players);
+    justResumed = false;
+};

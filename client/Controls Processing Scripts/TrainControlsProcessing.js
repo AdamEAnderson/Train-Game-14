@@ -82,8 +82,10 @@ var moveClick = function (e) {
 
         var key = e.key;
         var player = findPid(lastStatusMessage.players, pid);
-        var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
-        var hexKeyCodes = [71, 89, 85, 74, 78, 66];
+        //var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
+        var hexKeys = ['u', 'j', 'n', 'b', 'g', 'y'];
+        //var hexKeyCodes = [71, 89, 85, 74, 78, 66];
+        var hexKeyCodes = [85, 74, 78, 66, 71, 89];
         var index;
         if (key)
             index = hexKeys.indexOf(key);
@@ -96,29 +98,31 @@ var moveClick = function (e) {
             return;
         var milepost = trainLocations[train];
         milepost = gameData.mapData.orderedMileposts[(parseInt(milepost.y) * gameData.mapData.mpWidth) + parseInt(milepost.x)];
-        //var edge = milepost.edges[index];
-        var edges = [];
-        if (milepost.y % 2 == 0) {
-            edges[0] = { x: milepost.x - 1, y: milepost.y };
-            edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
-            edges[2] = { x: milepost.x, y: milepost.y - 1 };
-            edges[3] = { x: milepost.x + 1, y: milepost.y };
-            edges[4] = { x: milepost.x, y: milepost.y + 1 };
-            edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
-        }
-        else {
-            edges[0] = { x: milepost.x - 1, y: milepost.y };
-            edges[1] = { x: milepost.x, y: milepost.y - 1 };
-            edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
-            edges[3] = { x: milepost.x + 1, y: milepost.y };
-            edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
-            edges[5] = { x: milepost.x, y: milepost.y + 1 };
-        }
-        for (var i = 0; i < edges.length; i++) {
-            if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
-                edges[i] = undefined;
-        }
-        var edge = edges[index];
+        var edge = milepost.edges[index];
+        if (edge == null)
+            return;
+        //var edges = [];
+        //if (milepost.y % 2 == 0) {
+        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
+        //    edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
+        //    edges[2] = { x: milepost.x, y: milepost.y - 1 };
+        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
+        //    edges[4] = { x: milepost.x, y: milepost.y + 1 };
+        //    edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
+        //}
+        //else {
+        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
+        //    edges[1] = { x: milepost.x, y: milepost.y - 1 };
+        //    edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
+        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
+        //    edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
+        //    edges[5] = { x: milepost.x, y: milepost.y + 1 };
+        //}
+        //for (var i = 0; i < edges.length; i++) {
+        //    if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
+        //        edges[i] = undefined;
+        //}
+        //var edge = edges[index];
         edge = gameData.mapData.orderedMileposts[(parseInt(edge.y) * gameData.mapData.mpWidth) + parseInt(edge.x)];
         if (!edge)
             return;
@@ -151,8 +155,8 @@ var moveClick = function (e) {
         else {
             var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = mpjQ[0].getBBox();
-            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         $('#train' + pid + train).remove();
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
@@ -188,8 +192,8 @@ var moveClick = function (e) {
                 else {
                     var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                     var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-                    mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                    mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                    mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                    mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
                 }
                 $('#train' + pid + train).remove();
                 $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
@@ -230,8 +234,8 @@ var placeTrainClick = function (e) {
         else {
             var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': findPid(data.players, pid).color }));
         if (placeTrainLocations.length == findPid(data.players, pid).trains.length)

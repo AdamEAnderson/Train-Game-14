@@ -17,14 +17,17 @@ var refreshPlayers = function (players) {
 };
 
 var refreshCards = function (cards) {
-    $('#hand').empty();
+    //$('#hand').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var c = 0; c < cards.length; ++c) {
-        $('#hand').append($('<div class="card"/>').draggable());
+        if ($('#hand').children().eq(c).length != 0)
+            $('#hand').children().eq(c).empty();
+        else
+            $('#hand').append($('<div class="card"/>').draggable());
         card = cards[c];
         for (var t = 0; t < card.trips.length; ++t) {
-		    var iconPNG = iconPath +  "/" + card.trips[t].load + '.png';
-            $('#hand').children().eq(c).append('<div class="trip"><table><tr>' + '<td style="width:6%"><img width=30px height=30px src=' + iconPNG + '/></td>' + '<td style="width:39%">' + card.trips[t].load + '</td>' + '</td><td style="width:39%">' + card.trips[t].dest + '</td><td style="width:6%">' + card.trips[t].cost + '</td></tr></table></div>');
+            var iconPNG = iconPath +  "/" + card.trips[t].load + '.png';
+            $('#hand').children().eq(c).append('<div class="trip"><table><tr>' + '<td style="width:6%"><img width=30px height=30px src="' + iconPNG + '" /></td>' + '<td style="width:39%">' + card.trips[t].load + '</td>' + '</td><td style="width:39%">' + card.trips[t].dest + '</td><td style="width:6%">' + card.trips[t].cost + '</td></tr></table></div>');
             //if (t == card.trips.length - 1)
             //	$('#hand').children().eq(c).append('<div class="trip-last"><p><span>' + card.trips[t].load + '</span><br/><span>' + card.trips[t].dest + '</span><br/><span>' + card.trips[t].cost);
             //else
@@ -34,43 +37,49 @@ var refreshCards = function (cards) {
 };
 
 var refreshMovesRemaining = function (trains) {
-	var countMovesMade = 0;
-	for (var t = 0; t < movesMadeThisTurn.length; ++t) {
-		countMovesMade = movesMadeThisTurn[t];
-		if (movesMade != undefined)
-			countMovesMade += movesMade[t].length;
-		if ($('#trains').children().eq(t).children().length < 2) // move counter not yet created
-			$('#trains').children().eq(t).append('<div class="moveCounter"/>');
-		var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
-		moveCounterJS.empty();
-		var movesRemaining = trains[t].speed - countMovesMade;
-		moveCounterJS.append('<p><span>' + movesRemaining + '</span></p>');
+    var countMovesMade = 0;
+    for (var t = 0; t < movesMadeThisTurn.length; ++t) {
+        countMovesMade = movesMadeThisTurn[t];
+        if (movesMade != undefined)
+            countMovesMade += movesMade[t].length;
+        if ($('#trains').children().eq(t).children().length < 2) // move counter not yet created
+            $('#trains').children().eq(t).append('<div class="moveCounter"/>');
+        var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
+        moveCounterJS.empty();
+        var movesRemaining = trains[t].speed - countMovesMade;
+        moveCounterJS.append('<p><span>' + movesRemaining + '</span></p>');
     }
 }
 
 var refreshTrains = function (trains, myturn) {
-    $('#trains').empty();
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var t = 0; t < trains.length; ++t) {
-        $('#trains').append($('<div class="train"/>').draggable());
-        var train = $('#trains').children().eq(t);
+        var train;
+        if ($('#train' + t).length != 0) {
+            $('#train' + t).empty();
+            train = $('#train' + t);
+        }
+        else {
+            $('#trains').append($('<div class="train" id="train' + t + '"/>').draggable());
+            var train = $('#trains').children().eq(t);
+        }
         train.append('<div class="trainCard"/>');
         var trainCard = train.children().eq(t);
         trainCard.append('<p><span>' + trains[t].speed + '</span></p>');
         for (var l = 0; l < trains[t].loads.length; ++l) {
-        	var load = trains[t].loads[l];
-        	if (!load) {
-        		load = " ";
-            	trainCard.append('<p><span>' + load + '</span></p>');
+            var load = trains[t].loads[l];
+            if (!load) {
+                load = " ";
+                trainCard.append('<p><span>' + load + '</span></p>');
             }
-        	else {
-		    	var iconPNG = iconPath +  "/" + load + '.png';
-            	trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src=' + iconPNG + '/></p>');
+            else {
+                var iconPNG = iconPath + "/" + load + '.png';
+                trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src=' + iconPNG + '/></p>');
             }
         }
-        if (myturn) 
-        	refreshMovesRemaining(trains);
     }
+    if (myturn) 
+        refreshMovesRemaining(trains);
 };
 
 var refreshTrainLocations = function (players) {
@@ -91,8 +100,8 @@ var refreshTrainLocations = function (players) {
             else {
                 var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                 var bbox = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y))[0].getBBox();
-                mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
             }
             $('#trains' + players[i].pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + players[i].pid + j, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': players[i].color }));
         }
@@ -122,8 +131,8 @@ var refreshRails = function (players) {
                 else {
                     var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                     var bbox = m1jQ[0].getBBox();
-                    m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                    m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                    m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                    m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
                 }
                 if (m2jQ.prop('tagName') == 'circle') {
                     m2svg.x = m2jQ.attr('cx');
@@ -132,8 +141,8 @@ var refreshRails = function (players) {
                 else {
                     var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
                     var bbox = m2jQ[0].getBBox();
-                    m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-                    m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+                    m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+                    m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
                 }
                 drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, players[i].pid);
                 otherPlayersEdgesBuilt.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
@@ -143,12 +152,12 @@ var refreshRails = function (players) {
 };
 
 var refreshMoney = function(money) {
-	$('#moneyTotalNumber').empty();
-	$('#moneyTotalNumber').append('<span>' + money + '</span>');
+    $('#moneyTotalNumber').empty();
+    $('#moneyTotalNumber').append('<span>' + money + '</span>');
 }
 
 var refreshMoneySpent = function(moneySpent) {
-	$('#moneySpentNumber').empty();
-	$('#moneySpentNumber').append('<span>' + moneySpent + '</span>');
-	$('#moneySpent').show();
+    $('#moneySpentNumber').empty();
+    $('#moneySpentNumber').append('<span>' + moneySpent + '</span>');
+    $('#moneySpent').show();
 }

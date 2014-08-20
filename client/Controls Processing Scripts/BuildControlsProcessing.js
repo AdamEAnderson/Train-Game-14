@@ -39,6 +39,8 @@ var buildClick = function (e) {
         var isValidMilepost = false;
         var milepostCost;
         for (var i = 0; i < lastMilepost.edges.length; i++) {
+            if (lastMilepost.edges[i] == null)
+                continue;
             if (lastMilepost.edges[i].x == currentMilepost.x && lastMilepost.edges[i].y == currentMilepost.y) {
                 isValidMilepost = true;
                 milepostCost = lastMilepost.edges[i].cost;
@@ -55,8 +57,8 @@ var buildClick = function (e) {
         else if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
             var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         var currentX, currentY;
         if ($(this).prop("tagName") == 'circle') {
@@ -66,8 +68,8 @@ var buildClick = function (e) {
         else if ($(this).prop("tagName") == 'g') {
             var translate = $(this).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(this)[0].getBBox();
-            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         if (!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
             return;
@@ -87,8 +89,10 @@ var buildClick = function (e) {
             return;
         var key = e.key;
         var player = findPid(lastStatusMessage.players, pid);
-        var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
-        var hexKeyCodes = [71, 89, 85, 74, 78, 66];
+        //var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
+        var hexKeys = ['u', 'j', 'n', 'b', 'g', 'y'];
+        //var hexKeyCodes = [71, 89, 85, 74, 78, 66];
+        var hexKeyCodes = [85, 74, 78, 66, 71, 89];
         var index;
         if (key)
             index = hexKeys.indexOf(key);
@@ -98,27 +102,28 @@ var buildClick = function (e) {
             return;
         var milepost = verticesBuilt[verticesBuilt.length - 1];
         milepost = gameData.mapData.orderedMileposts[(parseInt(milepost.y) * gameData.mapData.mpWidth) + parseInt(milepost.x)];
-        var edges = [];
-        if (milepost.y % 2 == 0) {
-            edges[0] = { x: milepost.x - 1, y: milepost.y };
-            edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
-            edges[2] = { x: milepost.x, y: milepost.y - 1 };
-            edges[3] = { x: milepost.x + 1, y: milepost.y };
-            edges[4] = { x: milepost.x, y: milepost.y + 1 };
-            edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
-        }
-        else {
-            edges[0] = { x: milepost.x - 1, y: milepost.y };
-            edges[1] = { x: milepost.x, y: milepost.y - 1 };
-            edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
-            edges[3] = { x: milepost.x + 1, y: milepost.y };
-            edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
-            edges[5] = { x: milepost.x, y: milepost.y + 1 };
-        }
-        for (var i = 0; i < edges.length; i++) {
-            if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
-                edges[i] = undefined;
-        }
+        var edges = milepost.edges;
+        //var edges = [];
+        //if (milepost.y % 2 == 0) {
+        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
+        //    edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
+        //    edges[2] = { x: milepost.x, y: milepost.y - 1 };
+        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
+        //    edges[4] = { x: milepost.x, y: milepost.y + 1 };
+        //    edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
+        //}
+        //else {
+        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
+        //    edges[1] = { x: milepost.x, y: milepost.y - 1 };
+        //    edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
+        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
+        //    edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
+        //    edges[5] = { x: milepost.x, y: milepost.y + 1 };
+        //}
+        //for (var i = 0; i < edges.length; i++) {
+        //    if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
+        //        edges[i] = undefined;
+        //}
 
         /*-------------------------------------------------------------------------------*/
 
@@ -130,6 +135,8 @@ var buildClick = function (e) {
         var isValidMilepost = false;
         var milepostCost;
         for (var i = 0; i < lastMilepost.edges.length; i++) {
+            if (lastMilepost.edges[i] == null)
+                continue;
             if (lastMilepost.edges[i].x == currentMilepost.x && lastMilepost.edges[i].y == currentMilepost.y) {
                 isValidMilepost = true;
                 milepostCost = lastMilepost.edges[i].cost;
@@ -146,8 +153,8 @@ var buildClick = function (e) {
         else if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
             var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         var currentX, currentY;
         if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'circle') {
@@ -157,8 +164,8 @@ var buildClick = function (e) {
         else if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'g') {
             var translate = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
             var bbox = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y))[0].getBBox();
-            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 0.035);
-            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 0.035);
+            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
+            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
         }
         if (!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
             return;

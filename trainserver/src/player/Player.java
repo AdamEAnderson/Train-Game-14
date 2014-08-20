@@ -101,20 +101,19 @@ public class Player {
 			moveFerry(t, origin, next);
 		} else{
 			trains[t].moveTrain(next);
+			movesMade ++;
 		}
 	}
-	
 	
 	private void moveFerry(int t, Milepost origin, Milepost next) throws GameException{
-		if(movesMade == 0){
+		if(turnInProgress){
+			throw new GameException("InvalidMove");
+		} else{
 			movesMade = (trains[t].getSpeed())/2;
 			trains[t].moveTrain(next);
-		} else{
-			trains[t].moveTrain(origin);
-			throw new GameException("InvalidMove");
+			movesMade++;
 		}
 	}
-	
 	
 	public void upgradeTrain(int t, UpgradeType u) throws GameException {
 		turnInProgress = true;
@@ -130,7 +129,6 @@ public class Player {
 		spendings += 20;
 		
 	}
-	
 	
 	public void buildTrack(Queue<Milepost> mileposts) throws GameException {
 		turnInProgress = true;
@@ -177,18 +175,15 @@ public class Player {
 		buildTrack(mileposts);
 	}
 	
-	
 	public void pickupLoad(int t, String load) throws GameException{
 		turnInProgress = true;
 		trains[t].addLoad(load);
 	}
 	
-	
 	public void dropLoad(int t, String load) throws GameException{ 
 		turnInProgress = true;
 		trains[t].dropLoad(load); 
 	}
-	
 	
 	/** Delivers a load on the given card.
 	 * @param index is the location of the card in the player's hand, array-wise
@@ -228,15 +223,25 @@ public class Player {
 	public void resign() {
 		hasResigned = true;
 		readyToEnd = true;
+		readyToStart = true;
 		turnInProgress = false;
 	}
 	
 	private void deposit(int deposit){ 
-		if(money < 0) {
-			deposit += 2 *  money;
-			money = 0;
+		if(deposit < 0) {
+			money += deposit; 
+			return;
 		}
-		money += deposit;
+		if(money < 0){
+			if((-2) * money > deposit){
+				money += deposit / 2;
+			} else{
+				deposit += 2 * money;
+				money = deposit;
+			}
+		} else {
+			money += deposit;
+		}
 	}
 	
 	public void readyToStart(boolean ready) { readyToStart = ready;}

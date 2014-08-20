@@ -110,6 +110,14 @@ public class TrainServer {
 		status.ended = game.isOver();
 		status.turns = game.getTurns();
 		Player p = game.getActivePlayer();
+		if(p == null){
+			status.activeid = "";
+			status.lastid = "";
+			statusCache = gsonBuilder.serializeNulls().create().toJson(status);
+			statusGid = gid;
+			statusTransaction = game.transaction();
+			return statusCache;
+		}
 		if(game.getLastPlayer() == null) {
 			status.activeid = "";
 			status.lastid = "";
@@ -199,10 +207,7 @@ public class TrainServer {
 		NewGameResponse() {}
 	}
 	
-	static public String buildNewGameResponse(String gid, GameData gameData) {
-		// Build a JSON string that has gid, serialized map data, list of cities and loads
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
+	static private NewGameResponse newGameResponse(String gid, GameData gameData){
 		NewGameResponse response = new NewGameResponse();
 		response.mapData = gameData.map.getSerializeData();
 		response.cities = gameData.cities.values();
@@ -216,7 +221,15 @@ public class TrainServer {
 			response.loadset.put(load, cities);
 		}
 		response.gid = gid;
-		return gsonBuilder.serializeNulls().create().toJson(response);
+		return response;
+	}
+	
+	static public String buildNewGameResponse(String gid, GameData gameData) {
+		// Build a JSON string that has gid, serialized map data, list of cities and loads
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
+
+		return gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
 	}
 	
 	synchronized static public String newGame(String requestText) throws GameException {			
@@ -255,6 +268,14 @@ public class TrainServer {
 		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
+	static class ResumeGameResponse {
+		public String gid;
+		public String pid;
+		public NewGameResponse gameData;
+		public int spendings;
+		public int movesMade;
+	}
+	
 	synchronized static public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
@@ -266,7 +287,20 @@ public class TrainServer {
 				log.info("found gid {}", key);
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		}
-		return buildNewGameResponse(data.gid, game.gameData);
+		game.getPlayer(data.pid);	// throws PLAYER_NOT_FOUND if player not in game
+		
+		ResumeGameResponse response = new ResumeGameResponse();
+		response.gid = data.gid;
+		response.pid = data.pid;
+		response.gameData = newGameResponse(data.gid, game.gameData);
+		Player p = game.getPlayer(data.pid);
+		response.spendings = p.getSpending();
+		response.movesMade = p.getMovesMade();
+		
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
+
+		return gsonBuilder.serializeNulls().create().toJson(response);
 	}
 
 	static class StartGameData {

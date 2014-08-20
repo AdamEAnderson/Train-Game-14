@@ -27,7 +27,7 @@ var deliverClick = function (e) {
             		var train = player.trains[l];
                 	for (var k = 0; k < train.loads.length; k++) {
                     	if (train.loads[k] == trip.load) {
-                    	    deliveries.push({ train: k, load: trip.load, city: trip.dest, card: i });
+                    	    deliveries.push({ train: l, load: trip.load, city: trip.dest, card: i });
                     	}
                 	}
                 }
