@@ -287,6 +287,7 @@ public class TrainServer {
 				log.info("found gid {}", key);
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		}
+		game.getPlayer(data.pid);	// throws PLAYER_NOT_FOUND if player not in game
 		
 		ResumeGameResponse response = new ResumeGameResponse();
 		response.gid = data.gid;

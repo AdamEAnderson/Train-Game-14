@@ -1,7 +1,6 @@
 package test;
 
 import static org.junit.Assert.*;
-
 import map.MilepostId;
 
 import org.junit.Test;
@@ -73,6 +72,29 @@ public class GameTest {
         game.endGame("Sandy", true);
         game.endGame("Sandra", true);
     }
+	
+	@Test
+	public void testResume() {
+		String gid = null;
+		try {
+			String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+	        String oldGameData = TrainServer.newGame(jsonPayload);
+	        gid = oldGameData.substring(8, 16);
+			String resumePayload = String.format("{\"messageType\":\"resumeGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, "Louie");
+	        TrainServer.resumeGame(resumePayload);
+		} catch (GameException e) {
+	    	fail("GameException not expected here");
+	    }
+		
+		// Check that resuming a game with a bad player string throws an exception
+		try {
+			String resumePayload = String.format("{\"messageType\":\"resumeGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, "BADPLAYER");
+	        TrainServer.resumeGame(resumePayload);
+	    	fail("GameException expected -- should have thrown player not found");
+		} catch (GameException e) {
+	    }
+	}
+	
 	
 	// Upgrade to a 3-hauler
 	@Test
