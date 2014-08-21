@@ -150,15 +150,15 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 			switch (requestType) {
 				case NEW_GAME:
 					buf.append(TrainServer.newGame(message.jsonMessage));
-					log.info("newGame buf {}", buf);
+					log.debug("newGame buf {}", buf);
 					break;
 				case JOIN_GAME:
 					buf.append(TrainServer.joinGame(message.jsonMessage));
-					log.info("joinGame buf {}", buf);
+					log.debug("joinGame buf {}", buf);
 					break;
 				case RESUME_GAME:
 					buf.append(TrainServer.resumeGame(message.jsonMessage));
-					log.info("resumeGame buf {}", buf);
+					log.debug("resumeGame buf {}", buf);
 					break;
 				case START_GAME:
 					TrainServer.startGame(message.jsonMessage);

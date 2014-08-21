@@ -268,14 +268,6 @@ public class TrainServer {
 		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
-	static class ResumeGameResponse {
-		public String gid;
-		public String pid;
-		public NewGameResponse gameData;
-		public int spendings;
-		public int movesMade;
-	}
-	
 	synchronized static public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
@@ -288,14 +280,10 @@ public class TrainServer {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		}
 		game.getPlayer(data.pid);	// throws PLAYER_NOT_FOUND if player not in game
+		log.info("resumeGame(pid={})", data.pid);
 		
-		ResumeGameResponse response = new ResumeGameResponse();
-		response.gid = data.gid;
-		response.pid = data.pid;
-		response.gameData = newGameResponse(data.gid, game.gameData);
-		Player p = game.getPlayer(data.pid);
-		response.spendings = p.getSpending();
-		response.movesMade = p.getMovesMade();
+		NewGameResponse response = new NewGameResponse();
+		response = newGameResponse(data.gid, game.gameData);
 		
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
