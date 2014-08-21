@@ -949,7 +949,7 @@ public class GameTest {
 			
 			// Cross back to mainland, try to return to Dakar (should fail because 
 			// after ferry crossing goes half speed)
-			/** Following is commented out due to bug
+			/** Following is commented out due to bug */
 			moveMileposts = new MilepostId[] {
 					new MilepostId(2,17), 
 					new MilepostId(3,16), 
@@ -969,7 +969,6 @@ public class GameTest {
         		fail("Expected move exception here -- didn't get one");
         	} catch (GameException e) {
         	}
-        	*/
         	
         	// Now try moving legal amount (6)
 			moveMileposts = new MilepostId[] {
