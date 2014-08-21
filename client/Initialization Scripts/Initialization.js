@@ -245,6 +245,8 @@ var processResume = function (data) {
         //movesMadeThisTurn[i] = player.trains[i].movesMade;
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
+        $('#move').show();
+        $('#drop').show();
         var milepost = JSON.parse(player.trains[i].loc);
         trainLocations[i] = { x: milepost.x, y: milepost.y };
         var mpsvg = findMilepost(milepost.x, milepost.y);
@@ -288,8 +290,7 @@ var processResume = function (data) {
             verticesBuiltFinal.push(m1, m2);
         }
     }
-    $('#move').show();
-    $('#drop').show();
+    
     checkMoveButton();
     checkLoadButtons(lastStatusMessage.players);
     justResumed = false;

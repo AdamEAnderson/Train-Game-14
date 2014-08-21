@@ -53,7 +53,7 @@ var startedGame = function (data) {
     $('#endControls').buttonset();
     $('#okControls').buttonset();
     $('#placeControls').buttonset();
-    yourTurn = data.activeid == pid;
+    //yourTurn = data.activeid == pid;
     $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'track'));
     $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'trainsDisplay'));
     for (var i = 0; i < data.players.length; i++) {

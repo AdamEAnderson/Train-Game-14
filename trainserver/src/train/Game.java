@@ -107,19 +107,20 @@ public class Game implements AbstractGame {
 			++transaction;
 		}
 	}
-	
+
 	@Override
-	public void testBuildTrack(String pid, MilepostId[] milepostIds) throws GameException {
-		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, milepostIds.length);
-		for (int i = 0; i < milepostIds.length; ++i)
-			log.info("{}, ", milepostIds[i]);
+	public void testBuildTrack(String pid, MilepostId[] mileposts) throws GameException {
+		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
 		log.info("])");
 		checkActive(pid);
-		Milepost[] mileposts = new Milepost[milepostIds.length];
+		Milepost[] array = new Milepost[mileposts.length];
 		for(int i = 0; i < mileposts.length; i++){
-			mileposts[i] = map.getMilepost(milepostIds[i]);
+			array[i] = map.getMilepost(mileposts[i]);
 		}
-		active.testBuildTrack(mileposts);
+		active.testBuildTrack(array);	
+		++transaction;
 	}
 
 	@Override
