@@ -324,6 +324,15 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
+	synchronized static public void testBuildTrack(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.testBuildTrack(data.pid, data.mileposts);
+	}
+
 	synchronized static public void buildTrack(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
@@ -379,6 +388,15 @@ public class TrainServer {
 		public String pid;
 		public int train;
 		public MilepostId[] mileposts;
+	}
+
+	synchronized static public void testMoveTrain(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.testMoveTrain(data.pid, data.train, data.mileposts);
 	}
 
 	synchronized static public void moveTrain(String requestText) throws GameException {

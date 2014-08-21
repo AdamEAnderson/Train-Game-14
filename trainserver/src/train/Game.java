@@ -120,6 +120,15 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
+	public void testBuildTrack(String pid, MilepostId[] mileposts) throws GameException {
+		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		checkActive(pid);
+	}
+
+	@Override
 	public void buildTrack(String pid, MilepostId[] mileposts) throws GameException {
 		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
@@ -151,6 +160,23 @@ public class Game implements AbstractGame {
 		++transaction;
 	}
 
+	@Override
+	public void testMoveTrain(String pid, int train, MilepostId[] mileposts)
+			throws GameException {
+		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		checkActive(pid);
+		checkBuilding();
+		Queue<Milepost> moves = new ArrayDeque<Milepost>();
+		for(int i = 0; i < mileposts.length; i++){
+			moves.add(map.getMilepost(mileposts[i]));
+		}
+		active.moveTrain(train, moves);
+		++transaction;
+	}
+	
 	@Override
 	public void moveTrain(String pid, int train, MilepostId[] mileposts)
 			throws GameException {

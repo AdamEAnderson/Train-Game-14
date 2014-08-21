@@ -29,6 +29,18 @@ interface AbstractGame {
 	 */
 	void startGame(String player, boolean ready) throws GameException;
 	
+	/** Check to see if building a set of mileposts is possible
+	 * @param player	Player who is building
+	 * @param mileposts	Where track is being built
+	 * @throws GameException
+	 * 
+	 * Exceptions:
+	 * INVALID_TRACK
+	 * GAME_NOT_FOUND
+	 * PLAYER_NOT_FOUND
+	 */
+	void testBuildTrack(String pid, MilepostId[] mileposts) throws GameException;
+
 	/** Player builds new track
 	 * @param player	Player who is building
 	 * @param mileposts	Where track is being built
@@ -39,8 +51,8 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void buildTrack(String player, MilepostId[] mileposts) throws GameException;
-	
+	void buildTrack(String pid, MilepostId[] mileposts) throws GameException;
+
 	/** Upgrade a train, either to be faster or to carry more loads
 	 * @param pid		Player whose train is being upgraded
 	 * @param upgrade	Whether upgrade is for speed or capacity
@@ -66,6 +78,19 @@ interface AbstractGame {
 	 * PLAYER_NOT_FOUND
 	 */
 	void placeTrain(String player, int train, MilepostId where) throws GameException; 
+	
+	/** Check to see if move is possible
+	 * @param pid		Player whose train is being moved
+	 * @param train		Which train
+	 * @param milepost	Train's path along mileposts
+	 * @throws GameException
+	 * 
+	 * Exceptions:
+	 * INVALID_TRACK (train must start on a city milepost)
+	 * GAME_NOT_FOUND
+	 * PLAYER_NOT_FOUND
+	 */
+	void testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
 	
 	/** Player moves their train
 	 * @param pid		Player whose train is being moved
