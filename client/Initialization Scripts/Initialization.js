@@ -219,7 +219,7 @@ var drawMileposts = function () {
                     jQ[0].setAttributeNS('http://www.w3.org/1999/xlink', 'href', path);
                     var mpjQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                     $('#milepostsGroup').append(mpjQ.append(jQ));
-                    var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
+                    //var bbox = $('#milepostsGroup').find('g:last')[0].getBBox();//$(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').attr('viewBox').split(' ');
                     var scale = 1;
                     x -= (size / 2) * scale;
                     y -= (size / 2) * scale;
