@@ -327,7 +327,8 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.testBuildTrack(data.pid, data.mileposts);
+		if (!game.testBuildTrack(data.pid, data.mileposts))
+			throw new GameException(GameException.INVALID_TRACK);
 	}
 
 	synchronized static public void buildTrack(String requestText) throws GameException {
@@ -393,7 +394,8 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.testMoveTrain(data.pid, data.train, data.mileposts);
+		if (!game.testMoveTrain(data.pid, data.train, data.mileposts))
+			throw new GameException(GameException.INVALID_MOVE);
 	}
 
 	synchronized static public void moveTrain(String requestText) throws GameException {
@@ -511,6 +513,19 @@ public class TrainServer {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		if (game.endGame(data.pid, data.ready))
 			games.remove(data.gid);
+		
+		/* Send statistics on each player - 
+			amount of money
+			number of mileposts built
+			cost of mileposts
+			for each train how upgraded
+			number of deliveries
+			amount of money earned by deliveries
+			amount of money earned by rentals
+			amount of money spent on rentals
+			number of cities built to
+			number of major cities built to
+			*/
 	}
 	
 }

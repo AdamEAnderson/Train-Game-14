@@ -39,7 +39,7 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void testBuildTrack(String pid, MilepostId[] mileposts) throws GameException;
+	boolean testBuildTrack(String pid, MilepostId[] mileposts) throws GameException;
 
 	/** Player builds new track
 	 * @param player	Player who is building
@@ -90,7 +90,7 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
+	boolean testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
 	
 	/** Player moves their train
 	 * @param pid		Player whose train is being moved

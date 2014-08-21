@@ -109,7 +109,7 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void testBuildTrack(String pid, MilepostId[] mileposts) throws GameException {
+	public boolean testBuildTrack(String pid, MilepostId[] mileposts) throws GameException {
 		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
@@ -119,8 +119,7 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < mileposts.length; i++){
 			array[i] = map.getMilepost(mileposts[i]);
 		}
-		active.testBuildTrack(array);	
-		++transaction;
+		return active.testBuildTrack(array);	
 	}
 
 	@Override
@@ -156,7 +155,7 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void testMoveTrain(String pid, int train, MilepostId[] mileposts)
+	public boolean testMoveTrain(String pid, int train, MilepostId[] mileposts)
 			throws GameException {
 		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
@@ -169,8 +168,7 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < mileposts.length; i++){
 			mps[i + 1] = map.getMilepost(mileposts[i]);
 		}
-		active.testMoveTrain(train, mps);
-		++transaction;
+		return active.testMoveTrain(train, mps);
 	}
 	
 	@Override
