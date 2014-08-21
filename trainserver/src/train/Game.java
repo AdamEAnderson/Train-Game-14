@@ -119,26 +119,19 @@ public class Game implements AbstractGame {
 		}
 	}
 
-	private Queue<Milepost> enqueue (MilepostId[] mileposts) {
+	@Override
+	public void testBuildTrack(String pid, MilepostId[] mileposts) throws GameException {
+		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		checkActive(pid);
 		Queue<Milepost> queue = new ArrayDeque<Milepost>();
 		for(int i = 0; i < mileposts.length; i++){
 			queue.add(map.getMilepost(mileposts[i]));
 		}
-		return queue;
-	}
-	
-	@Override
-	public void testBuildTrack(String pid, MilepostId[] milepostIds) throws GameException {
-		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, milepostIds.length);
-		for (int i = 0; i < milepostIds.length; ++i)
-			log.info("{}, ", milepostIds[i]);
-		log.info("])");
-		checkActive(pid);
-		Milepost[] mileposts = new Milepost[milepostIds.length];
-		for(int i = 0; i < mileposts.length; i++){
-			mileposts[i] = map.getMilepost(milepostIds[i]);
-		}
-		active.testBuildTrack(mileposts);
+		active.buildTrack(queue);	
+		++transaction;
 	}
 
 	@Override
@@ -148,7 +141,11 @@ public class Game implements AbstractGame {
 			log.info("{}, ", mileposts[i]);
 		log.info("])");
 		checkActive(pid);
-		active.buildTrack(enqueue(mileposts));	
+		Queue<Milepost> queue = new ArrayDeque<Milepost>();
+		for(int i = 0; i < mileposts.length; i++){
+			queue.add(map.getMilepost(mileposts[i]));
+		}
+		active.buildTrack(queue);	
 		++transaction;
 	}
 
