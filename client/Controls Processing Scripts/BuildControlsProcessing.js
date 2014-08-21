@@ -188,11 +188,11 @@ var buildClick = function (e) {
         else
             $(document.getElementById('buildCursor')).hide();
     };
-    setInterval(buildCursor, 500);
+    var interval = setInterval(buildCursor, 500);
     $(document).keyup(milepostsKeyUp);
     $('#milepostsGroup > *:not(path)').click(milepostsClick);
     var acceptBuild = function () {
-        clearInterval(buildCursor);
+        clearInterval(interval);
         $(document.getElementById('buildCursor')).remove();
         builtTrack(verticesBuilt, edgesBuilt, moneySpentThisBuild, milepostEdgesBuilt);
         $('#acceptBuild').off('click');

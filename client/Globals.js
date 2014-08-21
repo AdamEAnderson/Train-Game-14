@@ -22,8 +22,8 @@ var mileposts = {}; //Object containing milepost svgs loaded through ajax on ini
 var geography; //The name of the map that is being played
 var started = false; //Boolean for if the game has been started
 var placedTrain = false; //Boolean for if the player has placed all trains
-var justResumed = false;
-var loading = false;
+var justResumed = false; //Boolean for if the player has just resumed
+var loading = false; //Boolean for if the gameDisplay is loading
 var moneySpent = 0; //Integer for money spent during the players turn
 var moneySpentThisBuild = 0; //Integer for money spent while building
 var verticesBuilt; //Array for mileposts built while building
@@ -36,6 +36,11 @@ var movesMadeThisTurn = []; //Array for al moves made this turn confirmed by ser
 var edgesBuilt; //Array of all jQuery elements of edges drawn
 var placeTrainLocations; //Array of objects where index corresponds to train index and objects have a milepost and a train property
 var trainLocations = []; //Array of objects where index corresponds to train index and object are mileposts
+var infoTimeoutHandle;
+var infoColors = {
+    'error': '#c00',
+    'info': '#008'
+};
 
 //Adds a clone function to the array prototype that deep-copies the array
 Array.prototype.clone = function () {

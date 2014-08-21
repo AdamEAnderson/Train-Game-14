@@ -59,6 +59,29 @@ var findMilepost = function (x, y) {
     return mpsvg;
 };
 
+var displayInfo = function (info, type) {
+    if (!type || !infoColors[type])
+        return;
+
+    var closeInfo = function () {
+        infoTimeoutHandle = undefined;
+        $('#info').animate({ bottom: '-31px' }, 100);
+    };
+
+    if (infoTimeoutHandle)
+        clearTimeout(infoTimeoutHandle);
+
+    if (!($('#info').css('top') == 0 || $('#info').css('top') == '0px')) {
+        $('#info').animate({ bottom: 0 }, 100, 'swing', function () {
+            infoTimeoutHandle = setTimeout(closeInfo, 1500);
+        });
+    }
+
+    $('#info > span').text(info);
+
+    $('#info > span').css({ color: infoColors[type] });
+};
+
 //Sends a HTTP POST request to the server with data data and calls callback when complete
 var post = function (data, callback) {
     $.ajax({
@@ -67,8 +90,28 @@ var post = function (data, callback) {
         data: JSON.stringify(data),
         success: callback,
         error: function (xhr, textStatus, errorThrown) {
-            console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
+            processAjaxErrors(xhr, textStatus, errorThrown);
         },
         dataType: 'json'
     });
+};
+
+var processAjaxErrors = function (xhr, textStatus, errorThrown) {
+    console.error("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
+    if (xhr.status == 404 && !xhr.responseJSON)
+        displayInfo('Error: Server not found', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'ColorNotAvailable')
+        displayInfo('Error: Color not availible', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'PlayerAlreadyJoined')
+        displayInfo('Error: Player already joined', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'GameNotFound')
+        displayInfo('Error: Game not found', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'PlayerNotFound')
+        displayInfo('Error: Player not found', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidMove')
+        displayInfo('Error: Invalid move', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidTrack')
+        displayInfo('Error: Invalid track', 'error');
+    else
+        displayInfo('Error');
 };

@@ -1,0 +1,16 @@
+﻿#info {
+    position: absolute;
+    bottom: -31px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background-color: #eee;
+    border-top: 1px solid #555;
+    text-align: center;
+}
+
+    #info > span {
+        position: relative;
+        top: 2.5px;
+        font-size:20px;
+    }

@@ -62,6 +62,7 @@ var builtTrack = function (vertices, edges, cost, milepostEdges) {
             Array.prototype.push.apply(edgesBuiltFinal, milepostEdges);
         },
         error: function (xhr, textStatus, errorThrown) {
+            processAjaxErrors(xhr, textStatus, errorThrown);
             if (xhr.responseText.toLowerCase().contains('invalidtrack')) {
                 for (var i = 0; i < edges.length; i++) {
                     $(edges[i]).remove();
@@ -69,8 +70,6 @@ var builtTrack = function (vertices, edges, cost, milepostEdges) {
                 moneySpent -= cost;
                 checkBuildMoney();
             }
-            else
-                console.log("error " + textStatus + " " + errorThrown + " " + xhr.responseText);
         },
         dataType: 'json'
     });
@@ -95,7 +94,7 @@ var moveTrain = function (train, vertices) {
             movesMade = undefined;
         },
         error: function (xhr, textStatus, errorThrown) {
-            console.log('Move error: ' + xhr.responseText);
+            processAjaxErrors(xhr, textStatus, errorThrown);
             if (xhr.responseText.toLowerCase().contains('invalidmove')) {
                 var player = findPid(lastStatusMessage.players, pid);
                 var milepost = vertices[-1];
@@ -118,8 +117,6 @@ var moveTrain = function (train, vertices) {
                 movesMade = undefined;
                 checksMoveButton();
             }
-            else
-                console.log("error: " + textStatus + " " + errorThrown + " " + xhr.responseText);
         },
         dataType: 'json'
     });
@@ -150,6 +147,7 @@ var endTurn = function () {
         movesMadeThisTurn[i] = 0;
     checkBuildMoney();
     $('#turnControls').buttonset('option', 'disabled', true);
+    yourTurn = false;
 };
 
 //Tells server I quit
@@ -196,7 +194,7 @@ var statusGet = function () {
             processStatus(responseData);
         },
         error: function (xhr, textStatus, errorThrown) {
-            console.log("error " + textStatus + " " + errorThrown);
+            processAjaxErrors(xhr, textStatus, errorThrown);
         }
     });
 };
