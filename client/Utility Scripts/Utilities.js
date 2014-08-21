@@ -53,11 +53,43 @@ var findMilepost = function (x, y) {
     else {
         var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
         var bbox = mpjQ[0].getBBox();
-        mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-        mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
+        mpsvg.x = parseInt(translate[0]) + ((milepostSize / 2) * 1);
+        mpsvg.y = parseInt(translate[1]) + ((milepostSize / 2) * 1);
     }
     return mpsvg;
 };
+
+//var displayInfo = function (info, type) {
+//    if (!type || !infoColors[type])
+//        return;
+
+//    var jQ;
+//    if (infoTimeoutHandle) {
+//        //clearTimeout(infoTimeoutHandle);
+//        jQ = $('#info').append($('<span/>').text(info)).find('span:last');
+//        jQ.css({ color: infoColors[type] });
+//    }
+//    else {
+//        $('#info > span').text(info);
+
+//        $('#info > span').css({ color: infoColors[type] });
+//    }
+
+//    var closeInfo = function () {
+//        if($('#info').children().length == 1)
+//            $('#info').animate({ bottom: '-31px' }, 100);
+//        if (jQ)
+//            jQ.remove();
+//    };
+
+//    if (!($('#info').css('bottom') == 0 || $('#info').css('bottom') == '0px')) {
+//        $('#info').animate({ bottom: 0 }, 100, 'swing', function () {
+//            infoTimeoutHandle = setTimeout(closeInfo, 1500);
+//        });
+//    }
+//    else
+//        infoTimeoutHandle = setTimeout(closeInfo, 1500);
+//};
 
 var displayInfo = function (info, type) {
     if (!type || !infoColors[type])
@@ -83,7 +115,7 @@ var displayInfo = function (info, type) {
 };
 
 //Sends a HTTP POST request to the server with data data and calls callback when complete
-var post = function (data, callback) {
+var post = function (data, callback, error) {
     $.ajax({
         type: "POST",
         url: server,
@@ -91,6 +123,8 @@ var post = function (data, callback) {
         success: callback,
         error: function (xhr, textStatus, errorThrown) {
             processAjaxErrors(xhr, textStatus, errorThrown);
+            if (error)
+                error.apply(this, arguments);
         },
         dataType: 'json'
     });

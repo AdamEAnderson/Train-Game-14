@@ -50,6 +50,15 @@ public class TrainServer {
 		return games.get(gid);		
 	}
 	
+	// For a given game, return its gameId, or null if not found
+	static public String getGameId(Game game) {
+		for (Map.Entry<String, Game> entry: games.entrySet()) {
+			if (entry.getValue() == game)
+				return entry.getKey();
+		}
+		return null;
+	}
+	
 	static class PlayerStatus {
 		public String pid;
 		public String color;
@@ -500,7 +509,8 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.endGame(data.pid, data.ready);
+		if (game.endGame(data.pid, data.ready))
+			games.remove(data.gid);
 	}
 	
 }

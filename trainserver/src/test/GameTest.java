@@ -2,9 +2,6 @@ package test;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import map.MilepostId;
 
 import org.junit.Test;
@@ -27,19 +24,16 @@ public class GameTest {
 	// Send a stream of requests to the server check the results
 	@Test
 	public void testTrain() throws Exception {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
-        game.joinGame("Sandra", "green");
-        game.joinGame("Sandy", "red");
-        game.joinGame("Robin", "purple");
-        game.startGame("Adam", true);
-        game.startGame("Robin", true);
-        game.startGame("Sandy", true);
-        game.startGame("Sandra", true);
+        game.joinGame("Huey", "green");
+        game.joinGame("Esmeralda", "red");
+        game.joinGame("Dewey", "purple");
+        startGame(game);
         
         String activePlayer = game.getActivePlayer().name;
         MilepostId[] mileposts;
@@ -71,10 +65,7 @@ public class GameTest {
         game.endTurn(activePlayer);
         game.endTurn(game.getActivePlayer().name);
         game.endTurn(game.getActivePlayer().name);
-        game.endGame("Adam", true);
-        game.endGame("Robin", true);
-        game.endGame("Sandy", true);
-        game.endGame("Sandra", true);
+        endGame(game);
     }
 	
 	@Test
@@ -104,19 +95,16 @@ public class GameTest {
 	// Upgrade to a 3-hauler
 	@Test
 	public void testUpgradeCapacity() throws Exception {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
-        game.joinGame("Sandra", "green");
-        game.joinGame("Sandy", "red");
-        game.joinGame("Robin", "purple");
-        game.startGame("Adam", true);
-        game.startGame("Robin", true);
-        game.startGame("Sandy", true);
-        game.startGame("Sandra", true);
+        game.joinGame("Huey", "green");
+        game.joinGame("Esmeralda", "red");
+        game.joinGame("Dewey", "purple");
+        startGame(game);
         
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
@@ -135,25 +123,21 @@ public class GameTest {
         
         game.upgradeTrain(game.getActivePlayer().name, 0, UpgradeType.SPEED);	// upgrade during standard turn
 
-        game.endGame("Adam", true);
-        game.endGame("Robin", true);
-        game.endGame("Sandy", true);
-        game.endGame("Sandra", true);
+        endGame(game);
     }
 	
 	// Play a short game with two trains
 	@Test
 	public void testTwoTrain() throws Exception {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"ruleSet\":{\"handSize\":4, \"startingMoney\":100, \"numTrains\":2}, \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"ruleSet\":{\"handSize\":4, \"startingMoney\":100, \"numTrains\":2}, \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
-        game.joinGame("Sandra", "green");
-        game.startGame("Adam", true);
-        game.startGame("Sandra", true);
-        
+        game.joinGame("Huey", "green");
+        startGame(game);
+
         String activePlayer = game.getActivePlayer().name;
         log.info("Active player is {}", activePlayer);
         MilepostId[] mileposts;
@@ -198,35 +182,34 @@ public class GameTest {
         assertTrue(movingPlayer.getMoney() == 121);	// total should includes deliveries - building
         game.endTurn(game.getActivePlayer().name);
         game.endTurn(game.getActivePlayer().name);
-        game.endGame("Adam", true);
-        game.endGame("Sandra", true);
+        endGame(game);
     }
 	
 	@Test
 	public void testOnePlayerGame() throws GameException {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
-        game.startGame("Adam", true);
-        game.endTurn("Adam");
-        game.endGame("Adam", true);
+        game.startGame("Louie", true);
+        game.endTurn("Louie");
+        game.endGame("Louie", true);
 	}
 	
 	@Test
 	public void testResign() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        log.info("newGame response {}", responseMessage);
 	        String gid = responseMessage.substring(8, 16);
 	        Game game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.joinGame("Sandra", "green");
-	        game.startGame("Sandra", true);
-	        game.startGame("Adam", true);
+	        game.joinGame("Huey", "green");
+	        game.startGame("Huey", true);
+	        game.startGame("Louie", true);
 	        skipPastBuildingTurns(game);
 	        String resignedPlayer = game.getActivePlayer().name;
 	        game.resign(resignedPlayer);
@@ -237,8 +220,8 @@ public class GameTest {
 	        // Player should still be the other one
 	        assertFalse(resignedPlayer.equals(game.getActivePlayer().name));
 	        
-	        game.endGame("Adam", true);
-	        game.endGame("Sandra", true);
+	        game.endGame("Louie", true);
+	        game.endGame("Huey", true);
 		} catch (GameException e) {
 			e.printStackTrace();
 			fail("Unexpected GameException");
@@ -250,15 +233,15 @@ public class GameTest {
 	public void testBuild() throws GameException {
 		int expectedTotalSpent = 0;
 		int accumulatedTotal = 70;
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
-        game.joinGame("Sandra", "green");
-        game.startGame("Adam", true);
-        game.startGame("Sandra", true);
+        game.joinGame("Huey", "green");
+        game.startGame("Louie", true);
+        game.startGame("Huey", true);
         
         Player firstPlayer = game.getActivePlayer();
 
@@ -313,21 +296,21 @@ public class GameTest {
 
         skipPastBuildingTurns(game);
         
-        game.endGame("Adam", true);
-        game.endGame("Sandra", true);
+        game.endGame("Louie", true);
+        game.endGame("Huey", true);
 	}
 	
 	/** Test building too much (cost more than 20) */
 	@Test
 	public void testBuildOverCost() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.startGame("Adam", true);
+	        game.startGame("Louie", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		} 
@@ -360,7 +343,7 @@ public class GameTest {
         }
 
 		try {
-	        game.endGame("Adam", true);
+	        game.endGame("Louie", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test cleanup");
 		} 
@@ -369,16 +352,16 @@ public class GameTest {
 	/** Test that building from a place that is not a mojor city, and not already on the player's track fails */
 	@Test
 	public void testBuildFromUnconnectedTrack()  {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.joinGame("Sandra", "green");
-	        game.startGame("Adam", true);
-	        game.startGame("Sandra", true);
+	        game.joinGame("Huey", "green");
+	        game.startGame("Louie", true);
+	        game.startGame("Huey", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		} 
@@ -394,8 +377,8 @@ public class GameTest {
         }
 
 		try {
-	        game.endGame("Adam", true);
-	        game.endGame("Sandra", true);
+	        game.endGame("Louie", true);
+	        game.endGame("Huey", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test cleanup");
 		} 
@@ -404,16 +387,16 @@ public class GameTest {
 	/** Test that building over track that has already been built fails */
 	@Test
 	public void testBuildOverExistingTrack()  {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.joinGame("Sandra", "green");
-	        game.startGame("Adam", true);
-	        game.startGame("Sandra", true);
+	        game.joinGame("Huey", "green");
+	        game.startGame("Louie", true);
+	        game.startGame("Huey", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		} 
@@ -431,8 +414,8 @@ public class GameTest {
         }
 
 		try {
-	        game.endGame("Adam", true);
-	        game.endGame("Sandra", true);
+	        game.endGame("Louie", true);
+	        game.endGame("Huey", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test cleanup");
 		} 
@@ -440,7 +423,7 @@ public class GameTest {
 	
 	@Test
 	public void testStatusMsg() throws GameException{
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
@@ -449,14 +432,14 @@ public class GameTest {
         log.info("empty status message {}", statusMsg);
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
-        game.joinGame("Sandra", "green");
-        game.joinGame("Sandy", "red");
-        game.joinGame("Robin", "purple");
+        game.joinGame("Huey", "green");
+        game.joinGame("Esmeralda", "red");
+        game.joinGame("Dewey", "purple");
         log.info("post-join status message {}", TrainServer.status(jsonRequestPayload));
-        game.startGame("Adam", true);
-        game.startGame("Robin", true);
-        game.startGame("Sandy", true);
-        game.startGame("Sandra", true);
+        game.startGame("Louie", true);
+        game.startGame("Dewey", true);
+        game.startGame("Esmeralda", true);
+        game.startGame("Huey", true);
         log.info("status after starting the game {}", TrainServer.status(jsonRequestPayload));
         
         String activePlayer = game.getActivePlayer().name;
@@ -471,14 +454,14 @@ public class GameTest {
 	/** Test standard move */
 	@Test
 	public void testMove() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.startGame("Adam", true);
+	        game.startGame("Louie", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		} 
@@ -522,9 +505,9 @@ public class GameTest {
 		try {
         	game.buildTrack(game.getActivePlayer().name, mileposts);
 			skipPastBuildingTurns(game);
-			game.placeTrain("Adam", 0, new MilepostId(34,56));
-			game.moveTrain("Adam", 0, moveMileposts);
-	        game.endGame("Adam", true);
+			game.placeTrain("Louie", 0, new MilepostId(34,56));
+			game.moveTrain("Louie", 0, moveMileposts);
+	        game.endGame("Louie", true);
 		} catch (GameException e) {
 			log.error("Unexpected exception {}", e);
 			fail("Unexpected exception");
@@ -534,14 +517,14 @@ public class GameTest {
 	/** Test move error, move further than train can go in one turn */
 	@Test
 	public void testMoveTooFar() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Adam\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
 			String responseMessage = TrainServer.newGame(jsonPayload);
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
-	        game.startGame("Adam", true);
+	        game.startGame("Louie", true);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		} 
@@ -588,18 +571,18 @@ public class GameTest {
 		try {
         	game.buildTrack(game.getActivePlayer().name, mileposts);
 			skipPastBuildingTurns(game);
-			game.placeTrain("Adam", 0, new MilepostId(34,56));
+			game.placeTrain("Louie", 0, new MilepostId(34,56));
 		} catch (GameException e) {
 			log.error("Unexpected exception {}", e);
 			fail("Unexpected exception");
 		} 
 		try {
-			game.moveTrain("Adam", 0, moveMileposts);
+			game.moveTrain("Louie", 0, moveMileposts);
 			fail("Expected move error from moving too far");
 		} catch (GameException e) {
 		} 
 		try {
-	        game.endGame("Adam", true);
+	        game.endGame("Louie", true);
 		} catch (GameException e) {
 			log.error("Unexpected exception {}", e);
 			fail("Unexpected exception");
@@ -786,7 +769,7 @@ public class GameTest {
         			new MilepostId(18,21),
         			new MilepostId(19,21),
     		};
-        	Arrays.sort(moveMileposts, Collections.reverseOrder());
+        	reverse(moveMileposts);
 	        Player player2 = game.getActivePlayer();
 	        game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20, 21));
         	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
@@ -820,7 +803,7 @@ public class GameTest {
         	Player player3 = game.getActivePlayer();
         	int renterMoneyAtStartOfTurn = player3.getMoney();
         	int landlordMoneyAtStartOfTurn = player2.getMoney();
-        	Arrays.sort(moveMileposts, Collections.reverseOrder());
+        	reverse(moveMileposts);
         	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20,21));
         	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
         	game.endTurn(game.getActivePlayer().name);
@@ -869,22 +852,29 @@ public class GameTest {
         	assertEquals(renterMoneyAtStartOfTurn - 4, player2.getMoney());	// check that rent was deducted from total
         	assertEquals(landlordMoneyAtStartOfTurn + 4, player1.getMoney()); // check that rent money is received
         	
-        	// Third player starts on player2's track, goes to Dakar, and heads out to Abidjan on player1'a track
+        	// Third player starts on player2's track, goes to Dakar, and 
+        	// heads out to Abidjan on player1's track, then goes back to 
+        	// player2's track to Kano.
         	// Test rental to 2 different players in one turn
+        	// Also tests returning to track that was rented this turn already
         	moveMileposts = new MilepostId[] {
     			new MilepostId(2,20),
 	        	new MilepostId(2,21),
 	        	new MilepostId(3,22),
 	        	new MilepostId(3,23),
-	        	new MilepostId(4,24),
-	        	new MilepostId(4,25),
-	        	new MilepostId(5,26),
-	        	new MilepostId(5,27),
-	        	new MilepostId(6,27),
-	        	new MilepostId(7,27),
-	        	new MilepostId(8,27), 
-	        	new MilepostId(9,27), 
-	        	new MilepostId(10,27),
+	        	new MilepostId(4,24), // Freetown
+	        	new MilepostId(3,23),
+	        	new MilepostId(3,22),
+	        	new MilepostId(2,21),
+    			new MilepostId(2,20),
+    			new MilepostId(3,20),
+    			new MilepostId(4,20),
+    			new MilepostId(5,20),
+    			new MilepostId(6,20),
+    			new MilepostId(7,20),
+    			new MilepostId(8,20),
+    			new MilepostId(9,20),
+    			new MilepostId(10,20),
         	};
         	int player1MoneyAtStartOfTurn = player1.getMoney();
         	int player2MoneyAtStartOfTurn = player2.getMoney();
@@ -901,6 +891,137 @@ public class GameTest {
 		}
 	} 
 	
+	@Test
+	public void testFerry() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        startGame(game);
+	        
+	        // Build to Tenarife
+			MilepostId[] buildMileposts = new MilepostId[] {
+					new MilepostId(2,18),
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),
+					new MilepostId(0,6)		// Tenarife via ferry
+					};
+			game.buildTrack(game.getActivePlayer().name, buildMileposts);
+			assertEquals(19, game.getActivePlayer().getSpending());
+			skipPastBuildingTurns(game);
+			
+			// Start in Dakar and go to port for Tenarife
+			MilepostId[] moveMileposts = new MilepostId[] {
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
+			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.endTurn(game.getActivePlayer().name);
+
+			// Cross to Tenarife
+			moveMileposts = new MilepostId[] {
+					new MilepostId(0,6)		// Tenarife via ferry
+					};
+			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			assertEquals(6, game.getActivePlayer().getMovesMade(0));
+			game.endTurn(game.getActivePlayer().name);
+			
+			// Cross back to mainland, try to return to Dakar (should fail because 
+			// after ferry crossing goes half speed)
+			/** Following is commented out due to bug
+			moveMileposts = new MilepostId[] {
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+        	reverse(moveMileposts);
+        	try {
+        		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        		fail("Expected move exception here -- didn't get one");
+        	} catch (GameException e) {
+        	}
+        	*/
+        	
+        	// Now try moving legal amount (6)
+			moveMileposts = new MilepostId[] {
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+        	reverse(moveMileposts);
+    		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.endTurn(game.getActivePlayer().name);
+        	
+			endGame(game);
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		}
+	}
+	
+	@Test
+	public void testEndGame() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        endGame(game);
+	        assertTrue(TrainServer.getGame(gid) == null);
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		}
+	}
+	
+	// Reverse the array (Arrays.sort can't be used because it doesn't work on primitive types)
+	private static void reverse(MilepostId[] b) {
+	   int left  = 0;          // index of leftmost element
+	   int right = b.length-1; // index of rightmost element
+	  
+	   while (left < right) {
+	      // exchange the left and right elements
+		  MilepostId temp = b[left]; 
+	      b[left]  = b[right]; 
+	      b[right] = temp;
+	     
+	      // move the bounds toward the center
+	      left++;
+	      right--;
+	   }
+	}
+	
 	private void skipPastBuildingTurns(Game game) throws GameException {
         // Skip past building turns
         for(Player p = game.getActivePlayer(); game.getTurns() < 3; p = game.getActivePlayer()){
@@ -916,7 +1037,10 @@ public class GameTest {
 	}
 
 	private void endGame(Game game) throws GameException {
-		for (Player p: game.getPlayers())
-			game.endGame(p.name, true);
+		for (Player p: game.getPlayers()) {
+			String jsonPayload = String.format("{\"messageType\":\"endGame\", \"gid\":\"%s\", \"pid\":\"%s\", \"ready\":true}", 
+				TrainServer.getGameId(game), p.name);
+			TrainServer.endGame(jsonPayload);
+		}
 	}
 }

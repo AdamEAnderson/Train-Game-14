@@ -271,7 +271,7 @@ public class Game implements AbstractGame {
 	}
 	
 	@Override
-	public void endGame(String pid, boolean ready) throws GameException {
+	public boolean endGame(String pid, boolean ready) throws GameException {
 		log.info("endGame(pid={}, ready={})", pid, ready);
 		Player p = getPlayer(pid);
 		p.readyToEnd(ready);
@@ -287,6 +287,7 @@ public class Game implements AbstractGame {
 			active = null;
 		}
 		++transaction;
+		return ended;
 	}
 
 	Player getPlayer(String pid) throws GameException {

@@ -173,13 +173,15 @@ interface AbstractGame {
 	 */
 	void resign(String player) throws GameException;
 	
-	/** Game is over.
+	/** Player declares that they are ready to end the game. Game ends when all players 
+	 * have declared they are ready to end.
 	 * @param pid		Player whose train is being moved
+	 * @returns 		true if the game was ended
 	 * @throws GameException
 	 * 
 	 * Exceptions:
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void endGame(String player, boolean ready) throws GameException;
+	boolean endGame(String player, boolean ready) throws GameException;
 }

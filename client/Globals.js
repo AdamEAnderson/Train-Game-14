@@ -41,6 +41,7 @@ var infoColors = {
     'error': '#c00',
     'info': '#008'
 };
+var milepostSize = 20;
 
 //Adds a clone function to the array prototype that deep-copies the array
 Array.prototype.clone = function () {
