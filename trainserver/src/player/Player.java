@@ -25,10 +25,10 @@ public class Player {
 	private Card[] cards;
 	private int spendings;
 	private int[] movesMade;
+	private boolean turnInProgress;
 	private ArrayList<String> rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
-	private boolean turnInProgress;
 	private boolean hasResigned;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
@@ -45,12 +45,12 @@ public class Player {
 		this.name = name;
 		this.color = color;
 		spendings = 0;
+		turnInProgress = false;
 		movesMade = new int[ruleSet.numTrains];
 		rentingFrom = new ArrayList<String>();
 		nextPlayer = next;
 		readyToStart = false;
 		readyToEnd = false;
-		turnInProgress = false;
 		hasResigned = false;
 	}
 	
@@ -61,6 +61,23 @@ public class Player {
 		else 
 			throw new GameException("TrainAlreadyPlaced");
 		log.info("after place");
+	}
+	
+	public boolean testMoveTrain(int tIndex, Milepost[] mileposts){
+		if(!mileposts[0].equals(trains[tIndex].getLocation())) return false;
+		return testMoveTrain(mileposts, 0, movesMade[tIndex]);
+	}
+	
+	private boolean testMoveTrain(Milepost[] mileposts, int mIndex, int tIndex){
+		if(mileposts.length <= mIndex) return true;
+		if(tIndex >= 20) return false;
+		Milepost origin = mileposts[mIndex];
+		Milepost next = mileposts[mIndex + 1];
+		
+		String ownerId = rail.anyConnects(origin, next);
+		if(ownerId.equals("") && !origin.isSameCity(next)) return false;
+		
+		return testMoveTrain(mileposts, mIndex + 1, tIndex + 1);
 	}
 	
 	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {
@@ -107,12 +124,11 @@ public class Player {
 	}
 	
 	private void moveFerry(int t, Milepost origin, Milepost next) throws GameException{
-		if(turnInProgress){
+		if(movesMade[t] != 0){
 			throw new GameException("InvalidMove");
 		} else{
 			movesMade[t] = (trains[t].getSpeed())/2;
 			trains[t].moveTrain(next);
-			movesMade[t]++;
 		}
 	}
 	
@@ -132,79 +148,61 @@ public class Player {
 	}
 
 	public boolean testBuildTrack(Milepost[] mileposts){
-		return testBuildTrack(mileposts, 0);
+		if(mileposts.length < 1) return true;
+		if((!rail.contains(mileposts[0]) && mileposts[0].type != Milepost.Type.MAJORCITY) 
+				|| mileposts[0].type == Milepost.Type.BLANK) return false;
+		int projectSpending = getSpending();
+		
+		for(int i = 0; i < mileposts.length -1 ; i++){
+			projectSpending += rail.getCost(mileposts[i], mileposts[i + 1]);
+			if(projectSpending > 20) return false;
+			if(mileposts[i].isSameCity(mileposts[i + 1])) return false;
+			if(rail.anyConnects(mileposts[i], mileposts[i + 1]) != "") {
+				log.warn("Track is already built there ({}, {}) and ({}, {})",
+						mileposts[i].x, mileposts[i].y, mileposts[i + 1].x, mileposts[i + 1].y);
+				return false;
+			}
+			if(!mileposts[i].isNeighbor(mileposts[i + 1])) {
+				log.warn("Mileposts are not contiguous ({}, {}) and ({}, {})", 
+						mileposts[i].x, mileposts[i].y, mileposts[i + 1].x, mileposts[i + 1].y);
+				return false;
+			}
+			if(mileposts[i + 1].type == Milepost.Type.BLANK) {
+				log.warn("Mileposts is blank ({}, {})", mileposts[i + 1].x, mileposts[i + 1].y);
+				return false;
+			}
+		}
+		return true;
+		//return testBuildTrack(mileposts, 0, getSpending());
 	}
 	
-	private boolean testBuildTrack(Milepost[] mileposts, int index) {
-		if(mileposts.length <= index) return true;
-		
-		Milepost origin = mileposts[index];
-		Milepost next = mileposts[index + 1];
-		
-		// We can only start building from the end of our track, or from a major city
-		if(!rail.contains(origin) && origin.type != Milepost.Type.MAJORCITY) return false;
-
-		// Cannot build through a major city
-		if(origin.isSameCity(next)) return false;
-
-		// Cannot build over track that has already been built
-		if(rail.anyConnects(origin, next) != "") {
-			log.warn("Track is already built there ({}, {}) and ({}, {})", origin.x, origin.y, next.x, next.y);
-			return false;
-		}
-		
-		if(!origin.isNeighbor(next)) {
-			log.warn("Mileposts are not contiguous ({}, {}) and ({}, {})", origin.x, origin.y, next.x, next.y);
-			return false;
-		}
-		
-		if(origin.type == Milepost.Type.BLANK || next.type == Milepost.Type.BLANK) {
-			if (origin.type == Milepost.Type.BLANK)
-				log.warn("Mileposts is blank ({}, {})", origin.x, origin.y);
-			if (next.type == Milepost.Type.BLANK) 
-				log.warn("Mileposts is blank ({}, {})", next.x, next.y);
-			return false;
-		}
-		
-		return true;
-	}	
 	
-	public void buildTrack(Queue<Milepost> mileposts) throws GameException{
-		Milepost[] tester = mileposts.toArray(new Milepost[mileposts.size()]);
+	public void buildTrack(Milepost[] mileposts) throws GameException{
+		Milepost[] tester = mileposts.clone();
 		if(!testBuildTrack(tester)){
 			throw new GameException("InvalidTrack");
 		}
-		
-		buildTrackHelper(mileposts);
-	}
-	
-	public void buildTrackHelper(Queue<Milepost> mileposts) throws GameException {
 		turnInProgress = true;
-		if(mileposts.isEmpty()) return;
-		Milepost origin = mileposts.poll();
-		if(mileposts.isEmpty()) return;
-		Milepost next = mileposts.peek();
-		
-		int cost = rail.build(origin, next);
-		if(spendings + cost <= 20){
-			spendings += cost;
-		} else {
-			log.warn("Cost {} exceeded maximum of 20", spendings + cost);
-			rail.erase(origin, next);
-			throw new GameException("ExceededAllowance");
+		for(int i = 0; i < mileposts.length - 1; i++){
+			spendings += rail.build(mileposts[i], mileposts[i + 1]);
 		}
-		buildTrackHelper(mileposts);
 	}
 	
-	public void pickupLoad(int t, String load) throws GameException{
+	
+	
+	public void pickupLoad(int t, String load) throws GameException{ 
 		turnInProgress = true;
-		trains[t].addLoad(load);
+		trains[t].addLoad(load); 
 	}
+	
+	
 	
 	public void dropLoad(int t, String load) throws GameException{ 
 		turnInProgress = true;
 		trains[t].dropLoad(load); 
 	}
+	
+	
 	
 	/** Delivers a load on the given card.
 	 * @param index is the location of the card in the player's hand, array-wise
@@ -221,7 +219,6 @@ public class Player {
 	}
 	
 	private Trip canDeliver(int ti, Card c){
-		turnInProgress = true;
 		if(trains[ti] == null) return null;
 		City city = trains[ti].getLocation().city;
 		if(city == null) return null;
@@ -233,10 +230,10 @@ public class Player {
 	}
 	
 	public Player endTurn(){
+		turnInProgress = true;
 		money -= spendings;
 		spendings = 0;
 		rentingFrom.clear();
-		turnInProgress = false;
 		for(int i = 0; i < movesMade.length; i++){
 			movesMade[i] = 0;
 		}
@@ -244,10 +241,10 @@ public class Player {
 	}
 	
 	public void resign() {
+		turnInProgress = true;
 		hasResigned = true;
 		readyToEnd = true;
 		readyToStart = true;
-		turnInProgress = false;
 	}
 	
 	private void deposit(int deposit){ 

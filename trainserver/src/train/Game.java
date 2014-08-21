@@ -57,17 +57,6 @@ public class Game implements AbstractGame {
 		joinable = true;
 	}
 	
-	/** Returns player whose turn it is */
-	public Player getActivePlayer() { return active; }
-	
-	public RuleSet getRuleSet() { return ruleSet; }
-	
-	public boolean isJoinable() { return joinable; }
-	
-	public boolean isOver() { return ended; }
-
-	public int transaction() { return transaction; }
-	
 	@Override
 	public void joinGame(String pid, String color) throws GameException {
 		log.info("joinGame(pid={}, color={})", pid, color);
@@ -118,14 +107,6 @@ public class Game implements AbstractGame {
 			++transaction;
 		}
 	}
-
-	private Queue<Milepost> enqueue (MilepostId[] mileposts) {
-		Queue<Milepost> queue = new ArrayDeque<Milepost>();
-		for(int i = 0; i < mileposts.length; i++){
-			queue.add(map.getMilepost(mileposts[i]));
-		}
-		return queue;
-	}
 	
 	@Override
 	public void testBuildTrack(String pid, MilepostId[] milepostIds) throws GameException {
@@ -142,13 +123,17 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void buildTrack(String pid, MilepostId[] mileposts) throws GameException {
-		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
+	public void buildTrack(String pid, MilepostId[] milepostIds) throws GameException {
+		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, milepostIds.length);
+		for (int i = 0; i < milepostIds.length; ++i)
+			log.info("{}, ", milepostIds[i]);
 		log.info("])");
 		checkActive(pid);
-		active.buildTrack(enqueue(mileposts));	
+		Milepost[] mileposts = new Milepost[milepostIds.length];
+		for(int i = 0; i < mileposts.length; i++){
+			mileposts[i] = map.getMilepost(milepostIds[i]);
+		}
+		active.buildTrack(mileposts);	
 		++transaction;
 	}
 
@@ -332,6 +317,15 @@ public class Game implements AbstractGame {
 		if(turns < 3) throw new GameException("InvalidMove");
 	}
 
+	/** Returns player whose turn it is */
+	public Player getActivePlayer() { return active; }
 	
+	public RuleSet getRuleSet() { return ruleSet; }
+	
+	public boolean isJoinable() { return joinable; }
+	
+	public boolean isOver() { return ended; }
+
+	public int transaction() { return transaction; }
 	
 }

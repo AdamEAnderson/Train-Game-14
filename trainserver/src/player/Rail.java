@@ -88,6 +88,12 @@ public class Rail {
 		}
 	}
 	
+	int getCost(Milepost origin, Milepost next){
+		Edge e = getEdge(origin, next);
+		if(e == null) return -1;
+		return e.cost;
+	}
+	
 	/** Adds the given track to the player's rails, if and only if the track can be legally built.
 	 * @param origin: the milepost already attached to the rail; next is where
 	 * you build towards.
