@@ -82,10 +82,11 @@ public class GameTest {
 		String gid = null;
 		try {
 			String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-	        String oldGameData = TrainServer.newGame(jsonPayload);
-	        gid = oldGameData.substring(8, 16);
+	        String newGameData = TrainServer.newGame(jsonPayload);
+	        gid = newGameData.substring(8, 16);
 			String resumePayload = String.format("{\"messageType\":\"resumeGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, "Louie");
-	        TrainServer.resumeGame(resumePayload);
+	        String resumeGameData = TrainServer.resumeGame(resumePayload);
+	        assertEquals(newGameData, resumeGameData);
 		} catch (GameException e) {
 	    	fail("GameException not expected here");
 	    }
@@ -766,7 +767,7 @@ public class GameTest {
 	        	new MilepostId(2,21),
 	        	//new MilepostId(2,20),
 	        };
-	        Player player1 = game.getActivePlayer();
+	        //Player player1 = game.getActivePlayer();
         	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
         	game.endTurn(game.getActivePlayer().name);
         	
