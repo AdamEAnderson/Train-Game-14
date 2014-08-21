@@ -66,7 +66,7 @@ $(document).ready(function () {
                         processGames(responseData);
                     },
                     error: function (xhr, textStatus, errorThrown) {
-                        console.log("error " + textStatus + " " + errorThrown);
+                        processAjaxErrors(xhr, textStatus, errorThrown);
                     }
                 });
             }
@@ -84,10 +84,10 @@ $(document).ready(function () {
             if (document.getElementById("actionPicker").value == "New") {
                 newGame(document.getElementById("colorPicker").value, $('#handlePicker').val(),
 					document.getElementById("geographyPicker").value);
-            } else if (document.getElementById("actionPicker").value == "Join") {
+            } else if (document.getElementById("actionPicker").value == "Join" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '') {
                 joinGame(document.getElementById("gamePicker").value,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
-            } else if (document.getElementById("actionPicker").value == "Resume") {
+            } else if (document.getElementById("actionPicker").value == "Resume" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '') {
                 resumeGame(document.getElementById("gamePicker").value, $('#handlePicker').val());
             }
         }
@@ -132,7 +132,7 @@ var initMap = function (geography) {
             setInterval('statusGet()', 250);
         },
         error: function (a, b, c) {
-            console.log('error:' + arguments.toString());
+            processAjaxErrors(a, b, c);
         }
     });
 }
@@ -209,7 +209,7 @@ var drawMileposts = function () {
                 case 'BLANK':
                     break;
                 default:
-                    var size = 20;
+                    var size = milepostSize;
                     //var jQ = $($(mileposts[gameData.mapData.orderedMileposts[mp].type]).find('svg').children()).clone();
                     var path = location.origin + join(location.pathname, '../../data/mileposts/' + gameData.mapData.orderedMileposts[mp].type.toLowerCase() + '.png');
                     var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'image')).attr({ 'x': 0, 'y': 0, 'width': size, 'height': size });
@@ -242,7 +242,7 @@ var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);
     for (var i = 0; i < player.trains.length; i++) {
-        //movesMadeThisTurn[i] = player.trains[i].movesMade;
+        movesMadeThisTurn[i] = player.trains[i].movesMade;
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
         $('#move').show();
@@ -271,9 +271,8 @@ var processResume = function (data) {
             }
             else {
                 var translate = m1jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                var bbox = m1jQ[0].getBBox();
-                m1svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-                m1svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
+                m1svg.x = parseInt(translate[0]) + ((milepostSize / 2) * 1);
+                m1svg.y = parseInt(translate[1]) + ((milepostSize / 2) * 1);
             }
             if (m2jQ.prop('tagName') == 'circle') {
                 m2svg.x = m2jQ.attr('cx');
@@ -281,9 +280,8 @@ var processResume = function (data) {
             }
             else {
                 var translate = m2jQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                var bbox = m2jQ[0].getBBox();
-                m2svg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-                m2svg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
+                m2svg.x = parseInt(translate[0]) + ((20) * 1);
+                m2svg.y = parseInt(translate[1]) + ((20) * 1);
             }
             drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
             edgesBuiltFinal.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });

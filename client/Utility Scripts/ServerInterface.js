@@ -11,6 +11,7 @@
 
 //Tells server we've joined a game
 var joinGame = function (GID, color, handle) {
+    $('#newGameButton').button('option', 'disabled', true);
     post({ messageType: 'joinGame', gid: GID, color: color, pid: handle }, function (data) {
         $('#loading').show();
         loading = true;
@@ -22,16 +23,18 @@ var joinGame = function (GID, color, handle) {
         geography = data.geography;
         console.log("join game: " + gid);
         enterGame();
+    }, function () {
+        $('#newGameButton').button('option', 'disabled', false);
     });
 };
 
 //Tells server to resume a game
 var resumeGame = function (GID, handle) {
+    $('#newGameButton').button('option', 'disabled', true);
     post({ messageType: 'resumeGame', gid: GID, pid: handle }, function (data) {
         $('#loading').show();
         loading = true;
-        gameData = data.gameData;
-        //gameData = data;
+        gameData = data;
         gid = GID;
         pid = handle;
         justResumed = true;
@@ -40,6 +43,8 @@ var resumeGame = function (GID, handle) {
         geography = gameData.geography;
         console.log("resume game: " + gid);
         enterGame();
+    }, function () {
+        $('#newGameButton').button('option', 'disabled', false);
     });
     pid = handle;
 };
@@ -63,7 +68,7 @@ var builtTrack = function (vertices, edges, cost, milepostEdges) {
         },
         error: function (xhr, textStatus, errorThrown) {
             processAjaxErrors(xhr, textStatus, errorThrown);
-            if (xhr.responseText.toLowerCase().contains('invalidtrack')) {
+            if (xhr.responseJSON && xhr.responseJSON.toLowerCase().indexOf('invalidtrack') != -1) {
                 for (var i = 0; i < edges.length; i++) {
                     $(edges[i]).remove();
                 }
@@ -90,12 +95,12 @@ var moveTrain = function (train, vertices) {
         data: JSON.stringify(data),
         success: function () {
             movesMadeThisTurn[train] += vertices.length;
-            checkLoadButtons(lastStatusMessage.players);
+            checkLoadButtons(lastStatusMessage.players, true);
             movesMade = undefined;
         },
         error: function (xhr, textStatus, errorThrown) {
             processAjaxErrors(xhr, textStatus, errorThrown);
-            if (xhr.responseText.toLowerCase().contains('invalidmove')) {
+            if (xhr.responseJSON && xhr.responseJSON.toLowerCase().indexOf('invalidmove') != -1) {
                 var player = findPid(lastStatusMessage.players, pid);
                 var milepost = vertices[-1];
                 trainLocations[train] = milepost;
@@ -113,7 +118,7 @@ var moveTrain = function (train, vertices) {
                 }
                 $('#train' + pid + train).remove();
                 $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
-                checkLoadButtons(lastStatusMessage.players);
+                checkLoadButtons(lastStatusMessage.players, true);
                 movesMade = undefined;
                 checksMoveButton();
             }
@@ -123,13 +128,14 @@ var moveTrain = function (train, vertices) {
 };
 
 var deliverLoad = function (train, load, card) {
-    post({ messageType: 'deliverLoad', train: train, load: load, card: card, pid:pid, gid:gid });
+    post({ messageType: 'deliverLoad', train: train, load: load, card: card, pid: pid, gid: gid });
 };
 
 //Tells server we've started our train
 var placeTrain = function (train, milepost) {
     post({ messageType: 'placeTrain', pid: pid, gid: gid, train: train, where: milepost });
     trainLocations[train] = milepost;
+    checkLoadButtons(lastStatusMessage.players, true);
 };
 
 //Tells server we've upgraded our train
@@ -163,6 +169,7 @@ var endGame = function (checked) {
 };
 
 var newGame = function (color, handle, gameGeo) {
+    $('#newGameButton').button('option', 'disabled', true);
     post({ messageType: 'newGame', color: color, pid: handle, gameType: gameGeo }, function (data) {
         $('#loading').show();
         loading = true;
@@ -175,6 +182,8 @@ var newGame = function (color, handle, gameGeo) {
         geography = gameGeo;
         console.log("new game: " + gid);
         enterGame();
+    }, function () {
+        $('#newGameButton').button('option', 'disabled', false);
     });
 };
 

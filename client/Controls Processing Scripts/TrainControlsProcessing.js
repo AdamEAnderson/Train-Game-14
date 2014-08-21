@@ -160,14 +160,13 @@ var moveClick = function (e) {
         }
         $('#train' + pid + train).remove();
         $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
-		refreshMovesRemaining(player.trains);
+        refreshMovesRemaining(player.trains);
     });
     $('#acceptBuild').click(function () {
         for (var i = 0; i < movesMade.length; i++) {
             moveTrain(i, movesMade[i]);
         }
         checkMoveButton();
-        checkLoadButtons(lastStatusMessage.players);
         $(this).off('click');
         $('#acceptBuild').off('click');
         $(document).off('keyup');
@@ -201,7 +200,7 @@ var moveClick = function (e) {
         }
         movesMade = undefined;
         checkMoveButton();
-        checkLoadButtons(lastStatusMessage.players);
+        checkLoadButtons(lastStatusMessage.players, true);
         $(this).off('click');
         $('#acceptBuild').off('click');
         $(document).off('keyup');
