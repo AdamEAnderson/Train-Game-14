@@ -119,6 +119,28 @@ public class Game implements AbstractGame {
 		}
 	}
 
+	private Queue<Milepost> enqueue (MilepostId[] mileposts) {
+		Queue<Milepost> queue = new ArrayDeque<Milepost>();
+		for(int i = 0; i < mileposts.length; i++){
+			queue.add(map.getMilepost(mileposts[i]));
+		}
+		return queue;
+	}
+	
+	@Override
+	public void testBuildTrack(String pid, MilepostId[] milepostIds) throws GameException {
+		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, milepostIds.length);
+		for (int i = 0; i < milepostIds.length; ++i)
+			log.info("{}, ", milepostIds[i]);
+		log.info("])");
+		checkActive(pid);
+		Milepost[] mileposts = new Milepost[milepostIds.length];
+		for(int i = 0; i < mileposts.length; i++){
+			mileposts[i] = map.getMilepost(milepostIds[i]);
+		}
+		active.testBuildTrack(mileposts);
+	}
+
 	@Override
 	public void buildTrack(String pid, MilepostId[] mileposts) throws GameException {
 		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
@@ -126,11 +148,7 @@ public class Game implements AbstractGame {
 			log.info("{}, ", mileposts[i]);
 		log.info("])");
 		checkActive(pid);
-		Queue<Milepost> queue = new ArrayDeque<Milepost>();
-		for(int i = 0; i < mileposts.length; i++){
-			queue.add(map.getMilepost(mileposts[i]));
-		}
-		active.buildTrack(queue);	
+		active.buildTrack(enqueue(mileposts));	
 		++transaction;
 	}
 
@@ -151,6 +169,23 @@ public class Game implements AbstractGame {
 		++transaction;
 	}
 
+	@Override
+	public void testMoveTrain(String pid, int train, MilepostId[] mileposts)
+			throws GameException {
+		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		checkActive(pid);
+		checkBuilding();
+		Queue<Milepost> moves = new ArrayDeque<Milepost>();
+		for(int i = 0; i < mileposts.length; i++){
+			moves.add(map.getMilepost(mileposts[i]));
+		}
+		active.moveTrain(train, moves);
+		++transaction;
+	}
+	
 	@Override
 	public void moveTrain(String pid, int train, MilepostId[] mileposts)
 			throws GameException {

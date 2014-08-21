@@ -144,12 +144,6 @@ public final class TrainMap {
 			++y;
 		}
 		serializeData.mpHeight = y;
-		
-		for (MilepostId mpID: milepostIndex.keySet())  {
-			Milepost mp = milepostIndex.get(mpID);
-			if (mp == null)
-				log.info("What?");
-		}
 	}
 	
 	private boolean isCrossing(MilepostId source, MilepostId destination,

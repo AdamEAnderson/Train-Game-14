@@ -58,7 +58,7 @@ public class TrainServer {
 		public Map<MilepostId, Set<MilepostId>> rail;
 		public Card[] hand;
 		public int spendings;
-		public int movesMade;
+		public int[] movesMade;
 		PlayerStatus() {}
 	}
 	
@@ -268,14 +268,6 @@ public class TrainServer {
 		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
-	static class ResumeGameResponse {
-		public String gid;
-		public String pid;
-		public NewGameResponse gameData;
-		public int spendings;
-		public int movesMade;
-	}
-	
 	synchronized static public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
@@ -288,14 +280,10 @@ public class TrainServer {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		}
 		game.getPlayer(data.pid);	// throws PLAYER_NOT_FOUND if player not in game
+		log.info("resumeGame(pid={})", data.pid);
 		
-		ResumeGameResponse response = new ResumeGameResponse();
-		response.gid = data.gid;
-		response.pid = data.pid;
-		response.gameData = newGameResponse(data.gid, game.gameData);
-		Player p = game.getPlayer(data.pid);
-		response.spendings = p.getSpending();
-		response.movesMade = p.getMovesMade();
+		NewGameResponse response = new NewGameResponse();
+		response = newGameResponse(data.gid, game.gameData);
 		
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
@@ -322,6 +310,15 @@ public class TrainServer {
 		public String gid;
 		public String pid;
 		public MilepostId[] mileposts;
+	}
+
+	synchronized static public void testBuildTrack(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.testBuildTrack(data.pid, data.mileposts);
 	}
 
 	synchronized static public void buildTrack(String requestText) throws GameException {
@@ -379,6 +376,15 @@ public class TrainServer {
 		public String pid;
 		public int train;
 		public MilepostId[] mileposts;
+	}
+
+	synchronized static public void testMoveTrain(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		game.testMoveTrain(data.pid, data.train, data.mileposts);
 	}
 
 	synchronized static public void moveTrain(String requestText) throws GameException {

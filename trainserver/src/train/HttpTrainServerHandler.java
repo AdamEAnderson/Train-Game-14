@@ -45,11 +45,13 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String RESUME_GAME = "resumeGame";
 	private final static String START_GAME = "startGame";
 	private final static String BUILD_TRACK = "buildTrack";
+	private final static String TEST_BUILD_TRACK = "testBuildTrack";
 	private final static String UPGRADE_TRAIN = "upgradeTrain";
 	private final static String PLACE_TRAIN = "placeTrain";
 	private final static String PICKUP_LOAD = "pickupLoad";
 	private final static String DELIVER_LOAD = "deliverLoad";
 	private final static String DUMP_LOAD = "dumpLoad";
+	private final static String TEST_MOVE_TRAIN = "testMoveTrain";
 	private final static String MOVE_TRAIN = "moveTrain";
 	private final static String TURN_IN_CARDS = "turnInCards";
 	private final static String END_TURN = "endTurn";
@@ -148,18 +150,21 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 			switch (requestType) {
 				case NEW_GAME:
 					buf.append(TrainServer.newGame(message.jsonMessage));
-					log.info("newGame buf {}", buf);
+					log.debug("newGame buf {}", buf);
 					break;
 				case JOIN_GAME:
 					buf.append(TrainServer.joinGame(message.jsonMessage));
-					log.info("joinGame buf {}", buf);
+					log.debug("joinGame buf {}", buf);
 					break;
 				case RESUME_GAME:
 					buf.append(TrainServer.resumeGame(message.jsonMessage));
-					log.info("resumeGame buf {}", buf);
+					log.debug("resumeGame buf {}", buf);
 					break;
 				case START_GAME:
 					TrainServer.startGame(message.jsonMessage);
+					break;
+				case TEST_BUILD_TRACK:
+					TrainServer.testBuildTrack(message.jsonMessage);
 					break;
 				case BUILD_TRACK:
 					TrainServer.buildTrack(message.jsonMessage);
@@ -169,6 +174,9 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					break;
 				case PLACE_TRAIN:
 					TrainServer.placeTrain(message.jsonMessage);
+					break;
+				case TEST_MOVE_TRAIN:
+					TrainServer.testMoveTrain(message.jsonMessage);
 					break;
 				case MOVE_TRAIN:
 					TrainServer.moveTrain(message.jsonMessage);
