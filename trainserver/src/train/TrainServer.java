@@ -58,7 +58,7 @@ public class TrainServer {
 		public Map<MilepostId, Set<MilepostId>> rail;
 		public Card[] hand;
 		public int spendings;
-		public int movesMade;
+		public int[] movesMade;
 		PlayerStatus() {}
 	}
 	
@@ -273,7 +273,7 @@ public class TrainServer {
 		public String pid;
 		public NewGameResponse gameData;
 		public int spendings;
-		public int movesMade;
+		public int[] movesMade;
 	}
 	
 	synchronized static public String resumeGame(String requestText) throws GameException {
