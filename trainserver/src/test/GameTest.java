@@ -2,9 +2,6 @@ package test;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import map.MilepostId;
 
 import org.junit.Test;
@@ -772,7 +769,7 @@ public class GameTest {
         			new MilepostId(18,21),
         			new MilepostId(19,21),
     		};
-        	Arrays.sort(moveMileposts, Collections.reverseOrder());
+        	reverse(moveMileposts);
 	        Player player2 = game.getActivePlayer();
 	        game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20, 21));
         	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
@@ -806,7 +803,7 @@ public class GameTest {
         	Player player3 = game.getActivePlayer();
         	int renterMoneyAtStartOfTurn = player3.getMoney();
         	int landlordMoneyAtStartOfTurn = player2.getMoney();
-        	Arrays.sort(moveMileposts, Collections.reverseOrder());
+        	reverse(moveMileposts);
         	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20,21));
         	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
         	game.endTurn(game.getActivePlayer().name);
@@ -895,6 +892,105 @@ public class GameTest {
 	} 
 	
 	@Test
+	public void testFerry() {
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		Game game = null;
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        game = TrainServer.getGame(gid);
+	        startGame(game);
+	        
+	        // Build to Tenarife
+			MilepostId[] buildMileposts = new MilepostId[] {
+					new MilepostId(2,18),
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),
+					new MilepostId(0,6)		// Tenarife via ferry
+					};
+			game.buildTrack(game.getActivePlayer().name, buildMileposts);
+			assertEquals(19, game.getActivePlayer().getSpending());
+			skipPastBuildingTurns(game);
+			
+			// Start in Dakar and go to port for Tenarife
+			MilepostId[] moveMileposts = new MilepostId[] {
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
+			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.endTurn(game.getActivePlayer().name);
+
+			// Cross to Tenarife
+			moveMileposts = new MilepostId[] {
+					new MilepostId(0,6)		// Tenarife via ferry
+					};
+			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			assertEquals(6, game.getActivePlayer().getMovesMade(0));
+			game.endTurn(game.getActivePlayer().name);
+			
+			// Cross back to mainland, try to return to Dakar (should fail because 
+			// after ferry crossing goes half speed)
+			/** Following is commented out due to bug
+			moveMileposts = new MilepostId[] {
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+        	reverse(moveMileposts);
+        	try {
+        		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        		fail("Expected move exception here -- didn't get one");
+        	} catch (GameException e) {
+        	}
+        	*/
+        	
+        	// Now try moving legal amount (6)
+			moveMileposts = new MilepostId[] {
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+        	reverse(moveMileposts);
+    		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.endTurn(game.getActivePlayer().name);
+        	
+			endGame(game);
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		}
+	}
+	
+	@Test
 	public void testEndGame() {
 		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;
@@ -907,6 +1003,23 @@ public class GameTest {
 		} catch (GameException e) {
 			fail("Unexpected exception");
 		}
+	}
+	
+	// Reverse the array (Arrays.sort can't be used because it doesn't work on primitive types)
+	private static void reverse(MilepostId[] b) {
+	   int left  = 0;          // index of leftmost element
+	   int right = b.length-1; // index of rightmost element
+	  
+	   while (left < right) {
+	      // exchange the left and right elements
+		  MilepostId temp = b[left]; 
+	      b[left]  = b[right]; 
+	      b[right] = temp;
+	     
+	      // move the bounds toward the center
+	      left++;
+	      right--;
+	   }
 	}
 	
 	private void skipPastBuildingTurns(Game game) throws GameException {
