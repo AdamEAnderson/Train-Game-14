@@ -1,5 +1,5 @@
 package train;
-import java.util.ArrayDeque;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -164,11 +164,12 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		checkBuilding();
-		Queue<Milepost> moves = new ArrayDeque<Milepost>();
+		Milepost[] mps = new Milepost[mileposts.length + 1];
+		mps[0] = active.getTrains()[train].getLocation();
 		for(int i = 0; i < mileposts.length; i++){
-			moves.add(map.getMilepost(mileposts[i]));
+			mps[i + 1] = map.getMilepost(mileposts[i]);
 		}
-		active.moveTrain(train, moves);
+		active.testMoveTrain(train, mps);
 		++transaction;
 	}
 	
@@ -181,11 +182,12 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		checkBuilding();
-		Queue<Milepost> moves = new ArrayDeque<Milepost>();
+		Milepost[] mps = new Milepost[mileposts.length + 1];
+		mps[0] = active.getTrains()[train].getLocation();
 		for(int i = 0; i < mileposts.length; i++){
-			moves.add(map.getMilepost(mileposts[i]));
+			mps[i + 1] = map.getMilepost(mileposts[i]);
 		}
-		active.moveTrain(train, moves);
+		active.moveTrain(train, mps);
 		++transaction;
 	}
 	

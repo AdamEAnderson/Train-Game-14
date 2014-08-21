@@ -2,7 +2,6 @@ package player;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -63,74 +62,51 @@ public class Player {
 		log.info("after place");
 	}
 	
-	public boolean testMoveTrain(int tIndex, Milepost[] mileposts){
-		if(!mileposts[0].equals(trains[tIndex].getLocation())) return false;
-		return testMoveTrain(mileposts, 0, movesMade[tIndex]);
-	}
-	
-	private boolean testMoveTrain(Milepost[] mileposts, int mIndex, int tIndex){
-		if(mileposts.length <= mIndex) return true;
-		if(tIndex >= 20) return false;
-		Milepost origin = mileposts[mIndex];
-		Milepost next = mileposts[mIndex + 1];
-		
-		String ownerId = rail.anyConnects(origin, next);
-		if(ownerId.equals("") && !origin.isSameCity(next)) return false;
-		
-		return testMoveTrain(mileposts, mIndex + 1, tIndex + 1);
-	}
-	
-	public void moveTrain(int t, Queue<Milepost> moves) throws GameException {
-		turnInProgress = true;
-		if(moves.isEmpty()) return;
-		Milepost l = trains[t].getLocation();
-		if(movesMade[t] >= trains[t].getSpeed() || l == null) 
-			throw new GameException("InvalidMove");
-		Milepost next = moves.poll();
-		if(next == null) return;
-		moveMileposts(t, l, next);
-		moveTrain(t, moves);
-	}
-	
-	private void moveMileposts(int t, Milepost origin, Milepost next) throws GameException{
-		String ownerID = rail.anyConnects(origin, next);
-		Player owner = null;
-		if(ownerID.equals(name)) owner = this;
-		for(Player p = nextPlayer; p != this; p = p.nextPlayer){
-			if(p.name.equals(ownerID)){
-				owner = p;
-				break;
+	public boolean testMoveTrain(int tIndex, Milepost[] mps){
+		if(mps[0] == null) return false;
+		for(int i = 0, m = movesMade[tIndex]; i < mps.length - 1; i++, m++){
+			if(m > trains[tIndex].getSpeed()) return false;
+			String ownerId = rail.anyConnects(mps[i], mps[i + 1]);
+			if(ownerId.equals("") && !mps[i].isSameCity(mps[i + 1])) return false;
+			if(rail.connectsByFerry(mps[i], mps[i + 1])){
+				if(m != 0) return false;
+				else{
+					m = trains[tIndex].getSpeed()/2;
+					m--;
+				}
 			}
 		}
-		if(owner == null){
-			if(origin.isSameCity(next)) {
-				trains[t].moveTrain(next);
-				return;
-			}
-			throw new GameException("InvalidMove");
-		}
-		if(!rentingFrom.contains(ownerID) && !ownerID.equals(name)){
-			rentingFrom.add(ownerID);
-			money -= 4;
-			owner.deposit(4);
-		}
-		
-		if(rail.connectsByFerry(origin, next)){
-			moveFerry(t, origin, next);
-		} else{
-			trains[t].moveTrain(next);
-			movesMade[t] ++;
-		}
+		return true;
 	}
 	
-	private void moveFerry(int t, Milepost origin, Milepost next) throws GameException{
-		if(movesMade[t] != 0){
-			throw new GameException("InvalidMove");
-		} else{
-			movesMade[t] = (trains[t].getSpeed())/2;
-			trains[t].moveTrain(next);
+	public void moveTrain(int t, Milepost[] mps) throws GameException{
+		if(!testMoveTrain(t, mps)) throw new GameException("Invalid Move");
+		trains[t].moveTrain(mps[mps.length - 1]);
+		for(int i = 0; i < mps.length - 1; i++){
+			String ownerID = rail.anyConnects(mps[i], mps[i + 1]);
+			Player owner = null;
+			if(ownerID.equals(name)) owner = this;
+			for(Player p = nextPlayer; p != this; p = p.nextPlayer){
+				if(p.name.equals(ownerID)){
+					owner = p;
+					break;
+				}
+			}
+			if(!rentingFrom.contains(ownerID) && !ownerID.equals(name) && owner != null){
+				rentingFrom.add(ownerID);
+				money -= 4;
+				owner.deposit(4);
+			}
+			if(rail.connectsByFerry(mps[i], mps[i + 1])){
+				movesMade[t] = trains[t].getSpeed()/2;
+			} else{
+				movesMade[t] ++;
+			}
 		}
 	}
+		
+	
+
 	
 	public void upgradeTrain(int t, UpgradeType u) throws GameException {
 		turnInProgress = true;
