@@ -886,6 +886,10 @@ public class GameTest {
         	assertEquals(player2MoneyAtStartOfTurn + 4, player2.getMoney()); // check that rent money is received
 
         	endGame(game);
+
+        	String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
+	        String statusMsg = TrainServer.status(jsonStatusPayload);
+	        log.info("endGame status message {}", statusMsg);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		}
@@ -998,7 +1002,11 @@ public class GameTest {
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        endGame(game);
-	        assertTrue(TrainServer.getGame(gid) == null);
+	        String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
+	        String statusMsg = TrainServer.status(jsonStatusPayload);
+	        log.info("endGame status message {}", statusMsg);
+	        assertTrue(statusMsg.contains("\"ended\":true"));
+	        assertTrue(statusMsg.contains("stats"));
 		} catch (GameException e) {
 			fail("Unexpected exception");
 		}

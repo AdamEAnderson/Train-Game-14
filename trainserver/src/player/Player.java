@@ -29,6 +29,7 @@ public class Player {
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	private boolean hasResigned;
+	private Stats stats;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
@@ -51,6 +52,7 @@ public class Player {
 		readyToStart = false;
 		readyToEnd = false;
 		hasResigned = false;
+		stats = new Stats();
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
@@ -95,7 +97,9 @@ public class Player {
 			if(!rentingFrom.contains(ownerID) && !ownerID.equals(name) && owner != null){
 				rentingFrom.add(ownerID);
 				money -= 4;
+				stats.rentalExpense += 4;
 				owner.deposit(4);
+				owner.stats.rentalIncome += 4;
 			}
 			if(rail.connectsByFerry(mps[i], mps[i + 1])){
 				movesMade[t] = trains[t].getSpeed()/2;
@@ -103,11 +107,9 @@ public class Player {
 				movesMade[t] ++;
 			}
 		}
+		stats.milesTravelled += mps.length;
 	}
 		
-	
-
-	
 	public void upgradeTrain(int t, UpgradeType u) throws GameException {
 		turnInProgress = true;
 		if(spendings > 0) throw new GameException("ExceededAllowance");
@@ -149,7 +151,6 @@ public class Player {
 			}
 		}
 		return true;
-		//return testBuildTrack(mileposts, 0, getSpending());
 	}
 	
 	
@@ -158,10 +159,13 @@ public class Player {
 		if(!testBuildTrack(tester)){
 			throw new GameException("InvalidTrack");
 		}
+		int cost = 0;
 		turnInProgress = true;
-		for(int i = 0; i < mileposts.length - 1; i++){
-			spendings += rail.build(mileposts[i], mileposts[i + 1]);
-		}
+		for(int i = 0; i < mileposts.length - 1; i++)
+			cost += rail.build(mileposts[i], mileposts[i + 1]);
+		stats.milepostsBuilt += mileposts.length;
+		stats.trackExpense += cost;
+		spendings += cost;
 	}
 	
 	
@@ -192,6 +196,8 @@ public class Player {
 		trains[tIndex].dropLoad(t.load);
 		cards[cIndex] = next; 
 		deposit(t.cost);
+		++stats.deliveryCount;
+		stats.deliveryIncome += t.cost;
 	}
 	
 	private Trip canDeliver(int ti, Card c){
@@ -271,6 +277,11 @@ public class Player {
 	public Train[] getTrains(){ return trains; }
 	
 	public Rail getRail(){ return rail; }
+	
+	public Stats stats() { 
+		stats.money = money;
+		return stats; 
+		}
 	
 	@Override 
 	public boolean equals(Object obj){

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import player.Player;
+import player.Stats;
 import player.Train;
 import reference.Card;
 import reference.City;
@@ -68,7 +69,29 @@ public class TrainServer {
 		public Card[] hand;
 		public int spendings;
 		public int[] movesMade;
+		public Stats stats;
 		PlayerStatus() {}
+		PlayerStatus(Player p) {
+			pid = p.name;
+			color = p.color;
+			trains = p.getTrains();
+			money = p.getMoney();
+			spendings = p.getSpending();
+			movesMade = p.getMovesMade();
+			stats = p.stats();
+			
+			Map<Milepost, Set<Milepost>> railMileposts = p.getRail().getRail();
+			Map<MilepostId, Set<MilepostId>> railIds = new HashMap<MilepostId, Set<MilepostId>>();
+			for(Milepost outer : railMileposts.keySet()){
+				Set<MilepostId> inner = new HashSet<MilepostId>();
+				railIds.put(new MilepostId(outer.x, outer.y), inner);
+				for(Milepost m : railMileposts.get(outer)){
+					inner.add(new MilepostId(m.x, m.y));
+				}
+			}
+			rail = railIds;
+			hand = p.getCards();
+		}
 	}
 	
 	static class GameStatus {
@@ -106,7 +129,7 @@ public class TrainServer {
 		// Status hasn't changed since the last time we sent a response -- just resend
 		if (gid.equals(statusGid) && game.transaction() == statusTransaction && statusCache != null)  
 			return statusCache;
-			
+		
 		// Generate a new status message
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
@@ -118,45 +141,24 @@ public class TrainServer {
 		status.joinable = game.getJoinable();
 		status.ended = game.isOver();
 		status.turns = game.getTurns();
+		Player activePlayer = game.getActivePlayer();
+		status.activeid = activePlayer != null ? activePlayer.name : "";
+		Player lastPlayer = game.getLastPlayer();
+		status.lastid = lastPlayer != null ? lastPlayer.name : "";
+		
+		// If the game is in progress, report the players in the order in which they are 
+		// playing, with the active player first. If the game has ended, there is no active
+		// player, and players are reported in the order in which they joined the game
 		Player p = game.getActivePlayer();
-		if(p == null){
-			status.activeid = "";
-			status.lastid = "";
-			statusCache = gsonBuilder.serializeNulls().create().toJson(status);
-			statusGid = gid;
-			statusTransaction = game.transaction();
-			return statusCache;
+		if (p != null) {
+			do {
+				status.players.add(new PlayerStatus(p));
+				p = p.getNextPlayer();
+			} while(p != game.getActivePlayer());
+		} else {
+			for (Player player : game.getPlayers()) 
+				status.players.add(new PlayerStatus(player));
 		}
-		if(game.getLastPlayer() == null) {
-			status.activeid = "";
-			status.lastid = "";
-		} else if (game.getActivePlayer() != null) {
-			status.activeid = game.getActivePlayer().name;
-			status.lastid = game.getLastPlayer().name;
-		}
-		do {
-			PlayerStatus pstatus = new PlayerStatus();
-			pstatus.pid = p.name;
-			pstatus.color = p.color;
-			pstatus.trains = p.getTrains();
-			pstatus.money = p.getMoney();
-			pstatus.spendings = p.getSpending();
-			pstatus.movesMade = p.getMovesMade();
-			
-			Map<Milepost, Set<Milepost>> railMileposts = p.getRail().getRail();
-			Map<MilepostId, Set<MilepostId>> railIds = new HashMap<MilepostId, Set<MilepostId>>();
-			for(Milepost outer : railMileposts.keySet()){
-				Set<MilepostId> inner = new HashSet<MilepostId>();
-				railIds.put(new MilepostId(outer.x, outer.y), inner);
-				for(Milepost m : railMileposts.get(outer)){
-					inner.add(new MilepostId(m.x, m.y));
-				}
-			}
-			pstatus.rail = railIds;
-			pstatus.hand = p.getCards();
-			status.players.add(pstatus);
-			p = p.getNextPlayer();
-		}while(p != game.getActivePlayer());
 		
 		statusCache = gsonBuilder.serializeNulls().create().toJson(status);
 		statusGid = gid;
@@ -511,21 +513,9 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (game.endGame(data.pid, data.ready))
-			games.remove(data.gid);
-		
-		/* Send statistics on each player - 
-			amount of money
-			number of mileposts built
-			cost of mileposts
-			for each train how upgraded
-			number of deliveries
-			amount of money earned by deliveries
-			amount of money earned by rentals
-			amount of money spent on rentals
-			number of cities built to
-			number of major cities built to
-			*/
+		game.endGame(data.pid, data.ready);
+		//if (game.endGame(data.pid, data.ready)) 
+		//	games.remove(data.gid);		
 	}
 	
 }
