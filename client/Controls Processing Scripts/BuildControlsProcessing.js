@@ -145,28 +145,12 @@ var buildClick = function (e) {
         }
         if (isValidMilepost == false)
             return;
-        var lastX, lastY;
-        if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'circle') {
-            lastX = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('cx');
-            lastY = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('cy');
-        }
-        else if ($(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).prop("tagName") == 'g') {
-            var translate = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-            var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            lastX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-            lastY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
-        }
-        var currentX, currentY;
-        if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'circle') {
-            currentX = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('cx');
-            currentY = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('cy');
-        }
-        else if ($(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).prop("tagName") == 'g') {
-            var translate = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y)).attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-            var bbox = $(document.getElementById('milepost' + currentMilepost.x + ',' + currentMilepost.y))[0].getBBox();
-            currentX = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-            currentY = parseInt(translate[1]) + ((bbox.height / 2) * 1);
-        }
+        var lastSVG = findMilepost(lastMilepost.x, lastMilepost.y);
+        var lastX = lastSVG.x;
+        var lastY = lastSVG.y;
+        var currentSVG = findMilepost(currentMilepost.x, currentMilepost.y);
+        var currentX = currentSVG.x;
+        var currentY = currentSVG.y;
         if (!document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))
             return;
         if (20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)

@@ -52,7 +52,6 @@ var findMilepost = function (x, y) {
     }
     else {
         var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-        var bbox = mpjQ[0].getBBox();
         mpsvg.x = parseInt(translate[0]) + ((milepostSize / 2) * 1);
         mpsvg.y = parseInt(translate[1]) + ((milepostSize / 2) * 1);
     }
@@ -62,40 +61,16 @@ var findMilepost = function (x, y) {
 var getMilepost = function (x, y) {
     x = parseInt(x);
     y = parseInt(y);
-    gameData.mapData.orderedMileposts[(gameData.mapData.mpWidth * y) + x];
+    return gameData.mapData.orderedMileposts[(gameData.mapData.mpWidth * y) + x];
 };
 
-//var displayInfo = function (info, type) {
-//    if (!type || !infoColors[type])
-//        return;
-
-//    var jQ;
-//    if (infoTimeoutHandle) {
-//        //clearTimeout(infoTimeoutHandle);
-//        jQ = $('#info').append($('<span/>').text(info)).find('span:last');
-//        jQ.css({ color: infoColors[type] });
-//    }
-//    else {
-//        $('#info > span').text(info);
-
-//        $('#info > span').css({ color: infoColors[type] });
-//    }
-
-//    var closeInfo = function () {
-//        if($('#info').children().length == 1)
-//            $('#info').animate({ bottom: '-31px' }, 100);
-//        if (jQ)
-//            jQ.remove();
-//    };
-
-//    if (!($('#info').css('bottom') == 0 || $('#info').css('bottom') == '0px')) {
-//        $('#info').animate({ bottom: 0 }, 100, 'swing', function () {
-//            infoTimeoutHandle = setTimeout(closeInfo, 1500);
-//        });
-//    }
-//    else
-//        infoTimeoutHandle = setTimeout(closeInfo, 1500);
-//};
+var drawTrain = function (train, PID, x, y) {
+    $('#train' + PID + train).remove();
+    $('#trains' + PID).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + PID + train, 'cx': x, 'cy': y, 'r': 10, 'fill': findPid(lastStatusMessage.players, PID).color }).click(function () {
+        if (trainLocations && trainLocations[train])
+            $(document.getElementById('milepost' + trainLocations[train].x + ',' + trainLocations[train].y)).click();
+    }));
+};
 
 var displayInfo = function (info, type) {
     if (!type || !infoColors[type] || !info || info == '')

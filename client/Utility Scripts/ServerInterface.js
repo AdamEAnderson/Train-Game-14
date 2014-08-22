@@ -104,20 +104,8 @@ var moveTrain = function (train, vertices) {
                 var player = findPid(lastStatusMessage.players, pid);
                 var milepost = vertices[-1];
                 trainLocations[train] = milepost;
-                var mpsvg = { x: 0, y: 0 };
-                var mpjQ = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y));
-                if (mpjQ.prop('tagName') == 'circle') {
-                    mpsvg.x = mpjQ.attr('cx');
-                    mpsvg.y = mpjQ.attr('cy');
-                }
-                else {
-                    var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                    var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-                    mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-                    mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
-                }
-                $('#train' + pid + train).remove();
-                $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+                var mpsvg = findMilepost(milepost.x, milepost.y);
+                drawTrain(train, pid, mpsvg.x, mpsvg.y);
                 checkLoadButtons(lastStatusMessage.players);
                 movesMade = undefined;
                 checksMoveButton();

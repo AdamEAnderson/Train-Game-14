@@ -82,9 +82,7 @@ var moveClick = function (e) {
 
         var key = e.key;
         var player = findPid(lastStatusMessage.players, pid);
-        //var hexKeys = ['g', 'y', 'u', 'j', 'n', 'b'];
         var hexKeys = ['u', 'j', 'n', 'b', 'g', 'y'];
-        //var hexKeyCodes = [71, 89, 85, 74, 78, 66];
         var hexKeyCodes = [85, 74, 78, 66, 71, 89];
         var index;
         if (key)
@@ -97,11 +95,11 @@ var moveClick = function (e) {
         if (movesMadeThisTurn[train] + movesMade[train].length >= player.trains[train].speed)
             return;
         var milepost = trainLocations[train];
-        milepost = gameData.mapData.orderedMileposts[(parseInt(milepost.y) * gameData.mapData.mpWidth) + parseInt(milepost.x)];
+        milepost = getMilepost(milepost.x, milepost.y);
         var edge = milepost.edges[index];
         if (edge == null)
             return;
-        edge = gameData.mapData.orderedMileposts[(parseInt(edge.y) * gameData.mapData.mpWidth) + parseInt(edge.x)];
+        edge = getMilepost(edge.x, edge.y);
         if (!edge)
             return;
         var valid = false;
@@ -125,20 +123,8 @@ var moveClick = function (e) {
         movesMade[train].push({ x: edge.x, y: edge.y });
         trainLocations[train] = { x: edge.x, y: edge.y };
         checkLoadButtons(lastStatusMessage.players, true);
-        var mpsvg = { x: 0, y: 0 };
-        var mpjQ = $(document.getElementById('milepost' + edge.x + ',' + edge.y));
-        if (mpjQ.prop('tagName') == 'circle') {
-            mpsvg.x = mpjQ.attr('cx');
-            mpsvg.y = mpjQ.attr('cy');
-        }
-        else {
-            var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-            var bbox = mpjQ[0].getBBox();
-            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
-        }
-        $('#train' + pid + train).remove();
-        $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+        var mpsvg = findMilepost(edge.x, edge.y);
+        drawTrain(train, pid, mpsvg.x, mpsvg.y);
         refreshMovesRemaining(player.trains);
     });
     $('#acceptBuild').click(function () {
@@ -161,20 +147,8 @@ var moveClick = function (e) {
                 var milepost = movesMade[i][-1];
                 trainLocations[i] = milepost;
                 var train = i;
-                var mpsvg = { x: 0, y: 0 };
-                var mpjQ = $(document.getElementById('milepost' + milepost.x + ',' + milepost.y));
-                if (mpjQ.prop('tagName') == 'circle') {
-                    mpsvg.x = mpjQ.attr('cx');
-                    mpsvg.y = mpjQ.attr('cy');
-                }
-                else {
-                    var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-                    var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-                    mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-                    mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
-                }
-                $('#train' + pid + train).remove();
-                $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': player.color }));
+                var mpsvg = findMilepost(milepost.x, milepost.y);
+                drawTrain(train, pid, milepost.x, milepost.y);
             }
         }
         movesMade = undefined;
@@ -211,11 +185,10 @@ var placeTrainClick = function (e) {
         }
         else {
             var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');
-            var bbox = $(document.getElementById('milepost' + lastMilepost.x + ',' + lastMilepost.y))[0].getBBox();
-            mpsvg.x = parseInt(translate[0]) + ((bbox.width / 2) * 1);
-            mpsvg.y = parseInt(translate[1]) + ((bbox.height / 2) * 1);
+            mpsvg.x = parseInt(translate[0]) + ((milepostSize / 2) * 1);
+            mpsvg.y = parseInt(translate[1]) + ((milepostSize / 2) * 1);
         }
-        $('#trains' + pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + pid + train, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': findPid(data.players, pid).color }));
+        drawTrain(train, pid, mpsvg.x, mpsvg.y);
         if (placeTrainLocations.length == findPid(data.players, pid).trains.length)
             $('#acceptBuild').button('option', 'disabled', false);
         else
