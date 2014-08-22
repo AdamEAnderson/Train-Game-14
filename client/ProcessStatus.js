@@ -37,6 +37,7 @@ var processStatus = function (data) {
             $('#turnControls').buttonset('option', 'disabled', false);
             checkBuildMoney();
             checkLoadButtons(data.players);
+            checkMoveButton();
         }
         else if (data.activeid && data.activeid != pid) {
             yourTurn = false;

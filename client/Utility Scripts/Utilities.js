@@ -59,6 +59,12 @@ var findMilepost = function (x, y) {
     return mpsvg;
 };
 
+var getMilepost = function (x, y) {
+    x = parseInt(x);
+    y = parseInt(y);
+    gameData.mapData.orderedMileposts[(gameData.mapData.mpWidth * y) + x];
+};
+
 //var displayInfo = function (info, type) {
 //    if (!type || !infoColors[type])
 //        return;
@@ -92,26 +98,37 @@ var findMilepost = function (x, y) {
 //};
 
 var displayInfo = function (info, type) {
-    if (!type || !infoColors[type])
+    if (!type || !infoColors[type] || !info || info == '')
         return;
 
-    var closeInfo = function () {
-        infoTimeoutHandle = undefined;
-        $('#info').animate({ bottom: '-31px' }, 100);
-    };
+    var children = $('#info').children();
 
-    if (infoTimeoutHandle)
-        clearTimeout(infoTimeoutHandle);
+    for (var i = 0; i < children.length; i++)
+        if ($(children[i]).text() == info)
+            return;
 
-    if (!($('#info').css('top') == 0 || $('#info').css('top') == '0px')) {
-        $('#info').animate({ bottom: 0 }, 100, 'swing', function () {
-            infoTimeoutHandle = setTimeout(closeInfo, 1500);
+    var jQ = $('<p/>').text(info).css('color', infoColors[type]).attr('data-index', infoIndex);
+
+    infoIndex++;
+
+    $('#info').append(jQ);
+
+    if ($('#info').css('bottom') != '0px' && $('#info').css('bottom') != 0) {
+        $('#info').animate({ 'bottom': 0 }, 150, 'swing', function () {
+            setTimeout(function () {
+                if (jQ.attr('data-index') == $('#info').children().last().attr('data-index'))
+                    $('#info').animate({ bottom: -31 }, 150);
+                jQ.remove();
+            }, 2500);
         });
     }
-
-    $('#info > span').text(info);
-
-    $('#info > span').css({ color: infoColors[type] });
+    else {
+        setTimeout(function () {
+            if (jQ.attr('data-index') == $('#info').children().last().attr('data-index'))
+                $('#info').animate({ bottom: -31 }, 150);
+            jQ.remove();
+        }, 2500);
+    }
 };
 
 //Sends a HTTP POST request to the server with data data and calls callback when complete

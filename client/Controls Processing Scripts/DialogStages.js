@@ -69,6 +69,8 @@ var upgradeDialogStageTwo = function (train, skippedStageOne) {
 var pickupDialogStageTwo = function (train, skippedStageOne) {
     var milepost = JSON.parse(train.loc);
     var loads = milepost.city.loads;
+    var player = findPid(lastStatusMessage.players, pid);
+    var city = milepost.city;
     if (loads.length == 1) {
         if (skippedStageOne) {
             $('#pickupDialog').append('<p>Are you sure you want to pickup ' + loads[0].toLowerCase() + '?</p>');
@@ -94,12 +96,20 @@ var pickupDialogStageTwo = function (train, skippedStageOne) {
         }
     }
     else if (loads.length > 1) {
+        var importantIndexes = [];
+        for (var i = 0; i < city.loads.length; i++)
+            for (var j = 0; j < player.hand.length; j++)
+                for (var k = 0; k < player.hand[j].trips.length; k++)
+                    if (player.hand[j].trips[k].load == city.loads[i])
+                        importantIndexes.push(i);
         $('#pickupDialog').append('<ul/>');
         for (var i = 0; i < loads.length; i++) {
-            $('#pickupDialog > ul').append('<li>' + loads[i] + '</li>').find('li:last').click(function () {
+            var jQ = $('#pickupDialog > ul').append('<li>' + loads[i] + '</li>').find('li:last').click(function () {
                 $('#pickupDialog > ul > li').removeClass('clicked');
                 $(this).addClass('clicked');
             });
+            if (importantIndexes.indexOf(i) != -1)
+                jQ.addClass('important');
         }
         var buttons = $('#pickupDialog').dialog('option', 'buttons');
         buttons.push({

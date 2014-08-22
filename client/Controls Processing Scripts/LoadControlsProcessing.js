@@ -26,8 +26,13 @@ var deliverClick = function (e) {
             	if (trip.dest == milepost.city.name) {
             		var train = player.trains[l];
                 	for (var k = 0; k < train.loads.length; k++) {
-                    	if (train.loads[k] == trip.load) {
-                    	    deliveries.push({ train: l, load: trip.load, city: trip.dest, card: i });
+                	    if (train.loads[k] == trip.load) {
+                	        var duplicate = false;
+                	        for (var m = 0; m < deliveries.length; m++)
+                	            if (deliveries[m].load == trip.load && deliveries[m].city == trip.dest && deliveries[m].card == i && deliveries[m].train == l)
+                	                duplicate = true;
+                            if(!duplicate)
+                    	        deliveries.push({ train: l, load: trip.load, city: trip.dest, card: i });
                     	}
                 	}
                 }

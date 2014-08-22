@@ -8,7 +8,7 @@
 /// <reference path="../Utility Scripts/Utilities.js" /> 
 
 //Checks for whether or not to hide the button for deliver, pickup, and dump
-var checkLoadButtons = function (players, reShowingControls) {
+var checkLoadButtons = function (players, moving) {
     var shownPickup = false;
     var shownDump = false;
     //Loops through all of the players trains
@@ -26,7 +26,7 @@ var checkLoadButtons = function (players, reShowingControls) {
         //If the player is in a city, check for deliver and pickup
         var milepost = gameData.mapData.orderedMileposts[(parseInt(trainLocations[i].y) * gameData.mapData.mpWidth) + parseInt(trainLocations[i].x)];
         if (milepost.type == 'MAJORCITY' || milepost.type == 'CITY') {
-            checkDeliver(milepost, findPid(players, pid), train, reShowingControls);
+            checkDeliver(milepost, findPid(players, pid), train, moving);
             if (milepost.city.loads && milepost.city.loads.length > 0) {
                 $('#pickup').show();
                 shownPickup = true;
@@ -42,14 +42,14 @@ var checkLoadButtons = function (players, reShowingControls) {
 }
 
 //Check for whether the player can deliver a load, and if so shows a button for it
-var checkDeliver = function (milepost, player, train, reShowingControls) {
+var checkDeliver = function (milepost, player, train, moving) {
     for (var i = 0; i < player.hand.length; i++) {
         for (var j = 0; j < player.hand[i].trips.length; j++) {
             var trip = player.hand[i].trips[j];
             if (trip.dest == milepost.city.name) {
                 for (var k = 0; k < train.loads.length; k++) {
                     if (train.loads[k] == trip.load) {
-                        if (reShowingControls)
+                        if (moving)
                             displayInfo('You can deliver ' + trip.load.toLowerCase() + ' to ' + milepost.city.name, 'info');
 
                         $('#deliver').show();
@@ -57,7 +57,7 @@ var checkDeliver = function (milepost, player, train, reShowingControls) {
                     }
                 }
             }
-            if (milepost.city.loads && reShowingControls)
+            if (milepost.city.loads && moving)
                 for (var k = 0; k < milepost.city.loads.length; k++) {
                     if (milepost.city.loads[k] == trip.load) {
                         //if ($('#pickup').css('display') == 'none')

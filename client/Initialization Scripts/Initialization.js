@@ -290,6 +290,6 @@ var processResume = function (data) {
     }
     
     checkMoveButton();
-    checkLoadButtons(lastStatusMessage.players);
+    checkLoadButtons(lastStatusMessage.players, true);
     justResumed = false;
 };

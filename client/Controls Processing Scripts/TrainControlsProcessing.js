@@ -101,28 +101,6 @@ var moveClick = function (e) {
         var edge = milepost.edges[index];
         if (edge == null)
             return;
-        //var edges = [];
-        //if (milepost.y % 2 == 0) {
-        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
-        //    edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
-        //    edges[2] = { x: milepost.x, y: milepost.y - 1 };
-        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
-        //    edges[4] = { x: milepost.x, y: milepost.y + 1 };
-        //    edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
-        //}
-        //else {
-        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
-        //    edges[1] = { x: milepost.x, y: milepost.y - 1 };
-        //    edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
-        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
-        //    edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
-        //    edges[5] = { x: milepost.x, y: milepost.y + 1 };
-        //}
-        //for (var i = 0; i < edges.length; i++) {
-        //    if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
-        //        edges[i] = undefined;
-        //}
-        //var edge = edges[index];
         edge = gameData.mapData.orderedMileposts[(parseInt(edge.y) * gameData.mapData.mpWidth) + parseInt(edge.x)];
         if (!edge)
             return;
@@ -146,6 +124,7 @@ var moveClick = function (e) {
         }
         movesMade[train].push({ x: edge.x, y: edge.y });
         trainLocations[train] = { x: edge.x, y: edge.y };
+        checkLoadButtons(lastStatusMessage.players, true);
         var mpsvg = { x: 0, y: 0 };
         var mpjQ = $(document.getElementById('milepost' + edge.x + ',' + edge.y));
         if (mpjQ.prop('tagName') == 'circle') {
@@ -200,7 +179,7 @@ var moveClick = function (e) {
         }
         movesMade = undefined;
         checkMoveButton();
-        checkLoadButtons(lastStatusMessage.players, true);
+        checkLoadButtons(lastStatusMessage.players);
         $(this).off('click');
         $('#acceptBuild').off('click');
         $(document).off('keyup');
