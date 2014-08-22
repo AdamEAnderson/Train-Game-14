@@ -138,6 +138,38 @@ var processAjaxErrors = function (xhr, textStatus, errorThrown) {
         displayInfo('Error: Invalid move', 'error');
     else if (xhr.status == 400 && xhr.responseJSON == 'InvalidTrack')
         displayInfo('Error: Invalid track', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidUpgrade')
+        displayInfo('Error: Invalid upgrade', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidMessageType')
+        displayInfo('Error: Invalid message type', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'TurnAlreadyStarted')
+        displayInfo('Error: Turn already started', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'BadMapData')
+        displayInfo('Error: Bad map data', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'BadCardData')
+        displayInfo('Error: Bad card data', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'ExceededAllowance')
+        displayInfo('Error: Exceeded allowance', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidCard')
+        displayInfo('Error: Invalid card', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'TrainAlreadyStarted')
+        displayInfo('Error: Train already started', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'RulesetNotFound')
+        displayInfo('Error: Ruleset not found', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'GameTypeNotFound')
+        displayInfo('Error: Game type not found', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'GameAlreadyStarted')
+        displayInfo('Error: Game already started', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'PlayerNotActive')
+        displayInfo('Error: Player not active', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'CityNotFound')
+        displayInfo('Error: City not found', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidLoad')
+        displayInfo('Error: Invalid load', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'TrainFull')
+        displayInfo('Error: Train full', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'InvalidDelivery')
+        displayInfo('Error: Invalid delivery', 'error');
     else
         displayInfo('Error');
 };
