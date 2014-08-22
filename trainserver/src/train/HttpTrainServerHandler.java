@@ -127,6 +127,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 		isStopped = true;
 		try {
 			messageHandler.join();
+			TrainServer.stop();
 		} catch (InterruptedException e) {
             Thread.currentThread().interrupt();
 		}		

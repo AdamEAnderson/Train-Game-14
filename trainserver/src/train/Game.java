@@ -1,6 +1,7 @@
 package train;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -37,6 +38,7 @@ public class Game implements AbstractGame {
 	private boolean joinable;	// game has not yet started
 	private boolean ended; // game has ended
 	private int transaction;
+	private Date lastChange;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -50,6 +52,7 @@ public class Game implements AbstractGame {
 		this.deck = gameData.deck;
 		this.ruleSet = ruleSet;
 		transaction = 1;
+		lastChange = new Date();
 		players = new ArrayList<Player>();
 		globalRail = new HashMap<Milepost, Set<Rail.Track>>();
 		globalFerry = new HashMap<Milepost, Ferry>();
@@ -76,7 +79,7 @@ public class Game implements AbstractGame {
 		players.add(p);
 		players.get(0).resetNextPlayer(p);
 		active = p;
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -104,7 +107,7 @@ public class Game implements AbstractGame {
 			}
 			last.resetNextPlayer(first);
 			joinable = false;
-			++transaction;
+			registerTransaction();
 		}
 	}
 
@@ -134,7 +137,7 @@ public class Game implements AbstractGame {
 			mileposts[i] = map.getMilepost(milepostIds[i]);
 		}
 		active.buildTrack(mileposts);	
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -143,7 +146,7 @@ public class Game implements AbstractGame {
 		log.info("upgradeTrain(pid={}, upgradeType={})", pid, upgrade);
 		checkActive(pid);
 		active.upgradeTrain(train, upgrade);
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -151,7 +154,7 @@ public class Game implements AbstractGame {
 		log.info("placeTrain(pid={}, train={}, where={})", pid, train, where);
 		checkActive(pid);
 		active.placeTrain(map.getMilepost(where), train);
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -186,7 +189,7 @@ public class Game implements AbstractGame {
 			mps[i + 1] = map.getMilepost(mileposts[i]);
 		}
 		active.moveTrain(train, mps);
-		++transaction;
+		registerTransaction();
 	}
 	
 	@Override
@@ -195,7 +198,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		active.pickupLoad(train, load);
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -205,7 +208,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		active.deliverLoad(card, train, deck.poll());
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -213,7 +216,7 @@ public class Game implements AbstractGame {
 		log.info("dumpLoad(pid={}, load={})", pid, load);
 		checkActive(pid);
 		active.dropLoad(train, load);
-		++transaction;
+		registerTransaction();
 	}
 
 	@Override
@@ -255,7 +258,7 @@ public class Game implements AbstractGame {
 			if(last) turns++;
 		}
 			
-		++transaction;
+		registerTransaction();
 		
 		if(active.hasResigned())
 			endTurn(active.getPid());
@@ -284,7 +287,7 @@ public class Game implements AbstractGame {
 			ended = true;
 			active = null;
 		}
-		++transaction;
+		registerTransaction();
 		return ended;
 	}
 
@@ -329,5 +332,12 @@ public class Game implements AbstractGame {
 	public boolean isOver() { return ended; }
 
 	public int transaction() { return transaction; }
+	
+	public Date lastChangeDate() { return lastChange; }
+	
+	private void registerTransaction() {
+		lastChange = new Date();
+		++transaction;
+	}
 	
 }

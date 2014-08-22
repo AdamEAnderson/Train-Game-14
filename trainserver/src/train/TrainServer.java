@@ -2,12 +2,17 @@ package train;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import map.Milepost;
 import map.MilepostId;
@@ -30,6 +35,28 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+class GameGCTask extends TimerTask {
+
+	@Override
+	public void run() {
+		TrainServer.removeOldGames();
+	}
+}
+
+class GameGC  {
+
+	private Timer timer;
+	private GameGCTask task;
+	
+	GameGC(long interval) {
+		timer = new Timer();
+		task = new GameGCTask();
+		timer.schedule(task, interval, interval);
+	}
+	
+	void stop() { task.cancel(); }
+}
+	
 /** Maps incoming data from JSON strings into calls on a specific game. Maintains the list 
  * of in progress games.
  */
@@ -40,6 +67,13 @@ public class TrainServer {
 	private static int statusTransaction = 0;	// transaction that was current when statusCache was created
 	private static String statusGid = null;		// GID used for generating statusCache
 
+	private static long hourMilli = 3600000L;		// Number of milliseconds in one hour
+	private static long fortnightMilli = 1209600000L; // Number of milliseconds in 14 days
+	private static long endedExpiration = hourMilli;// Number of milliseconds before a game that has ended will be removed
+	private static long notStartedExpiration = hourMilli;// Number of milliseconds before a game was never started will be removed
+	private static long abandonedExpiration = fortnightMilli;// Number of milliseconds since last change before a game will be removed
+	
+	private static GameGC gameGC = new GameGC(hourMilli);		// garbage collect old games
 	private static RandomString gameNamer = new RandomString(8); // use for
 																	// generating
 																	// (semi)unique
@@ -47,9 +81,21 @@ public class TrainServer {
 
 	static Map<String, Game> games = new HashMap<String, Game>(); // games currently in progress;
 	
+	static void stop() { gameGC.stop(); }
+	
 	static public Game getGame(String gid) {
 		return games.get(gid);		
 	}
+	
+	/** TEST ONLY! */
+	static public void resetExpirations(long ended, long notStarted, long abandoned) {
+		endedExpiration = ended;
+		notStartedExpiration = notStarted;
+		abandonedExpiration = abandoned;
+		gameGC.stop();
+		gameGC = new GameGC(endedExpiration);
+	}
+	
 	
 	// For a given game, return its gameId, or null if not found
 	static public String getGameId(Game game) {
@@ -118,7 +164,7 @@ public class TrainServer {
 		StatusRequest() {}
 	}
 	
-	synchronized static public String status(String requestText) throws GameException {
+	static public String status(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		StatusRequest data = gson.fromJson(requestText, StatusRequest.class);
 		String gid = data.gid;
@@ -177,7 +223,7 @@ public class TrainServer {
 		ListResponse() { gids = new HashSet<String>(); }
 	}
 	
-	synchronized static public String list(String requestText) throws GameException {
+	static public String list(String requestText) throws GameException {
 		log.info("list requestText: {}", requestText);
 		Gson gson = new GsonBuilder().create();
 		ListRequest data = gson.fromJson(requestText, ListRequest.class);
@@ -243,7 +289,7 @@ public class TrainServer {
 		return gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
 	}
 	
-	synchronized static public String newGame(String requestText) throws GameException {			
+	static public String newGame(String requestText) throws GameException {			
 		String gameId = null;
 		Gson gson = new GsonBuilder().create();
 		NewGameData data = gson.fromJson(requestText, NewGameData.class);
@@ -264,7 +310,7 @@ public class TrainServer {
 		public String color;
 		}
 	
-	synchronized static public String joinGame(String requestText) throws GameException {
+	static public String joinGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
 		Game game = games.get(data.gid);
@@ -279,7 +325,7 @@ public class TrainServer {
 		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
-	synchronized static public String resumeGame(String requestText) throws GameException {
+	static public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
 		Game game = games.get(data.gid);
@@ -308,7 +354,7 @@ public class TrainServer {
 		boolean ready;
 	}
 
-	synchronized static public void startGame(String requestText) throws GameException {
+	static public void startGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		StartGameData data = gson.fromJson(requestText, StartGameData.class);
 		Game game = games.get(data.gid);
@@ -323,7 +369,7 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
-	synchronized static public void testBuildTrack(String requestText) throws GameException {
+	static public void testBuildTrack(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
 		Game game = games.get(data.gid);
@@ -333,7 +379,7 @@ public class TrainServer {
 			throw new GameException(GameException.INVALID_TRACK);
 	}
 
-	synchronized static public void buildTrack(String requestText) throws GameException {
+	static public void buildTrack(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
 		Game game = games.get(data.gid);
@@ -353,7 +399,7 @@ public class TrainServer {
 		}
 	}
 
-	synchronized static public void upgradeTrain(String requestText) throws GameException {
+	static public void upgradeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		UpgradeTrainData data = gson.fromJson(requestText,
 				UpgradeTrainData.class);
@@ -374,7 +420,7 @@ public class TrainServer {
 		public MilepostId where;
 	}
 
-	synchronized static public void placeTrain(String requestText) throws GameException {
+	static public void placeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PlaceTrainData data = gson.fromJson(requestText, PlaceTrainData.class);
 		Game game = games.get(data.gid);
@@ -390,7 +436,7 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
-	synchronized static public void testMoveTrain(String requestText) throws GameException {
+	static public void testMoveTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
 		Game game = games.get(data.gid);
@@ -400,7 +446,7 @@ public class TrainServer {
 			throw new GameException(GameException.INVALID_MOVE);
 	}
 
-	synchronized static public void moveTrain(String requestText) throws GameException {
+	static public void moveTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
 		Game game = games.get(data.gid);
@@ -416,7 +462,7 @@ public class TrainServer {
 		public String load;
 	}
 
-	synchronized static public void pickupLoad(String requestText) throws GameException {
+	static public void pickupLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PickupLoadData data = gson.fromJson(requestText, PickupLoadData.class);
 		Game game = games.get(data.gid);
@@ -433,7 +479,7 @@ public class TrainServer {
 		public int card;
 	}
 
-	synchronized static public void deliverLoad(String requestText) throws GameException {
+	static public void deliverLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DeliverLoadData data = gson
 				.fromJson(requestText, DeliverLoadData.class);
@@ -450,7 +496,7 @@ public class TrainServer {
 		public String load;
 	}
 
-	synchronized static public void dumpLoad(String requestText) throws GameException {
+	static public void dumpLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DumpLoadData data = gson.fromJson(requestText, DumpLoadData.class);
 		Game game = games.get(data.gid);
@@ -464,7 +510,7 @@ public class TrainServer {
 		public String pid;
 	}
 	
-	synchronized static public void turnInCards(String requestText) throws GameException {
+	static public void turnInCards(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		TurnInCardsData data = gson.fromJson(requestText, TurnInCardsData.class);
 		Game game = games.get(data.gid);
@@ -478,7 +524,7 @@ public class TrainServer {
 		public String pid;
 	}
 
-	synchronized static public void endTurn(String requestText) throws GameException {
+	static public void endTurn(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndTurnData data = gson.fromJson(requestText, EndTurnData.class);
 		Game game = games.get(data.gid);
@@ -492,7 +538,7 @@ public class TrainServer {
 		String pid;
 	}
 	
-	synchronized static public void resignGame(String requestText) throws GameException {
+	static public void resignGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		ResignData data = gson.fromJson(requestText, ResignData.class);
 		Game game = games.get(data.gid);
@@ -507,7 +553,8 @@ public class TrainServer {
 		public boolean ready;
 	}
 
-	synchronized static public void endGame(String requestText) throws GameException {
+	/** Handle endGame */
+	static public void endGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndGame data = gson.fromJson(requestText, EndGame.class);
 		Game game = games.get(data.gid);
@@ -516,6 +563,33 @@ public class TrainServer {
 		game.endGame(data.pid, data.ready);
 		//if (game.endGame(data.pid, data.ready)) 
 		//	games.remove(data.gid);		
+	}
+	
+	/** Delete specified games */
+	static public void removeOldGames(Predicate<Game> tester) {
+		for(Iterator<Map.Entry<String, Game>> it = games.entrySet().iterator(); it.hasNext(); ) {
+		      Map.Entry<String, Game> entry = it.next();
+		      Game game = entry.getValue();
+			if (tester.test(game)) {
+				log.warn("Removing expired game {}", entry.getKey());
+		        it.remove();
+			}
+		}
+	}
+	
+	/** Delete expired games */
+	static public void removeOldGames() {
+		// Delete games that have ended, and are older than endedExpiration
+		Date oldestEnded = new Date(System.currentTimeMillis() - endedExpiration);
+		removeOldGames(game -> game.isOver() && game.lastChangeDate().before(oldestEnded));
+		
+		// Delete games that were never started and are older than notStartedExpiration
+		Date oldestNotStarted = new Date(System.currentTimeMillis() - notStartedExpiration);
+		removeOldGames(game -> game.isJoinable() && game.lastChangeDate().before(oldestNotStarted));
+		
+		// Delete games that have been abandoned -- last previous change is older than abandonedExpiration
+		Date oldestPlayed = new Date(System.currentTimeMillis() - abandonedExpiration);
+		removeOldGames(game -> game.lastChangeDate().before(oldestPlayed));
 	}
 	
 }
