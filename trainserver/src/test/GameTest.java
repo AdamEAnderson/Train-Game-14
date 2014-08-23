@@ -24,10 +24,7 @@ public class GameTest {
 	// Send a stream of requests to the server check the results
 	@Test
 	public void testTrain() throws Exception {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-        String responseMessage = TrainServer.newGame(jsonPayload);
-        log.info("newGame response {}", responseMessage);
-        String gid = responseMessage.substring(8, 16);
+		String gid = newGame("Louie", "blue", "africa");
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Huey", "green");
@@ -72,7 +69,7 @@ public class GameTest {
 	public void testResume() {
 		String gid = null;
 		try {
-			String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+			String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\", \"name\":\"TestGame\"}";
 	        String newGameData = TrainServer.newGame(jsonPayload);
 	        gid = newGameData.substring(8, 16);
 			String resumePayload = String.format("{\"messageType\":\"resumeGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, "Louie");
@@ -95,10 +92,7 @@ public class GameTest {
 	// Upgrade to a 3-hauler
 	@Test
 	public void testUpgradeCapacity() throws Exception {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-        String responseMessage = TrainServer.newGame(jsonPayload);
-        log.info("newGame response {}", responseMessage);
-        String gid = responseMessage.substring(8, 16);
+		String gid = newGame("Louie", "blue", "africa");
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Huey", "green");
@@ -129,7 +123,7 @@ public class GameTest {
 	// Play a short game with two trains
 	@Test
 	public void testTwoTrain() throws Exception {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"ruleSet\":{\"handSize\":4, \"startingMoney\":100, \"numTrains\":2}, \"gameType\":\"africa\"}";
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"name\":\"TestGame\", \"ruleSet\":{\"handSize\":4, \"startingMoney\":100, \"numTrains\":2}, \"gameType\":\"africa\"}";
         String responseMessage = TrainServer.newGame(jsonPayload);
         log.info("newGame response {}", responseMessage);
         String gid = responseMessage.substring(8, 16);
@@ -187,10 +181,7 @@ public class GameTest {
 	
 	@Test
 	public void testOnePlayerGame() throws GameException {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-        String responseMessage = TrainServer.newGame(jsonPayload);
-        log.info("newGame response {}", responseMessage);
-        String gid = responseMessage.substring(8, 16);
+		String gid = newGame("Louie", "blue", "africa");
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.startGame("Louie", true);
@@ -200,11 +191,8 @@ public class GameTest {
 	
 	@Test
 	public void testResign() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        log.info("newGame response {}", responseMessage);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        Game game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
@@ -233,10 +221,7 @@ public class GameTest {
 	public void testBuild() throws GameException {
 		int expectedTotalSpent = 0;
 		int accumulatedTotal = 70;
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-        String responseMessage = TrainServer.newGame(jsonPayload);
-        log.info("newGame response {}", responseMessage);
-        String gid = responseMessage.substring(8, 16);
+		String gid = newGame("Louie", "blue", "africa");
         Game game = TrainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Huey", "green");
@@ -303,11 +288,9 @@ public class GameTest {
 	/** Test building too much (cost more than 20) */
 	@Test
 	public void testBuildOverCost() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.startGame("Louie", true);
@@ -352,11 +335,9 @@ public class GameTest {
 	/** Test that building from a place that is not a mojor city, and not already on the player's track fails */
 	@Test
 	public void testBuildFromUnconnectedTrack()  {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
@@ -387,11 +368,9 @@ public class GameTest {
 	/** Test that building over track that has already been built fails */
 	@Test
 	public void testBuildOverExistingTrack()  {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
@@ -423,10 +402,7 @@ public class GameTest {
 	
 	@Test
 	public void testStatusMsg() throws GameException{
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
-        String responseMessage = TrainServer.newGame(jsonPayload);
-        log.info("newGame response {}", responseMessage);
-        String gid = responseMessage.substring(8, 16);
+		String gid = newGame("Louie", "blue", "africa");
         String jsonRequestPayload = "{\"gid\":\"" + gid + "\"}";
         String statusMsg = TrainServer.status(jsonRequestPayload);
         log.info("empty status message {}", statusMsg);
@@ -454,11 +430,9 @@ public class GameTest {
 	/** Test standard move */
 	@Test
 	public void testMove() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.startGame("Louie", true);
@@ -517,11 +491,9 @@ public class GameTest {
 	/** Test move error, move further than train can go in one turn */
 	@Test
 	public void testMoveTooFar() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.startGame("Louie", true);
@@ -592,11 +564,9 @@ public class GameTest {
 	/** Test moving a train without having placed it */
 	@Test
 	public void testMoveNoPlace() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Tim", "black");
@@ -650,11 +620,9 @@ public class GameTest {
 	
 	@Test
 	public void testRental() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Tim", "black");
@@ -897,11 +865,9 @@ public class GameTest {
 	
 	@Test
 	public void testFerry() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        startGame(game);
 	        
@@ -995,11 +961,9 @@ public class GameTest {
 	
 	@Test
 	public void testEndGame() {
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		Game game = null;
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        game = TrainServer.getGame(gid);
 	        endGame(game);
 	        String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
@@ -1018,10 +982,8 @@ public class GameTest {
 		TrainServer.resetExpirations(expiration, expiration, expiration);
 
 		// Test deletion of games created and not started
-		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        assertNotEquals(null, TrainServer.getGame(gid));
 			Thread.sleep(expiration * 2);
 			assertEquals(null, TrainServer.getGame(gid));
@@ -1033,8 +995,7 @@ public class GameTest {
 		
 		// Test deletion of ended games
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        assertNotEquals(null, TrainServer.getGame(gid));
 	        endGame(TrainServer.getGame(gid));
 			Thread.sleep(expiration * 2);
@@ -1047,8 +1008,7 @@ public class GameTest {
 
 		// Test deletion of abandoned games
 		try {
-			String responseMessage = TrainServer.newGame(jsonPayload);
-	        String gid = responseMessage.substring(8, 16);
+			String gid = newGame("Louie", "blue", "africa");
 	        assertNotEquals(null, TrainServer.getGame(gid));
 	        startGame(TrainServer.getGame(gid));
 			Thread.sleep(expiration * 2);
@@ -1058,6 +1018,7 @@ public class GameTest {
 		} catch (InterruptedException e) {
 			
 		}
+		TrainServer.resetExpirations();
 }
 	
 	
@@ -1099,4 +1060,19 @@ public class GameTest {
 			TrainServer.endGame(jsonPayload);
 		}
 	}
+	
+	private static String newGame(String pid, String color, String gameType) throws GameException {
+		return newGame("TestGame", pid, color, gameType);
+	}
+	
+	private static String newGame(String name, String pid, String color, String gameType) throws GameException {
+		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"gameType\":\"%s\", \"name\":\"%s\"}", pid, color, gameType, name);
+		String responseMessage = TrainServer.newGame(jsonPayload);
+        //log.info("Got response message: {}", responseMessage);
+        assertTrue(responseMessage.startsWith("{\"gid\":\""));
+        String gid = responseMessage.substring(8, 16);
+        return gid;
+	}
+	
+
 }

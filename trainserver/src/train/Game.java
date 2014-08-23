@@ -39,6 +39,7 @@ public class Game implements AbstractGame {
 	private boolean ended; // game has ended
 	private int transaction;
 	private Date lastChange;
+	private String name;
 	
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -46,11 +47,12 @@ public class Game implements AbstractGame {
 	 * @param map
 	 * @param ruleSet
 	 */
-	public Game(GameData gameData, RuleSet ruleSet){
+	public Game(String name, GameData gameData, RuleSet ruleSet){
 		this.gameData = gameData;
 		this.map = gameData.map;
 		this.deck = gameData.deck;
 		this.ruleSet = ruleSet;
+		this.name = name;
 		transaction = 1;
 		lastChange = new Date();
 		players = new ArrayList<Player>();
@@ -334,6 +336,8 @@ public class Game implements AbstractGame {
 	public int transaction() { return transaction; }
 	
 	public Date lastChangeDate() { return lastChange; }
+	
+	public String name() { return name; }
 	
 	private void registerTransaction() {
 		lastChange = new Date();

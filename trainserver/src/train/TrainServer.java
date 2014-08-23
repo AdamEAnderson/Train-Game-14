@@ -96,6 +96,15 @@ public class TrainServer {
 		gameGC = new GameGC(endedExpiration);
 	}
 	
+	/** TEST ONLY! */
+	static public void resetExpirations() {
+		endedExpiration = hourMilli;
+		notStartedExpiration = hourMilli;
+		abandonedExpiration = fortnightMilli;
+		gameGC.stop();
+		gameGC = new GameGC(endedExpiration);
+	}
+	
 	
 	// For a given game, return its gameId, or null if not found
 	static public String getGameId(Game game) {
@@ -219,8 +228,8 @@ public class TrainServer {
 	}
 	
 	static class ListResponse {
-		public Set<String> gids;
-		ListResponse() { gids = new HashSet<String>(); }
+		public Map<String, String> gidNames;
+		ListResponse() { gidNames = new HashMap<String, String>(); }
 	}
 	
 	static public String list(String requestText) throws GameException {
@@ -229,17 +238,23 @@ public class TrainServer {
 		ListRequest data = gson.fromJson(requestText, ListRequest.class);
 		ListResponse responseData = new ListResponse();
 		if (data.listType.equals("joinable")) {
-			for (String gid : games.keySet())
-				if (games.get(gid).isJoinable())
-					responseData.gids.add(gid);
+			for (String gid : games.keySet()) {
+				Game game = games.get(gid);
+				if (game.isJoinable())
+					responseData.gidNames.put(gid, game.name());
+			}
 		}
 		else if (data.listType.equals("resumeable")) {
-			for (String gid : games.keySet())
-				if (!games.get(gid).isJoinable())
-					responseData.gids.add(gid);
+			for (String gid : games.keySet()) {
+				Game game = games.get(gid);
+				if (!game.isJoinable())
+					responseData.gidNames.put(gid, game.name());
+			}
 		}
-		else if (data.listType == "all")
-			responseData.gids = games.keySet();
+		else if (data.listType == "all") {
+			for (String gid : games.keySet()) 
+				responseData.gidNames.put(gid, games.get(gid).name());
+		}
 		String result = gson.toJson(responseData);
 		log.info("list response {}", result);
 		return gson.toJson(responseData);
@@ -251,6 +266,7 @@ public class TrainServer {
 		public String color; // color for track building
 		public RuleSet ruleSet; // name for rules of the game
 		public String gameType; // which game (Africa, Eurasia, etc.)
+		public String name;	// display (human readable) name of game
 		
 		NewGameData() {}
 	}
@@ -297,7 +313,7 @@ public class TrainServer {
 		GameData gameData = new GameData(data.gameType);
 		if (data.ruleSet == null)
 			data.ruleSet = new RuleSet(4, 70, 1);
-		Game game = new Game(gameData, data.ruleSet);
+		Game game = new Game(data.name, gameData, data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
 		game.joinGame(data.pid, data.color);

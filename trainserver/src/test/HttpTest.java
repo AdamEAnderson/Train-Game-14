@@ -127,14 +127,15 @@ public class HttpTest {
         String responseMessage = getResponse(connection);
         log.info("Got response message: {}", responseMessage);
         assertEquals(connection.getResponseCode(), 200);
-        assertTrue(responseMessage.startsWith("{\"gids\":["));
-        String gid = responseMessage.substring(10, 18);
+        assertTrue(responseMessage.startsWith("{\"gidNames\":{"));
+        String gid = responseMessage.substring(14, 22);
         assertEquals(expectedGid, gid);
         return gid;
 	}
 	
 	private static String newGame(String pid, String color) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"gameType\":\"africa\"}", pid, color);
+		String name = "TestGame";
+		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"gameType\":\"africa\", \"name\":\"%s\"}", pid, color, name);
 		log.info("jsonPayload {}", jsonPayload);
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
         String responseMessage = sendPostMessage(connection, jsonPayload);
@@ -285,11 +286,11 @@ public class HttpTest {
 	public void testTrain() throws Exception {
 		Thread serverThread = startServer();
 		
-        String gid = newGame("Adam", "red");
+        String gid = newGame("Huey", "red");
         list("joinable", gid);	// the new game should appear in the list of joinable games
-        joinGame(gid, "Sandra", "green");
-        startGame(gid, "Adam", true);
-        startGame(gid, "Sandra", true);
+        joinGame(gid, "Louie", "green");
+        startGame(gid, "Huey", true);
+        startGame(gid, "Louie", true);
         String currentPlayer = getActivePlayer(gid);
         
         String mileposts = "[{\"x\":34,\"y\":58},{\"x\":33,\"y\":58},{\"x\":32,\"y\":58},{\"x\":31,\"y\":59}]";
@@ -313,8 +314,8 @@ public class HttpTest {
         // deliverLoad(gid, currentPlayer, "turnips");
         dumpLoad(gid, currentPlayer, 0, "Arms");
         endTurn(gid, currentPlayer);
-        endGame(gid, "Adam");
-        endGame(gid, "Sandra");
+        endGame(gid, "Huey");
+        endGame(gid, "Louie");
         
         //join game
         HttpTrainServer.stopServer();
