@@ -39,7 +39,7 @@ var checkLoadButtons = function (players, moving) {
                                 important = true;
                             }
                 if (!important)
-                    $('#pickup > span').css('color', 'red');
+                    $('#pickup > span').removeAttr('style');
                 shownPickup = true;
             }
         }

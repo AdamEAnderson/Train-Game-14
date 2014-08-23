@@ -178,7 +178,7 @@ var buildClick = function (e) {
     };
     $('#acceptBuild').click(acceptBuild);
     var cancelBuild = function () {
-        clearInterval(buildCursor);
+        clearInterval(interval);
         $(document.getElementById('buildCursor')).remove();
         $('#acceptBuild').off('click');
         $('#cancelBuild').off('click');
