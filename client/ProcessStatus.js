@@ -1,6 +1,8 @@
 ﻿//Processes a status response from the server
 var processStatus = function (data) {
     if (data.transaction != lastStatus) {
+        if (!lastStatus)
+            lastStatusMessage = data;
         var justStarted = false;
         if (!started && data.joinable == false) {
             justStarted = true;

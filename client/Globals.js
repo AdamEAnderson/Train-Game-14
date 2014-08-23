@@ -45,6 +45,25 @@ var infoColors = {
 };
 var infoIndex = 0;
 var milepostSize = 20;
+var gamePicked;
+var colors = [
+    'aqua',
+    'black',
+    'blue',
+    'fuchsia',
+    'gray',
+    'green',
+    'lime',
+    'maroon',
+    'navy',
+    'olive',
+    'orange',
+    'purple',
+    'red',
+    'silver',
+    'teal',
+    'yellow'
+];
 
 //Adds a clone function to the array prototype that deep-copies the array
 Array.prototype.clone = function () {

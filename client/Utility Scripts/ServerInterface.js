@@ -197,6 +197,19 @@ var placeTrain = function (train, milepost) {
     checkLoadButtons(lastStatusMessage.players, true);
 };
 
+var listColors = function () {
+    if (!gamePicked)
+        return;
+    post({ messageType: 'listColors', gid: gamePicked }, function (d) {
+        for (var i = 0; i < colors.length; i++) {
+            if (d.indexOf(colors) != -1)
+                continue;
+            $('#colorPicker').append('<option>' + colors[i] + '</option>');
+            $('#colorPicker').selectmenu('refresh');
+        }
+    });
+};
+
 //Tells server we've upgraded our train
 var upgradedTrain = function (trainState) {
     moneySpent += 20;

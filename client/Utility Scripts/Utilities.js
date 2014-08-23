@@ -9,9 +9,8 @@
 // Process a game list
 var processGames = function (data) {
     $('#gamePicker').empty();
-    for (var i = 0; i < data.gids.length; i++) {
-        $('#gamePicker').append('<option>' + data.gids[i] + '</option>').click(data.gids[i], function (e) {
-        });
+    for (var key in data.gidNames) {
+        $('#gamePicker').append($('<option>' + data.gidNames[key] + '</option>').attr('data-gid', key));
     }
     $('#gamePicker').menu('refresh');
 };

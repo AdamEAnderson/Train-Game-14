@@ -31,7 +31,7 @@ $(document).ready(function () {
     $('#mainMenu').append('<h4>Handle</h4>');
     $('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:200px;"/>');
     $('#mainMenu').append('<h4>Game Color</h4>');
-    $('#mainMenu').append('<select id="colorPicker"><option>aqua</option><option>black</option><option>blue</option><option>fuchsia</option><option>gray</option><option>green</option><option>lime</option><option>maroon</option><option>navy</option><option>olive</option><option>orange</option><option>purple</option><option>red</option><option>silver</option><option>teal</option><option>yellow</option></select>');
+    $('#mainMenu').append('<select id="colorPicker"/>');
     $('#mainMenu').append('<h4 id="geographyPicker-label">Geography</h4>');
     $('#mainMenu').append('<select id="geographyPicker"><option>africa</option></select>');
     $('#actionPicker').selectmenu({
@@ -80,7 +80,12 @@ $(document).ready(function () {
     });
     $('#colorPicker').selectmenu();
     $('#geographyPicker').selectmenu();
-    $('#gamePicker').selectmenu();
+    $('#gamePicker').selectmenu({
+        select: function (event, ui) {
+            gamePicked = ui.item.element.attr('data-gid');
+            listColors();
+        }
+    });
     $('#colorPicker').css('font-size', '0.8em');
     $('#mainMenu').append('<br/>');
     $('#mainMenu').append('<button id="newGameButton">OK</button>');
@@ -90,11 +95,11 @@ $(document).ready(function () {
             if (document.getElementById("actionPicker").value == "New") {
                 newGame(document.getElementById("colorPicker").value, $('#handlePicker').val(),
 					document.getElementById("geographyPicker").value, $('#gameNamePicker').val());
-            } else if (document.getElementById("actionPicker").value == "Join" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '') {
-                joinGame(document.getElementById("gamePicker").value,
+            } else if (document.getElementById("actionPicker").value == "Join" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '' && gamePicked) {
+                joinGame(gamePicked,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
-            } else if (document.getElementById("actionPicker").value == "Resume" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '') {
-                resumeGame(document.getElementById("gamePicker").value, $('#handlePicker').val());
+            } else if (document.getElementById("actionPicker").value == "Resume" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '' && gamePicked) {
+                resumeGame(gamePicked, $('#handlePicker').val());
             }
         }
     });
