@@ -18,10 +18,12 @@ var processGames = function (data) {
 
 //Draws an edge of track between x1,y1 and x2,y2 in the color of a player with ID PID
 var drawLineBetweenMileposts = function (x1, y1, x2, y2, PID) {
-    $('#pid' + PID).append($(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr({ x1: x1, y1: y1, x2: x2, y2: y2 }).css({ 'stroke-width': '4px', 'stroke': findPid(lastStatusMessage.players, PID).color }));
+    var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr({ x1: x1, y1: y1, x2: x2, y2: y2 }).css({ 'stroke-width': '4px', 'stroke': findPid(lastStatusMessage.players, PID).color });
+    $('#pid' + PID).append(jQ);
     if (PID == pid && justResumed == false) {
-        edgesBuilt.push($('#pid' + PID + ' > line:last'))
+        edgesBuilt.push(jQ)
     }
+    return jQ;
 };
 
 // Return true if the milepost is top left of major city.

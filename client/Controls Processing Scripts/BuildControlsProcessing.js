@@ -21,7 +21,9 @@ var buildClick = function (e) {
     moneySpentThisBuild = 0;
     verticesBuilt = [];
     edgesBuilt = [];
+    edgesBuiltDOM = [];
     milepostEdgesBuilt = [];
+    lastTrackBuilt = [];
     var milepostsClick = function () {
         var player = findPid(lastStatusMessage.players, pid);
         if (verticesBuilt.length == 0) {
@@ -30,6 +32,7 @@ var buildClick = function (e) {
             verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
             var mpsvg = findMilepost(currentMilepost.x, currentMilepost.y);
             $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 2, 'fill': player.color }));
+            testBuildTrack(verticesBuilt, edgesBuilt, moneySpentThisBuild, milepostEdgesBuilt);
             return;
         }
         var lastMilepost = verticesBuilt[verticesBuilt.length - 1];
@@ -80,6 +83,7 @@ var buildClick = function (e) {
         milepostEdgesBuilt.push({ x1: lastMilepost.x, y1: lastMilepost.y, x2: currentMilepost.x, y2: currentMilepost.y });
         moneySpentThisBuild += milepostCost;
         refreshMoneySpent(moneySpent + moneySpentThisBuild);
+        testBuildTrack(verticesBuilt, edgesBuilt, moneySpentThisBuild, milepostEdgesBuilt);
         console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);
     };
     var milepostsKeyUp = function (e) {
@@ -101,27 +105,6 @@ var buildClick = function (e) {
         var milepost = verticesBuilt[verticesBuilt.length - 1];
         milepost = gameData.mapData.orderedMileposts[(parseInt(milepost.y) * gameData.mapData.mpWidth) + parseInt(milepost.x)];
         var edges = milepost.edges;
-        //var edges = [];
-        //if (milepost.y % 2 == 0) {
-        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
-        //    edges[1] = { x: milepost.x - 1, y: milepost.y - 1 };
-        //    edges[2] = { x: milepost.x, y: milepost.y - 1 };
-        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
-        //    edges[4] = { x: milepost.x, y: milepost.y + 1 };
-        //    edges[5] = { x: milepost.x - 1, y: milepost.y + 1 };
-        //}
-        //else {
-        //    edges[0] = { x: milepost.x - 1, y: milepost.y };
-        //    edges[1] = { x: milepost.x, y: milepost.y - 1 };
-        //    edges[2] = { x: milepost.x + 1, y: milepost.y - 1 };
-        //    edges[3] = { x: milepost.x + 1, y: milepost.y };
-        //    edges[4] = { x: milepost.x + 1, y: milepost.y + 1 };
-        //    edges[5] = { x: milepost.x, y: milepost.y + 1 };
-        //}
-        //for (var i = 0; i < edges.length; i++) {
-        //    if (!document.getElementById('milepost' + milepost.x + ',' + milepost.y))
-        //        edges[i] = undefined;
-        //}
 
         /*-------------------------------------------------------------------------------*/
 
@@ -161,6 +144,7 @@ var buildClick = function (e) {
         moneySpentThisBuild += milepostCost;
         refreshMoneySpent(moneySpent + moneySpentThisBuild);
         console.log("moneySpentThisBuild " + moneySpentThisBuild + " milepostCost " + milepostCost);
+        testBuildTrack(verticesBuilt, edgesBuilt, moneySpentThisBuild, milepostEdgesBuilt);
     };
     var buildCursor = function () {
         if (!document.getElementById('buildCursor'))
@@ -186,6 +170,7 @@ var buildClick = function (e) {
         $('#endControls').show();
         verticesBuilt = [];
         milepostEdgesBuilt = [];
+        lastTrackBuilt = undefined;
         edgesBuilt = [];
         moneySpent += moneySpentThisBuild;
         moneySpentThisBuild = 0;
@@ -204,6 +189,7 @@ var buildClick = function (e) {
         $('#endControls').show();
         verticesBuilt = [];
         milepostEdgesBuilt = [];
+        lastTrackBuilt = undefined;
         for (var i = 0; i < edgesBuilt.length; i++) {
             $(edgesBuilt[i]).remove();
         }

@@ -71,8 +71,10 @@ var moveClick = function (e) {
     $('#endControls').hide();
     $('#okControls').show();
     movesMade = [];
+    lastSuccessfulMove = [];
     for (var i = 0; i < findPid(data.players, pid).trains.length; i++) {
         movesMade[i] = [];
+        lastSuccessfulMove[i] = [];
     }
     if (findPid(data.players, pid).trains.length > 1)
         $('#placeControls').show();
@@ -126,6 +128,7 @@ var moveClick = function (e) {
         var mpsvg = findMilepost(edge.x, edge.y);
         drawTrain(train, pid, mpsvg.x, mpsvg.y);
         refreshMovesRemaining(player.trains);
+        testMoveTrain(train, movesMade[train]);
     });
     $('#acceptBuild').click(function () {
         for (var i = 0; i < movesMade.length; i++) {
@@ -152,6 +155,7 @@ var moveClick = function (e) {
             }
         }
         movesMade = undefined;
+        lastSuccessfulMove = undefined;
         checkMoveButton();
         checkLoadButtons(lastStatusMessage.players);
         $(this).off('click');

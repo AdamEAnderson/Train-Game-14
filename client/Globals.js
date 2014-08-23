@@ -29,9 +29,11 @@ var moneySpentThisBuild = 0; //Integer for money spent while building
 var verticesBuilt; //Array for mileposts built while building
 var verticesBuiltFinal = []; //Array for mileposts built and confirmed by server
 var milepostEdgesBuilt; //Array for edges built while building
+var lastTrackBuilt;
 var edgesBuiltFinal = []; //Array for edges built and confirmed by server
 var otherPlayersEdgesBuilt = []; //Array for edges built by other players
 var movesMade; //Array for all moves made while moving
+var lastSuccessfulMove;
 var movesMadeThisTurn = []; //Array for al moves made this turn confirmed by server
 var edgesBuilt; //Array of all jQuery elements of edges drawn
 var placeTrainLocations; //Array of objects where index corresponds to train index and objects have a milepost and a train property
