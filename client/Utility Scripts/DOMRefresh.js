@@ -14,6 +14,9 @@ var refreshPlayers = function (players) {
         $('#players').append($('<input type="radio" id="' + i + '"><label for="' + i + '">' + players[i].pid + '</label></input>').attr({ 'readonly': '', 'disabled': '' }));
     }
     $('#players').buttonset();
+    for (var i = 0; i < players.length; i++) {
+        $('#' + i).next().css('border-color', players[i].color);
+    }
 };
 
 var refreshCards = function (cards) {
@@ -87,7 +90,9 @@ var refreshTrainLocations = function (players) {
             $(document.getElementById('train' + players[i].pid + j)).remove();
             var milepost = JSON.parse(players[i].trains[j].loc);
             var mpsvg = findMilepost(milepost.x, milepost.y);
-            $('#trains' + players[i].pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + players[i].pid + j, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': players[i].color }));
+            $('#trains' + players[i].pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + players[i].pid + j, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': players[i].color }).click(function () {
+                $(document.getElementById('milepost' + JSON.parse(lastStatusMessage.players[i].trains[j].loc).x + ',' + JSON.parse(lastStatusMessage.players[i].trains[j].loc).y)).click();
+            }));
         }
     }
 };

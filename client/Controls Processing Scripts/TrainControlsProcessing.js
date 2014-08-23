@@ -151,7 +151,7 @@ var moveClick = function (e) {
                 trainLocations[i] = milepost;
                 var train = i;
                 var mpsvg = findMilepost(milepost.x, milepost.y);
-                drawTrain(train, pid, milepost.x, milepost.y);
+                drawTrain(train, pid, mpsvg.x, mpsvg.y);
             }
         }
         movesMade = undefined;

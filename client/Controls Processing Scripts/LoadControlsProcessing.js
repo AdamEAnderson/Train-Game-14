@@ -21,8 +21,12 @@ var deliverClick = function (e) {
     for (var i = 0; i < player.hand.length; i++) {
         for (var j = 0; j < player.hand[i].trips.length; j++) {
             var trip = player.hand[i].trips[j];
-            for(var l = 0; l < player.trains.length; l++){
-            	var milepost = JSON.parse(player.trains[l].loc);
+            for (var l = 0; l < player.trains.length; l++) {
+                var milepost;
+                if (trainLocations[l])
+                    milepost = getMilepost(trainLocations[l].x, trainLocations[l].y);
+                else
+            	    milepost = JSON.parse(player.trains[l].loc);
             	if (trip.dest == milepost.city.name) {
             		var train = player.trains[l];
                 	for (var k = 0; k < train.loads.length; k++) {
