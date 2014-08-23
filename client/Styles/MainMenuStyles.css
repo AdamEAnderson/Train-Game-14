@@ -1,4 +1,16 @@
-﻿.phaseDiv {
+﻿#mainMenu > h4 {
+    width: 200px;
+    text-align: center;
+    margin: 10px 0 3px 0;
+}
+
+#mainMenu > h2 {
+    width:200px;
+    text-align:center;
+    margin:10px 0 10px 0;
+}
+
+.phaseDiv {
     display: none;
 }
 
@@ -43,10 +55,10 @@
     font-size: .8em;
 }
 
-#mainMenu  {
+#mainMenu {
     padding-left: 10px;
 }
 
-#mainMenu select {
-    display: block;
-}
+    #mainMenu select {
+        display: block;
+    }

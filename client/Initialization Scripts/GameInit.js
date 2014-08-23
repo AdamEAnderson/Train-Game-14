@@ -64,4 +64,5 @@ var startedGame = function (data) {
     }
     $('#track').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'pid' + pid));
     $('#trainsDisplay').append($(document.createElementNS('http://www.w3.org/2000/svg', 'g')).attr('id', 'trains' + pid));
+    $('#deliver > span').css('color', 'red');
 };

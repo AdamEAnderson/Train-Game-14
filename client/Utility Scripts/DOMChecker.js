@@ -11,6 +11,7 @@
 var checkLoadButtons = function (players, moving) {
     var shownPickup = false;
     var shownDump = false;
+    var player = findPid(players, pid);
     //Loops through all of the players trains
     for (var i = 0; i < findPid(players, pid).trains.length; i++) {
         var train = findPid(players, pid).trains[i];
@@ -29,6 +30,16 @@ var checkLoadButtons = function (players, moving) {
             checkDeliver(milepost, findPid(players, pid), train, moving);
             if (milepost.city.loads && milepost.city.loads.length > 0) {
                 $('#pickup').show();
+                var important = false;
+                for (var j = 0; j < player.hand.length; j++)
+                    for (k = 0; k < player.hand[j].trips.length; k++)
+                        for (var l = 0; l < milepost.city.loads.length; l++)
+                            if (player.hand[j].trips[k].load == milepost.city.loads[l]) {
+                                $('#pickup > span').css('color', 'red');
+                                important = true;
+                            }
+                if (!important)
+                    $('#pickup > span').removeAttr('style');
                 shownPickup = true;
             }
         }

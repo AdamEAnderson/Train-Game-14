@@ -21,16 +21,18 @@ $(document).ready(function () {
     });
 
     //Init main menu
-    $('#mainMenu').append('<h3 id="joinGameText">Train Game</h3>');
+    $('#mainMenu').append('<h2 id="joinGameText">Train Game</h3>');
     $('#loading').append('<div id="loadingBar" />');
     $('#loadingBar').progressbar();
     $('#mainMenu').append('<select id="actionPicker"><option>New</option><option>Join</option><option>Resume</option></select>');
     $('#mainMenu').append('<select id="gamePicker"/>');
-    $('#mainMenu').append('<h4 style="margin:10px 0px 5px 75px;">Handle</h4>');
+    $('#mainMenu').append('<h4>Game Name</h4>');
+    $('#mainMenu').append('<input id="gameNamePicker" type="text" size="32" style="width:200px;"/>');
+    $('#mainMenu').append('<h4>Handle</h4>');
     $('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:200px;"/>');
-    $('#mainMenu').append('<h4 style="margin:10px 0px 5px 60px;">Game Color</h4>');
+    $('#mainMenu').append('<h4>Game Color</h4>');
     $('#mainMenu').append('<select id="colorPicker"><option>aqua</option><option>black</option><option>blue</option><option>fuchsia</option><option>gray</option><option>green</option><option>lime</option><option>maroon</option><option>navy</option><option>olive</option><option>orange</option><option>purple</option><option>red</option><option>silver</option><option>teal</option><option>yellow</option></select>');
-    $('#mainMenu').append('<h4 id="geographyPicker-label" style="margin:10px 0px 5px 60px;">Geography</h4>');
+    $('#mainMenu').append('<h4 id="geographyPicker-label">Geography</h4>');
     $('#mainMenu').append('<select id="geographyPicker"><option>africa</option></select>');
     $('#actionPicker').selectmenu({
         change: function (event, data) {
@@ -41,6 +43,8 @@ $(document).ready(function () {
                 $('#colorPicker').next().show();
                 $('#geographyPicker-label').show();
                 $('#geographyPicker-button').show();
+                $('#gameNamePicker').show();
+                $('#gameNamePicker').prev().show();
             }
             else {
                 $('#gamePicker-button').show().css('display', 'block');
@@ -48,6 +52,8 @@ $(document).ready(function () {
                 $('#geographyPicker-button').hide();
                 $('#colorPicker').prev().show();
                 $('#colorPicker').next().show();
+                $('#gameNamePicker').hide();
+                $('#gameNamePicker').prev().hide();
                 if (data.item.label == "Join")
                     gameOption = "joinable";
                 else {
@@ -83,7 +89,7 @@ $(document).ready(function () {
         if ($('#handlePicker').val() && $('#handlePicker').val().length > 0) {
             if (document.getElementById("actionPicker").value == "New") {
                 newGame(document.getElementById("colorPicker").value, $('#handlePicker').val(),
-					document.getElementById("geographyPicker").value);
+					document.getElementById("geographyPicker").value, $('#gameNamePicker').val());
             } else if (document.getElementById("actionPicker").value == "Join" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '') {
                 joinGame(document.getElementById("gamePicker").value,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
@@ -250,7 +256,7 @@ var processResume = function (data) {
         var milepost = JSON.parse(player.trains[i].loc);
         trainLocations[i] = { x: milepost.x, y: milepost.y };
         var mpsvg = findMilepost(milepost.x, milepost.y);
-        drawTrain(i, pid, milepost.x, milepost.y);
+        drawTrain(i, pid, mpsvg.x, mpsvg.y);
     }
     moneySpent = player.spendings;
     checkBuildMoney();

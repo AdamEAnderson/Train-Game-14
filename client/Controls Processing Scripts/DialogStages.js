@@ -67,7 +67,11 @@ var upgradeDialogStageTwo = function (train, skippedStageOne) {
 };
 
 var pickupDialogStageTwo = function (train, skippedStageOne) {
-    var milepost = JSON.parse(train.loc);
+    var milepost;
+    if (trainLocations[train.index])
+        milepost = getMilepost(trainLocations[train.index].x, trainLocations[train.index].y);
+    else
+        milepost = JSON.parse(train.loc);
     var loads = milepost.city.loads;
     var player = findPid(lastStatusMessage.players, pid);
     var city = milepost.city;
