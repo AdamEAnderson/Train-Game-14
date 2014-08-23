@@ -79,6 +79,7 @@ var builtTrack = function (vertices, edges, cost, milepostEdges) {
         dataType: 'json'
     });
 };
+
 var pickupLoad = function (train, load) {
     post({ messageType: 'pickupLoad', train: train, load: load, pid: pid, gid: gid });
 };
@@ -97,6 +98,7 @@ var moveTrain = function (train, vertices) {
             movesMadeThisTurn[train] += vertices.length;
             checkLoadButtons(lastStatusMessage.players);
             movesMade = undefined;
+            lastSuccessfulMove = undefined;
         },
         error: function (xhr, textStatus, errorThrown) {
             processAjaxErrors(xhr, textStatus, errorThrown);
@@ -108,10 +110,79 @@ var moveTrain = function (train, vertices) {
                 drawTrain(train, pid, mpsvg.x, mpsvg.y);
                 checkLoadButtons(lastStatusMessage.players);
                 movesMade = undefined;
+                lastSuccessfulMove = undefined;
                 checksMoveButton();
             }
         },
         dataType: 'json'
+    });
+};
+
+var testMoveTrain = function (train, vertices) {
+    var data = { messageType: 'testMoveTrain', pid: pid, gid: gid, mileposts: vertices, train: train };
+    $.ajax({
+        type: 'POST',
+        url: server,
+        data: JSON.stringify(data),
+        success: function () {
+            if (lastSuccessfulMove) {
+                lastSuccessfulMove[train] = vertices.clone();
+                if (vertices[-1]) {
+                    lastSuccessfulMove[train][-1] = JSON.parse(JSON.stringify(vertices[-1]));
+                }
+            }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            processAjaxErrors(xhr, textStatus, errorThrown);
+            if (!movesMade || !movesMade[train])
+                return;
+            if (lastSuccessfulMove && !lastSuccessfulMove[train])
+                movesMade[train] = [];
+            else {
+                movesMade[train] = lastSuccessfulMove[train].clone();
+                if (lastSuccessfulMove[train][-1])
+                    movesMade[train][-1] = JSON.parse(JSON.stringify(lastSuccessfulMove[train][-1]));
+            }
+            var mpsvg = findMilepost(movesMade[train][movesMade[train].length - 1].x, movesMade[train][movesMade[train].length - 1].y);
+            drawTrain(train, pid, mpsvg.x, mpsvg.y);
+            trainLocations[train] = movesMade[train][movesMade[train].length - 1] || undefined;
+            refreshMovesRemaining(findPid(lastStatusMessage.players, pid).trains);
+        }
+    });
+};
+
+var testBuildTrack = function (vertices, edges, cost, milepostEdges) {
+    var data = { messageType: 'testBuildTrack', pid: pid, gid: gid, mileposts: vertices };
+    $.ajax({
+        type: 'POST',
+        url: server,
+        data: JSON.stringify(data),
+        success: function () {
+            lastTrackBuilt = { vertices: vertices.clone(), edges: milepostEdges.clone(), DOMEdges: edges.clone(), cost: cost };
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            processAjaxErrors(xhr, textStatus, errorThrown);
+            if ($('#turnControls').css('display') != 'none')
+                return;
+            verticesBuilt = lastTrackBuilt.vertices || [];
+            milepostEdgesBuilt = lastTrackBuilt.edges || [];
+            for (var i = 0; i < edgesBuilt.length; i++)
+                edgesBuilt[i].remove();
+            edgesBuilt = lastTrackBuilt.DOMEdges || [];
+            if ($('#buildCursor').length > 0)
+                $('#buildCursor').remove();
+            if (verticesBuilt.length > 0) {
+                var mpsvg = findMilepost(verticesBuilt[verticesBuilt.length - 1].x, verticesBuilt[verticesBuilt.length - 1].y);
+                $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 2, 'fill': findPid(lastStatusMessage.players, pid).color }));
+            }
+            for (var j = 0; j < milepostEdgesBuilt.length; j++) {
+                var mpsvg1 = findMilepost(milepostEdgesBuilt[j].x1, milepostEdgesBuilt[j].y1);
+                var mpsvg2 = findMilepost(milepostEdgesBuilt[j].x2, milepostEdgesBuilt[j].y2);
+                drawLineBetweenMileposts(mpsvg1.x, mpsvg1.y, mpsvg2.x, mpsvg2.y, pid);
+            }
+            moneySpentThisBuild = cost;
+            refreshMoneySpent(moneySpent + moneySpentThisBuild);
+        }
     });
 };
 
@@ -181,7 +252,7 @@ var statusGet = function () {
 
     //Request status from server
     //requestData = gid ? {messageType:'statusUpdate', pid:pid, gid:gid} : {messageType:'statusUpdate', pid:pid};
-    requestData = { messageType: 'status', gid: gid, pid: pid };
+    var requestData = { messageType: 'status', gid: gid, pid: pid };
     $.ajax({
         type: "GET",
         url: server,

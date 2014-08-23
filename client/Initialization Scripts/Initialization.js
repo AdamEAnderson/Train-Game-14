@@ -250,7 +250,7 @@ var processResume = function (data) {
         var milepost = JSON.parse(player.trains[i].loc);
         trainLocations[i] = { x: milepost.x, y: milepost.y };
         var mpsvg = findMilepost(milepost.x, milepost.y);
-        drawTrain(i, pid, milepost.x, milepost.y);
+        drawTrain(i, pid, mpsvg.x, mpsvg.y);
     }
     moneySpent = player.spendings;
     checkBuildMoney();

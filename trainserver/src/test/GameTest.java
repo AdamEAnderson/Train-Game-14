@@ -886,6 +886,10 @@ public class GameTest {
         	assertEquals(player2MoneyAtStartOfTurn + 4, player2.getMoney()); // check that rent money is received
 
         	endGame(game);
+
+        	String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
+	        String statusMsg = TrainServer.status(jsonStatusPayload);
+	        log.info("endGame status message {}", statusMsg);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");
 		}
@@ -998,11 +1002,64 @@ public class GameTest {
 	        String gid = responseMessage.substring(8, 16);
 	        game = TrainServer.getGame(gid);
 	        endGame(game);
-	        assertTrue(TrainServer.getGame(gid) == null);
+	        String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
+	        String statusMsg = TrainServer.status(jsonStatusPayload);
+	        log.info("endGame status message {}", statusMsg);
+	        assertTrue(statusMsg.contains("\"ended\":true"));
+	        assertTrue(statusMsg.contains("stats"));
 		} catch (GameException e) {
 			fail("Unexpected exception");
 		}
 	}
+	
+	@Test
+	public void testGameDeletion() {
+		long expiration = 500;
+		TrainServer.resetExpirations(expiration, expiration, expiration);
+
+		// Test deletion of games created and not started
+		String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Julie\", \"color\":\"blue\", \"gameType\":\"africa\"}";
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        assertNotEquals(null, TrainServer.getGame(gid));
+			Thread.sleep(expiration * 2);
+			assertEquals(null, TrainServer.getGame(gid));
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		} catch (InterruptedException e) {
+			
+		}
+		
+		// Test deletion of ended games
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        assertNotEquals(null, TrainServer.getGame(gid));
+	        endGame(TrainServer.getGame(gid));
+			Thread.sleep(expiration * 2);
+			assertEquals(null, TrainServer.getGame(gid));
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		} catch (InterruptedException e) {
+			
+		}
+
+		// Test deletion of abandoned games
+		try {
+			String responseMessage = TrainServer.newGame(jsonPayload);
+	        String gid = responseMessage.substring(8, 16);
+	        assertNotEquals(null, TrainServer.getGame(gid));
+	        startGame(TrainServer.getGame(gid));
+			Thread.sleep(expiration * 2);
+			assertEquals(null, TrainServer.getGame(gid));
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		} catch (InterruptedException e) {
+			
+		}
+}
+	
 	
 	// Reverse the array (Arrays.sort can't be used because it doesn't work on primitive types)
 	private static void reverse(MilepostId[] b) {
