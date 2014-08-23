@@ -977,6 +977,27 @@ public class GameTest {
 	}
 	
 	@Test
+	public void testListColors() {
+		try {
+			String gid = newGame("Louie", "blue", "africa");
+			Game game = TrainServer.getGame(gid);
+	        game.joinGame("Tim", "black");
+	        game.joinGame("Ann", "green");
+	        game.joinGame("Julio", "red");
+	        game.joinGame("Xavier", "mauve");
+	        String request = String.format("{\"messageType\":\"listColors\", \"gid\":\"%s\"}", gid);
+	        String result = TrainServer.listColors(request);
+	        log.info("listColor result {}", result);;
+	        startGame(game);
+	        String result2 = TrainServer.listColors(request);
+	        assertEquals(result, result2);
+	        assertTrue(result.startsWith("[\""));
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		} 
+	}
+	
+	@Test
 	public void testGameDeletion() {
 		long expiration = 500;
 		TrainServer.resetExpirations(expiration, expiration, expiration);

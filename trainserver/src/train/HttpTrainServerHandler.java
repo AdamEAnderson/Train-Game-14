@@ -60,6 +60,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	
 	private final static String LIST = "list";
 	private final static String STATUS = "status";
+	private final static String LIST_COLORS = "listColors";
 	
 	private static Logger log = LoggerFactory.getLogger(HttpTrainServerHandler.class);
 	
@@ -208,6 +209,9 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					break;
 				case STATUS:
 					buf.append(TrainServer.status(message.jsonMessage));
+					break;
+				case LIST_COLORS:
+					buf.append(TrainServer.listColors(message.jsonMessage));
 					break;
 				default:
 					throw new GameException(GameException.INVALID_MESSAGE_TYPE);

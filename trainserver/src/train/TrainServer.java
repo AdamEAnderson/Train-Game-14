@@ -222,6 +222,21 @@ public class TrainServer {
 		return statusCache;
 	}
 	
+	/** Returns a list of the colors in use in a given game */
+	static public String listColors(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		StatusRequest data = gson.fromJson(requestText, StatusRequest.class);
+		String gid = data.gid;
+		Game game = getGame(gid);
+		if (game == null)
+			return "{}";
+		
+		List<String> colors = new ArrayList<String>();
+		for (Player p: game.getPlayers()) 
+			colors.add(p.color);
+		return new GsonBuilder().create().toJson(colors);
+	}
+	
 	static class ListRequest {
 		public String listType;
 		ListRequest() {}
