@@ -227,9 +227,9 @@ var endGame = function (checked) {
     post({ messageType: 'endGame', pid: pid, gid: gid, ready: checked });
 };
 
-var newGame = function (color, handle, gameGeo) {
+var newGame = function (color, handle, gameGeo, gameName) {
     $('#newGameButton').button('option', 'disabled', true);
-    post({ messageType: 'newGame', color: color, pid: handle, gameType: gameGeo }, function (data) {
+    post({ messageType: 'newGame', color: color, pid: handle, gameType: gameGeo, name: gameName }, function (data) {
         $('#loading').show();
         loading = true;
         gameData = data;
