@@ -34,6 +34,12 @@ $(document).ready(function () {
     $('#mainMenu').append('<select id="colorPicker"/>');
     $('#mainMenu').append('<h4 id="geographyPicker-label">Geography</h4>');
     $('#mainMenu').append('<select id="geographyPicker"><option>africa</option></select>');
+    $('#mainMenu').append('<h4>Number of Cards</h4>');
+    $('#mainMenu').append('<input id="numCardsPicker" type="text" size="32"style="width:200px;" value="4"/>');
+    $('#mainMenu').append('<h4>Starting Money</h4>');
+    $('#mainMenu').append('<input id="startingMoneyPicker" type="text" size="32"style="width:200px;" value="70"/>');
+    $('#mainMenu').append('<h4>Number of Trains</h4>');
+    $('#mainMenu').append('<input id="numTrainsPicker" type="text" size="32"style="width:200px;" value="1"/>');
     $('#actionPicker').selectmenu({
         change: function (event, data) {
             if (data.item.label == "New") {
@@ -45,6 +51,14 @@ $(document).ready(function () {
                 $('#geographyPicker-button').show();
                 $('#gameNamePicker').show();
                 $('#gameNamePicker').prev().show();
+                $('#colorPicker').empty();
+                for (var i = 0; i < colors.length; i++) {
+                    $('#colorPicker').append('<option>' + colors[i] + '</option>');
+                }
+                $('#colorPicker').selectmenu('refresh');
+                $('#numTrainsPicker').show().prev().show();
+                $('#startingMoneyPicker').show().prev().show();
+                $('#numCardsPicker').show().prev().show();
             }
             else {
                 $('#gamePicker-button').show().css('display', 'block');
@@ -54,6 +68,9 @@ $(document).ready(function () {
                 $('#colorPicker').next().show();
                 $('#gameNamePicker').hide();
                 $('#gameNamePicker').prev().hide();
+                $('#numTrainsPicker').hide().prev().hide();
+                $('#startingMoneyPicker').hide().prev().hide();
+                $('#numCardsPicker').hide().prev().hide();
                 if (data.item.label == "Join")
                     gameOption = "joinable";
                 else {
@@ -87,14 +104,18 @@ $(document).ready(function () {
         }
     });
     $('#colorPicker').css('font-size', '0.8em');
+    $('#colorPicker').empty();
+    for (var i = 0; i < colors.length; i++) {
+        $('#colorPicker').append('<option>' + colors[i] + '</option>');
+    }
     $('#mainMenu').append('<br/>');
     $('#mainMenu').append('<button id="newGameButton">OK</button>');
     $('#newGameButton').css('margin-top', '15px');
     $('#newGameButton').button().click(function () {
         if ($('#handlePicker').val() && $('#handlePicker').val().length > 0) {
-            if (document.getElementById("actionPicker").value == "New") {
+            if (document.getElementById("actionPicker").value == "New" && !isNaN(parseInt($('#numCardsPicker').val())) && !isNaN(parseInt($('#startingMoneyPicker').val())) && !isNaN(parseInt($('#numTrainsPicker').val()))) {
                 newGame(document.getElementById("colorPicker").value, $('#handlePicker').val(),
-					document.getElementById("geographyPicker").value, $('#gameNamePicker').val());
+					document.getElementById("geographyPicker").value, $('#gameNamePicker').val(), parseInt($('#numCardsPicker').val()), parseInt($('#startingMoneyPicker').val()), parseInt($('#numTrainsPicker').val()));
             } else if (document.getElementById("actionPicker").value == "Join" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '' && gamePicked) {
                 joinGame(gamePicked,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());

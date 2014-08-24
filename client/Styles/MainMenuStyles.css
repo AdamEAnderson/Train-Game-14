@@ -57,6 +57,7 @@
 
 #mainMenu {
     padding-left: 10px;
+    overflow:hidden;
 }
 
     #mainMenu select {

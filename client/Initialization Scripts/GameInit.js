@@ -26,7 +26,7 @@ var startedGame = function (data) {
     $('#okControls').append('<button id="acceptBuild">OK</button>')
     $('#okControls').append('<button id="cancelBuild">Cancel</button>');
     for (var i = 0; i < findPid(data.players, pid).trains.length; i++) {
-        $('#placeControls').append('<input type="radio" id="trainpicker' + i + '"><label for="trainpicker' + i + '">Train ' + (i + 1) + '</label></input>');
+        $('#placeControls').append('<input type="radio" id="trainpicker' + i + '" name="radio"><label for="trainpicker' + i + '">Train ' + (i + 1) + '</label></input>');
     }
     $('#endControls').append('<input type="checkbox" id="endGame"><label for="endGame">End Game</label></input>');
     $('#endControls').append('<button id="resign">Resign</button>');

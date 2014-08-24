@@ -27,7 +27,7 @@ var upgradeDialogStageTwo = function (train, skippedStageOne) {
             buttons.push({
                 text: 'Yes',
                 click: function () {
-                    upgradedTrain(upgrades[0].replace('Upgrade ', ''));
+                    upgradedTrain(upgrades[0].replace('Upgrade ', ''), train.index);
                     if ((upgrades[0] == 'Upgrade Speed' && train.speed == 16) || (upgrades[0] == 'Upgrade Capacity' && train.capacity == 2))
                         $('#upgrade').hide();
                     $('#upgradeDialog').dialog('destroy');
@@ -37,7 +37,7 @@ var upgradeDialogStageTwo = function (train, skippedStageOne) {
             $('#upgradeDialog').dialog('option', 'buttons', buttons);
         }
         else {
-            upgradedTrain(upgrades[0].replace('Upgrade ', ''));
+            upgradedTrain(upgrades[0].replace('Upgrade ', ''), train.index);
             checkUpgradeHiding();
             $('#upgradeDialog').dialog('destroy');
             $('#upgradeDialog').remove();
@@ -56,7 +56,7 @@ var upgradeDialogStageTwo = function (train, skippedStageOne) {
             text: 'Upgrade',
             click: function () {
                 if ($('#upgradeDialog > ul > li.clicked').length == 1) {
-                    upgradedTrain($('#upgradeDialog > ul > li.clicked').text().replace('Upgrade ', ''));
+                    upgradedTrain($('#upgradeDialog > ul > li.clicked').text().replace('Upgrade ', ''), train.index);
                     $('#upgradeDialog').dialog('destroy');
                     $('#upgradeDialog').remove();
                 }

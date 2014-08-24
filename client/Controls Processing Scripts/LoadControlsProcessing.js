@@ -124,7 +124,7 @@ var pickupClick = function (e) {
     else if (validTrains.length > 1) {
         $('#pickupDialog').append('<ul/>');
         for (var i = 0; i < player.trains.length; i++) {
-            if (!validTrains.contains(player.trains[i]))
+            if (validTrains.indexOf(player.trains[i]) == -1)
                 continue;
             $('#pickupDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function () {
                 $('#pickupDialog > ul > li').removeClass('clicked');
@@ -135,11 +135,12 @@ var pickupClick = function (e) {
         buttons.push({
             text: "OK",
             click: function () {
+                var train = parseInt($('#pickupDialog > ul > li.clicked').text().replace('Train ', '')) - 1;
                 $('#pickupDialog').empty();
                 var buttons = $('#pickupDialog').dialog('option', 'buttons');
                 buttons.pop();
                 $('#pickupDialog').dialog('option', 'buttons', buttons);
-                pickupDialogStageTwo(player.trains[parseInt($('#pickupDialog > ul > li.clicked').text().replace('Train ', '')) - 1], false);
+                pickupDialogStageTwo(player.trains[train], false);
             }
         });
         $('#pickupDialog').dialog('option', 'buttons', buttons);
@@ -175,7 +176,7 @@ var dumpClick = function (e) {
     else if (validTrains.length > 1) {
         $('#dumpDialog').append('<ul/>');
         for (var i = 0; i < player.trains.length; i++) {
-            if (!validTrains.contains(player.trains[i]))
+            if (validTrains.indexOf(player.trains[i]) == -1)
                 continue;
             $('#dumpDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function () {
                 $('#dumpDialog > ul > li').removeClass('clicked');

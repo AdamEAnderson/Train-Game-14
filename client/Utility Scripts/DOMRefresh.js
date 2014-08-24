@@ -62,8 +62,11 @@ var refreshTrains = function (trains, myturn) {
             var train = $('#trains').children().eq(t);
         }
         train.append('<div class="trainCard"/>');
-        var trainCard = train.children().eq(t);
-        trainCard.append('<p><span>' + trains[t].speed + '</span></p>');
+        var trainCard = train.children().eq(0);
+        if(trains.length - 1 > 0)
+            trainCard.append('<p><span>#' + (t + 1) + ' - ' + trains[t].speed + '</span></p>');
+        else
+            trainCard.append('<p><span>' + trains[t].speed + '</span></p>');
         for (var l = 0; l < trains[t].loads.length; ++l) {
             var load = trains[t].loads[l];
             if (!load) {

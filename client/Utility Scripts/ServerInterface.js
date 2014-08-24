@@ -201,6 +201,7 @@ var listColors = function () {
     if (!gamePicked)
         return;
     post({ messageType: 'listColors', gid: gamePicked }, function (d) {
+        $('#colorPicker').empty();
         for (var i = 0; i < colors.length; i++) {
             if (d.indexOf(colors[i]) != -1)
                 continue;
@@ -211,10 +212,10 @@ var listColors = function () {
 };
 
 //Tells server we've upgraded our train
-var upgradedTrain = function (trainState) {
+var upgradedTrain = function (trainState, train) {
     moneySpent += 20;
     checkBuildMoney();
-    post({ messageType: 'upgradeTrain', pid: pid, gid: gid, upgradeType: trainState });
+    post({ messageType: 'upgradeTrain', pid: pid, gid: gid, upgradeType: trainState, train: train });
 };
 
 //Tells server we're done with our turn
@@ -240,9 +241,14 @@ var endGame = function (checked) {
     post({ messageType: 'endGame', pid: pid, gid: gid, ready: checked });
 };
 
-var newGame = function (color, handle, gameGeo, gameName) {
+var newGame = function (color, handle, gameGeo, gameName, handSize, startingMoney, numTrains) {
     $('#newGameButton').button('option', 'disabled', true);
-    post({ messageType: 'newGame', color: color, pid: handle, gameType: gameGeo, name: gameName }, function (data) {
+    var data = { messageType: 'newGame', color: color, pid: handle, gameType: gameGeo, name: gameName };
+    data["ruleSet"] = {};
+    data.ruleSet["handSize"] = handSize || 4;
+    data.ruleSet["startingMoney"] = startingMoney || 70;
+    data.ruleSet["numTrains"] = numTrains || 1;
+    post(data, function (data) {
         $('#loading').show();
         loading = true;
         gameData = data;

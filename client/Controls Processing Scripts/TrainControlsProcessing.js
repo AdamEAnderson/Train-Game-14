@@ -42,7 +42,7 @@ var upgradeClick = function (e) {
             else if (trains.length > 1) {
                 $('#upgradeDialog').append('<ul/>');
                 for (var i = 0; i < player.trains.length; i++) {
-                    if (!trains.contains(player.trains[i]))
+                    if (trains.indexOf(player.trains[i]) == -1)
                         continue;
                     $('#upgradeDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function () {
                         $('#upgradeDialog > ul > li').removeClass('clicked');
@@ -53,11 +53,12 @@ var upgradeClick = function (e) {
                 buttons.push({
                     text: "OK",
                     click: function () {
+                        var train = parseInt($('#upgradeDialog > ul > li.clicked').text().replace('Train ', '')) - 1;
                         $('#upgradeDialog').empty();
                         var buttons = $('#upgradeDialog').dialog('option', 'buttons');
                         buttons.pop();
                         $('#upgradeDialog').dialog('option', 'buttons', buttons);
-                        upgradeDialogStageTwo(player.trains[parseInt($('#upgradeDialog > ul > li.clicked').text().replace('Train ', '')) - 1], false);
+                        upgradeDialogStageTwo(player.trains[train], false);
                     }
                 });
                 $('#upgradeDialog').dialog('option', 'buttons', buttons);
@@ -193,7 +194,7 @@ var placeTrainClick = function (e) {
             mpsvg.y = parseInt(translate[1]) + ((milepostSize / 2) * 1);
         }
         drawTrain(train, pid, mpsvg.x, mpsvg.y);
-        if (placeTrainLocations.length == findPid(data.players, pid).trains.length)
+        if (Object.keys(placeTrainLocations).length == findPid(data.players, pid).trains.length)
             $('#acceptBuild').button('option', 'disabled', false);
         else
             $('#acceptBuild').button('option', 'disabled', true);
