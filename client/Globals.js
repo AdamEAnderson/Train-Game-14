@@ -64,6 +64,8 @@ var colors = [
     'teal',
     'yellow'
 ];
+var statusIntervalHandle;
+var endedGame = false;
 
 //Adds a clone function to the array prototype that deep-copies the array
 Array.prototype.clone = function () {

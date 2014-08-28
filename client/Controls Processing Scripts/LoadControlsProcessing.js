@@ -26,7 +26,9 @@ var deliverClick = function (e) {
                 if (trainLocations[l])
                     milepost = getMilepost(trainLocations[l].x, trainLocations[l].y);
                 else
-            	    milepost = JSON.parse(player.trains[l].loc);
+                    milepost = JSON.parse(player.trains[l].loc);
+                if (!milepost.city)
+                    continue;
             	if (trip.dest == milepost.city.name) {
             		var train = player.trains[l];
                 	for (var k = 0; k < train.loads.length; k++) {

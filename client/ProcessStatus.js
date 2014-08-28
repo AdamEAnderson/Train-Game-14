@@ -1,8 +1,13 @@
 ﻿//Processes a status response from the server
 var processStatus = function (data) {
+    if (endedGame) {
+        clearInterval(statusIntervalHandle);
+        return;
+    }
     if (data.transaction != lastStatus) {
         if (!lastStatus)
             lastStatusMessage = data;
+        if (data.ended) endedGameHandler(data);
         var justStarted = false;
         if (!started && data.joinable == false) {
             justStarted = true;

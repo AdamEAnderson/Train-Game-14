@@ -92,6 +92,8 @@ var displayInfo = function (info, type) {
     if ($('#info').css('bottom') != '0px' && $('#info').css('bottom') != 0) {
         $('#info').animate({ 'bottom': 0 }, 150, 'swing', function () {
             setTimeout(function () {
+                if ($('#info').length == 0)
+                    return;
                 if (jQ.attr('data-index') == $('#info').children().last().attr('data-index'))
                     $('#info').animate({ bottom: -31 }, 150);
                 jQ.remove();
@@ -100,6 +102,8 @@ var displayInfo = function (info, type) {
     }
     else {
         setTimeout(function () {
+            if ($('#info').length == 0)
+                return;
             if (jQ.attr('data-index') == $('#info').children().last().attr('data-index'))
                 $('#info').animate({ bottom: -31 }, 150);
             jQ.remove();

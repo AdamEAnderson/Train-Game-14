@@ -75,7 +75,7 @@ var refreshTrains = function (trains, myturn) {
             }
             else {
                 var iconPNG = iconPath + "/" + load + '.png';
-                trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src=' + iconPNG + '/></p>');
+                trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src="' + iconPNG + '" /></p>');
             }
         }
     }

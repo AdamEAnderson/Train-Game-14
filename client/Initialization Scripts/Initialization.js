@@ -161,7 +161,7 @@ var initMap = function (geography) {
             $('#mainMenu').hide();
             panZoom.enable();
             drawMileposts();
-            setInterval('statusGet()', 250);
+            statusIntervalHandle = setInterval('statusGet()', 250);
         },
         error: function (a, b, c) {
             processAjaxErrors(a, b, c);
@@ -193,7 +193,7 @@ var enterGame = function () {
     else {
         // join/resume: we'll make the map once we have gotten a status message 
         // and know the geography
-        setInterval('statusGet()', 250);
+        statusIntervalHandle = setInterval('statusGet()', 250);
     }
 }
 
