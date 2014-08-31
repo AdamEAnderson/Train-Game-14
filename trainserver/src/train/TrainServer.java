@@ -212,6 +212,14 @@ public class TrainServer {
 		return statusCache;
 	}
 	
+	/** List all available game geographies (map boards)
+	 * 
+	 */
+	static public String listGeographies(String requestText) throws GameException {		
+		List<String> geographies = GameData.getGeographies();
+		return new GsonBuilder().create().toJson(geographies);
+	}
+	
 	/** Returns a list of the colors in use in a given game */
 	static public String listColors(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
@@ -237,6 +245,10 @@ public class TrainServer {
 		ListResponse() { gidNames = new HashMap<String, String>(); }
 	}
 	
+	/** List games that can be joined, or resumed.
+	 * Games may be joined if they have been created but not yet started.
+	 * Games may be resumed once they have started.
+	 */
 	static public String list(String requestText) throws GameException {
 		log.info("list requestText: {}", requestText);
 		Gson gson = new GsonBuilder().create();
@@ -310,6 +322,7 @@ public class TrainServer {
 		return gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
 	}
 	
+	/** Create a new game */
 	static public String newGame(String requestText) throws GameException {			
 		String gameId = null;
 		Gson gson = new GsonBuilder().create();
@@ -331,6 +344,7 @@ public class TrainServer {
 		public String color;
 		}
 	
+	/** Join a game */
 	static public String joinGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
@@ -346,6 +360,13 @@ public class TrainServer {
 		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
+	/** Resume a game
+	 * Typically used when a player has dropped has dropped a connection to a game in progress,
+	 * and wants to restart the client connection to the in progress game.
+	 * @param requestText
+	 * @return NewGameData, as a serialized JSON string
+	 * @throws GameException if the requested doesn't exist, or the player wasn't part of the game
+	 */
 	static public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
@@ -375,6 +396,11 @@ public class TrainServer {
 		boolean ready;
 	}
 
+	/** Start playing the game.
+	 * Game will order players, and start building turns. Once this is done, new players cannot join.
+	 * @param requestText
+	 * @throws GameException if game doesn't exist
+	 */
 	static public void startGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		StartGameData data = gson.fromJson(requestText, StartGameData.class);
@@ -390,6 +416,11 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
+	/** Query the server to see if the specified track can be built
+	 * 
+	 * @param requestText
+	 * @throws GameException if the track cannot be buit, game or player is unknown
+	 */
 	static public void testBuildTrack(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
@@ -400,6 +431,11 @@ public class TrainServer {
 			throw new GameException(GameException.INVALID_TRACK);
 	}
 
+	/** Build the track
+	 * 
+	 * @param requestText
+	 * @throws GameException if the track cannot be buit, game or player is unknown
+	 */
 	static public void buildTrack(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
@@ -420,6 +456,8 @@ public class TrainServer {
 		}
 	}
 
+	/** Upgrade the player's train, either to go faster or to carry more loads
+	 */
 	static public void upgradeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		UpgradeTrainData data = gson.fromJson(requestText,
@@ -441,6 +479,13 @@ public class TrainServer {
 		public MilepostId where;
 	}
 
+	/** Start the train at a location on the board.
+	 * This is typically called at the start of a game, on the first regular (post-building) turn.
+	 * If the train has already been placed, it cannot be placed again. A train must
+	 * be placed before it can be moved.
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void placeTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PlaceTrainData data = gson.fromJson(requestText, PlaceTrainData.class);
@@ -457,6 +502,11 @@ public class TrainServer {
 		public MilepostId[] mileposts;
 	}
 
+	/** Check to see if the train can be moved through the set of mileposts.
+	 * 
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void testMoveTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
@@ -467,6 +517,11 @@ public class TrainServer {
 			throw new GameException(GameException.INVALID_MOVE);
 	}
 
+	/** Move the train through a set of mileposts
+	 * 
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void moveTrain(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
@@ -483,6 +538,11 @@ public class TrainServer {
 		public String load;
 	}
 
+	/** Pickup a load.
+	 * Load must be available at the current train location.
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void pickupLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PickupLoadData data = gson.fromJson(requestText, PickupLoadData.class);
@@ -500,6 +560,12 @@ public class TrainServer {
 		public int card;
 	}
 
+	/** Deliver a load
+	 * Load must be requested on a card the player has, it must be on the player's train,
+	 * and the train must be at the location that the load is for.
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void deliverLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DeliverLoadData data = gson
@@ -517,6 +583,11 @@ public class TrainServer {
 		public String load;
 	}
 
+	/** Remove a load from the train
+	 * 
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void dumpLoad(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DumpLoadData data = gson.fromJson(requestText, DumpLoadData.class);
@@ -531,6 +602,12 @@ public class TrainServer {
 		public String pid;
 	}
 	
+	/** Replace all of a players cards
+	 * Player may turn in all of their cards, and get a complete new set. Player may not move, 
+	 * upgrade, or build track during the same turn.
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void turnInCards(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		TurnInCardsData data = gson.fromJson(requestText, TurnInCardsData.class);
@@ -545,6 +622,13 @@ public class TrainServer {
 		public String pid;
 	}
 
+	/** Undo the previous action
+	 * Player may undo previous action they did this turn. Player may keep undoing to 
+	 * undo multiple actions. Player may not undo actions taken by other players, or
+	 * their own actions during previous turns.
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void undo(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		UndoData data = gson.fromJson(requestText, UndoData.class);
@@ -563,6 +647,9 @@ public class TrainServer {
 		public String pid;
 	}
 
+	/* Player declares their turn is over, and control goes to the next player
+	 * 
+	 */
 	static public void endTurn(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndTurnData data = gson.fromJson(requestText, EndTurnData.class);
@@ -577,6 +664,11 @@ public class TrainServer {
 		String pid;
 	}
 	
+	/** Player is quitting the game
+	 * 
+	 * @param requestText
+	 * @throws GameException
+	 */
 	static public void resignGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		ResignData data = gson.fromJson(requestText, ResignData.class);
@@ -592,7 +684,9 @@ public class TrainServer {
 		public boolean ready;
 	}
 
-	/** Handle endGame */
+	/** Player declares they are ready to end the game. 
+	 * When all players are ready to end, the game will be over.
+	 */
 	static public void endGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndGame data = gson.fromJson(requestText, EndGame.class);

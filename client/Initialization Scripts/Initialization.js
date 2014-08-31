@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -33,7 +33,8 @@ $(document).ready(function () {
     $('#mainMenu').append('<h4>Game Color</h4>');
     $('#mainMenu').append('<select id="colorPicker"/>');
     $('#mainMenu').append('<h4 id="geographyPicker-label">Geography</h4>');
-    $('#mainMenu').append('<select id="geographyPicker"><option>africa</option></select>');
+    populateGeographies();
+    $('#mainMenu').append('<select id="geographyPicker"></select>');
     $('#mainMenu').append('<h4>Number of Cards</h4>');
     $('#mainMenu').append('<input id="numCardsPicker" type="text" size="32"style="width:200px;" value="4"/>');
     $('#mainMenu').append('<h4>Starting Money</h4>');
@@ -271,6 +272,30 @@ var drawMileposts = function () {
     $("#loadingBar .ui-progressbar-value").animate({ width: '66%' }, 'fast');
 };
 
+// Process a game list
+var processGeographies = function (data) {
+    $('#geographyPicker').empty();
+    for (var i = 0; i < data.length; ++i)
+        $('#geographyPicker').append($('<option>' + data[i] + '</option>'));
+    $('#geographyPicker').menu('refresh');
+};
+
+var populateGeographies = function() {
+    //Populate geographies list menu
+    requestData = { messageType: 'listGeographies' };
+    $.ajax({
+        type: "GET",
+        url: server,
+        data: JSON.stringify(requestData),
+        dataType: 'json',
+        success: function (responseData) {
+            processGeographies(responseData);
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            processAjaxErrors(xhr, textStatus, errorThrown);
+        }
+    });
+}
 var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);

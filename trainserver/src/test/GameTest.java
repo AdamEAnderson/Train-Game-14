@@ -1018,6 +1018,19 @@ public class GameTest {
 	}
 	
 	@Test
+	public void testListGeographies() {
+		try {
+	        String request = String.format("{\"messageType\":\"listGeographies\"}");
+	        String result = TrainServer.listGeographies(request);
+	        log.info("listGeographies result {}", result);
+	        assertTrue(result.startsWith("[\""));
+	        assertTrue(result.contains("africa"));
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		} 
+	}
+	
+	@Test
 	public void testListColors() {
 		try {
 			String gid = newGame("Louie", "blue", "africa");

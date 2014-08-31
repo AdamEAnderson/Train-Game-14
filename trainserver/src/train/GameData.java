@@ -14,6 +14,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,20 +57,6 @@ public class GameData {
 
 	private static Logger log = LoggerFactory.getLogger(GameData.class);
 
-	/** Returns a list of the supported game types. All game types must have a folder
-	 * in the data directory that contains all the data for the game. Name of the type 
-	 * is the name of the folder.
-	 * @return List of game types
-	 */
-	static public List<String> getGameTypes() {
-		List<String> gameTypes = new ArrayList<String>();
-		File dataDir = new File(dataDirectoryPath);
-		File dataChildren[] = dataDir.listFiles(new DirectoryFileFilter());
-		for (File child: dataChildren)
-			gameTypes.add(child.getName());
-		return gameTypes;
-	}
-	
 	public GameData(String gameType) throws GameException {
 		try {
 			setDataFolder();
@@ -265,6 +252,33 @@ public class GameData {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		}
 		return cities;
+	}
+	
+	/** Returns a list of the supported geographies (game types). All geographies must have a folder
+	 * in the data directory that contains all the data for the game. The name of the geography 
+	 * is the name of the folder.
+	 * @return List of game types
+	 */
+	public static List<String> getGeographies() throws GameException {
+		try {
+			setDataFolder();
+		} catch (IOException e) {
+			log.error("Cannot find data folder");
+			throw new GameException(GameException.BAD_MAP_DATA);
+		}
+
+		String[] excludedDirs = {"artwork", "icons", "mileposts"};	// subfolders of data that are not game types
+		List<String> excluded = Arrays.asList(excludedDirs);
+		File dataDir = new File(dataDirectoryPath);
+		if (!dataDir.isDirectory())
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		File[] dataChildren = dataDir.listFiles((File file) -> 
+        	file.isDirectory() &&
+        	!excluded.contains(file.getName()));
+		List<String> geographyList = new ArrayList<String>();
+		for (File child: dataChildren) 
+			geographyList.add(child.getName());
+		return geographyList;
 	}
 
 }

@@ -62,6 +62,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String LIST = "list";
 	private final static String STATUS = "status";
 	private final static String LIST_COLORS = "listColors";
+	private final static String LIST_GEOGRAPHIES = "listGeographies";
 	
 	private static Logger log = LoggerFactory.getLogger(HttpTrainServerHandler.class);
 	
@@ -216,6 +217,9 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					break;
 				case LIST_COLORS:
 					buf.append(TrainServer.listColors(message.jsonMessage));
+					break;
+				case LIST_GEOGRAPHIES:
+					buf.append(TrainServer.listGeographies(message.jsonMessage));
 					break;
 				default:
 					throw new GameException(GameException.INVALID_MESSAGE_TYPE);
