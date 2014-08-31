@@ -14,42 +14,70 @@
 /// <reference path="../Controls Processing/DialogStages.js" /> 
 
 var loadsClick = function (e) {
+
     var data = e.data;
     $('#gameDisplay').append('<div id="loadsDialog" title="Loads Key" />').find('div:last').dialog({
+
         buttons: [{
+
             text: "Close",
             click: function () {
+
                 $(this).dialog('destroy');
                 $('#loadsDialog').remove();
+
             }
+
         }],
         close: function () {
+
             $(this).dialog('destroy');
             $('#loadsDialog').remove();
+
         },
         width: '60%',
         height: 500
+
     });
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     $('#loadsDialog').append('<table/>');
     for (var key in gameData.loadset) {
+
         iconPNG = iconPath + '/' + key + '.png';
         $('#loadsDialog > table').append('<tr><td><img width=30px height=30px src=' + iconPNG + '/><td>' + key + '</td><td>' + gameData.loadset[key].join(', ') + '</td></tr>');
+
     }
+
 };
 
 var resignClick = function () {
+
     $('#turnControls').hide();
     $('#endControls').hide();
     $('#okControls').show();
     $('#acceptBuild').click(function () {
+
         resignGame();
         $('#okControls').hide();
+
     });
     $('#cancelBuild').click(function () {
+
         $('#okControls').hide();
+
         $('#turnControls').show();
+
         $('okControls').show();
+
     });
+
+};
+
+
+var undoKeyUp = function (e) {
+	if (!e.ctrlKey)
+		return;
+    if (e.which == 90) 
+        undo();
 };
 

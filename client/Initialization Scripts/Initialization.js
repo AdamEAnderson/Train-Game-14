@@ -124,6 +124,7 @@ $(document).ready(function () {
             }
         }
     });
+    $(document).keyup(undoKeyUp);
     $('#mainMenu').show();
 
     lastStatus = 0;

@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -175,6 +175,10 @@ var processAjaxErrors = function (xhr, textStatus, errorThrown) {
         displayInfo('Error: Train full', 'error');
     else if (xhr.status == 400 && xhr.responseJSON == 'InvalidDelivery')
         displayInfo('Error: Invalid delivery', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'NothingToUndo')
+        displayInfo('Error: Nothing to undo', 'error');
+    else if(xhr.responseJSON)
+        displayInfo('Error ' + xhr.responseJSON);
     else
         displayInfo('Error');
 };

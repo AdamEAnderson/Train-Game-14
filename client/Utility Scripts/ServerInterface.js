@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -216,6 +216,11 @@ var upgradedTrain = function (trainState, train) {
     moneySpent += 20;
     checkBuildMoney();
     post({ messageType: 'upgradeTrain', pid: pid, gid: gid, upgradeType: trainState, train: train });
+};
+
+//Tells server to undo the last action
+var undo = function () {
+    post({ messageType: 'undo', gid: gid, pid: pid }, function () { justResumed = true; });
 };
 
 //Tells server we're done with our turn
