@@ -1,5 +1,4 @@
 package train;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -16,6 +15,7 @@ import java.util.function.Predicate;
 
 import map.Milepost;
 import map.MilepostId;
+import map.MilepostSerializer;
 import map.TrainMap;
 
 import org.slf4j.Logger;
@@ -30,10 +30,6 @@ import reference.UpgradeType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 class GameGCTask extends TimerTask {
 
@@ -162,12 +158,6 @@ public class TrainServer {
 		GameStatus() {}
 	}
 	
-	private static class MilepostSerializer implements JsonSerializer<Milepost> {
-		  public JsonElement serialize(Milepost src, Type typeOfSrc, JsonSerializationContext context) {
-		    return new JsonPrimitive(src.toString());
-		  }		
-	}
-	
 	static class StatusRequest {
 		public String gid;
 		StatusRequest() {}
@@ -208,7 +198,7 @@ public class TrainServer {
 		if (p != null) {
 			do {
 				status.players.add(new PlayerStatus(p));
-				p = p.getNextPlayer();
+				p = game.getNextPlayer(p);
 			} while(p != game.getActivePlayer());
 		} else {
 			for (Player player : game.getPlayers()) 
@@ -550,6 +540,24 @@ public class TrainServer {
 		game.turnInCards(data.pid);
 	}
 	
+	static class UndoData {
+		public String gid;
+		public String pid;
+	}
+
+	static public void undo(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		UndoData data = gson.fromJson(requestText, UndoData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		if (!data.pid.equals(game.getActivePlayer().name))
+			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
+		Game newGame = game.undo();
+		if (newGame != null)
+			games.replace(data.gid, newGame);
+	}
+	
 	static class EndTurnData {
 		public String gid;
 		public String pid;
@@ -592,8 +600,6 @@ public class TrainServer {
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		game.endGame(data.pid, data.ready);
-		//if (game.endGame(data.pid, data.ready)) 
-		//	games.remove(data.gid);		
 	}
 	
 	/** Delete specified games */

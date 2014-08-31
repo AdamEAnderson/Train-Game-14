@@ -14,8 +14,8 @@ public class Rail {
 	
 	private Map<Milepost, Set<Milepost>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
-	private Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
-	private Map<Milepost, Ferry> allFerries;
+	public Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
+	public Map<Milepost, Ferry> allFerries;
 	private String pid;
 	
 	Rail(Map<Milepost, Set<Track>> allTracks, Map<Milepost, Ferry> allFerries, String pid){
@@ -113,7 +113,7 @@ public class Rail {
 			}
 			else {
 				erase(origin, next);
-				throw new GameException("InvalidTrack");
+				throw new GameException(GameException.INVALID_TRACK);
 			}
 		}
 		int cost = e.cost;

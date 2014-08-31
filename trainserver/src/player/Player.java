@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import reference.*;
+import train.Game;
 import train.GameException;
 import train.RuleSet;
 import map.Ferry;
@@ -17,7 +18,6 @@ import map.Milepost;
 public class Player {
 	public final String name;
 	public final String color;
-	private Player nextPlayer;
 	private Train[] trains;
 	private int money;
 	private Rail rail;
@@ -30,15 +30,17 @@ public class Player {
 	private boolean readyToEnd;
 	private boolean hasResigned;
 	private Stats stats;
+	private transient Game game;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
 	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
-			Player next, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries){
+			Game game, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries){
 		trains = new Train[ruleSet.numTrains];
 		for (int i = 0; i < ruleSet.numTrains; ++i) {
 			trains[i] = new Train(i);
 		}
+		this.game = game;
 		money = ruleSet.startingMoney;
 		rail = new Rail(globalRail, globalFerries, name);
 		cards = hand;
@@ -48,7 +50,6 @@ public class Player {
 		turnInProgress = false;
 		movesMade = new int[ruleSet.numTrains];
 		rentingFrom = new ArrayList<String>();
-		nextPlayer = next;
 		readyToStart = false;
 		readyToEnd = false;
 		hasResigned = false;
@@ -65,13 +66,23 @@ public class Player {
 	}
 	
 	public boolean testMoveTrain(int tIndex, Milepost[] mps){
-		if(mps[0] == null) return false;
+		if(mps[0] == null) 
+			return false;
 		for(int i = 0, m = movesMade[tIndex]; i < mps.length - 1; i++, m++){
-			if(m > trains[tIndex].getSpeed()) return false;
+			if(m > trains[tIndex].getSpeed()) {
+				log.warn("Train cannot move {} mileposts", m);
+				return false;
+			}
 			String ownerId = rail.anyConnects(mps[i], mps[i + 1]);
-			if(ownerId.equals("") && !mps[i].isSameCity(mps[i + 1])) return false;
+			if(ownerId.equals("") && !mps[i].isSameCity(mps[i + 1])) {
+				log.warn("Cannot move - missing track from {} to {}", mps[i].toString(), mps[i+1].toString());
+				return false;
+			}
 			if(rail.connectsByFerry(mps[i], mps[i + 1])){
-				if(m != 0) return false;
+				if(m != 0) {
+					log.warn("Travelling by ferry must be at start of turn");
+					return false;
+				}
 				else{
 					m = trains[tIndex].getSpeed()/2;
 					m--;
@@ -82,18 +93,12 @@ public class Player {
 	}
 	
 	public void moveTrain(int t, Milepost[] mps) throws GameException{
-		if(!testMoveTrain(t, mps)) throw new GameException("Invalid Move");
+		if(!testMoveTrain(t, mps)) 
+			throw new GameException("Invalid Move");
 		trains[t].moveTrain(mps[mps.length - 1]);
 		for(int i = 0; i < mps.length - 1; i++){
 			String ownerID = rail.anyConnects(mps[i], mps[i + 1]);
-			Player owner = null;
-			if(ownerID.equals(name)) owner = this;
-			for(Player p = nextPlayer; p != this; p = p.nextPlayer){
-				if(p.name.equals(ownerID)){
-					owner = p;
-					break;
-				}
-			}
+			Player owner = game.getPlayer(ownerID);
 			if(!rentingFrom.contains(ownerID) && !ownerID.equals(name) && owner != null){
 				rentingFrom.add(ownerID);
 				money -= 4;
@@ -127,8 +132,19 @@ public class Player {
 
 	public boolean testBuildTrack(Milepost[] mileposts){
 		if(mileposts.length < 1) return true;
-		if((!rail.contains(mileposts[0]) && mileposts[0].type != Milepost.Type.MAJORCITY) 
-				|| mileposts[0].type == Milepost.Type.BLANK) return false;
+		
+		// Cannot build where there is no milepost
+		if (mileposts[0].type == Milepost.Type.BLANK) {
+			log.warn("Cannot build from blank milepost");
+			return false;
+		}
+
+		// Building must start from track that has been built by this player previously,
+		// or from a major city. 
+		if (!rail.contains(mileposts[0]) && mileposts[0].type != Milepost.Type.MAJORCITY) {
+			log.warn("Building must start from player's track or from major city");
+			return false;
+		}
 		int projectSpending = getSpending();
 		
 		for(int i = 0; i < mileposts.length -1 ; i++){
@@ -157,7 +173,7 @@ public class Player {
 	public void buildTrack(Milepost[] mileposts) throws GameException{
 		Milepost[] tester = mileposts.clone();
 		if(!testBuildTrack(tester)){
-			throw new GameException("InvalidTrack");
+			throw new GameException(GameException.INVALID_TRACK);
 		}
 		int cost = 0;
 		turnInProgress = true;
@@ -211,7 +227,7 @@ public class Player {
 		return null;
 	}
 	
-	public Player endTurn(){
+	public void endTurn(){
 		turnInProgress = true;
 		money -= spendings;
 		spendings = 0;
@@ -219,7 +235,6 @@ public class Player {
 		for(int i = 0; i < movesMade.length; i++){
 			movesMade[i] = 0;
 		}
-		return nextPlayer;
 	}
 	
 	public void resign() {
@@ -257,13 +272,9 @@ public class Player {
 	public boolean turnInProgress() { return turnInProgress; }
 	
 	public boolean hasResigned() {return hasResigned; }
-	
-	public void resetNextPlayer(Player p){ nextPlayer = p; }
-	
+		
 	public String getPid(){ return name; }
-	
-	public Player getNextPlayer(){ return nextPlayer; }
-	
+		
 	public int getMoney() {	return money; }
 	
 	public int getSpending(){ return spendings; }
@@ -309,4 +320,10 @@ public class Player {
 	
 	/** Call this from test code only!! Just here for debugging */
 	public void turnInCards(Card[] cards)  { this.cards = cards; }
+	
+	public void fixup(Game game, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries) {
+		this.game = game;
+		rail.allTracks = globalRail;
+		rail.allFerries = globalFerries;
+	}
 }

@@ -704,7 +704,6 @@ public class GameTest {
         	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(10,27));
 	        MilepostId[] moveMileposts;
 	        moveMileposts = new MilepostId[]{ 
-	        	new MilepostId(10,27),
 	        	new MilepostId(9,27), 
 	        	new MilepostId(8,27), 
 	        	new MilepostId(7,27),
@@ -863,6 +862,48 @@ public class GameTest {
 		}
 	} 
 	
+	/** Test player order in turns */
+	@Test
+	public void testTurns() {
+		Game game = null;
+		try {
+			String gid = newGame("Louie", "blue", "africa");
+	        game = TrainServer.getGame(gid);
+	        assertTrue(game != null);
+	        game.joinGame("Tim", "black");
+	        game.joinGame("Ann", "green");
+	        startGame(game);
+
+	        // First round of building goes in forward order
+	        String first = game.getActivePlayer().name;
+	        takeTurn(game, first);
+        	String second = game.getActivePlayer().name;
+        	takeTurn(game, second);
+        	String third = game.getActivePlayer().name;
+        	takeTurn(game, third);
+        	
+        	// Turnaround turn - goes in reverse order
+        	takeTurn(game, third);
+        	takeTurn(game, second);
+        	takeTurn(game, first);
+        	
+        	// Last building turn - goes in forward order
+	        takeTurn(game, first);
+        	takeTurn(game, second);
+        	takeTurn(game, third);
+        	
+        	// Regular turns go in forward order -- run through a few
+        	for (int i = 0; i < 5; ++i) {
+    	        takeTurn(game, first);
+            	takeTurn(game, second);
+            	takeTurn(game, third);
+        	}
+        	endGame(game);
+		} catch (GameException e) {
+			fail("Unexpected exception in test setup");
+		}
+	}
+	
 	@Test
 	public void testFerry() {
 		Game game = null;
@@ -987,14 +1028,77 @@ public class GameTest {
 	        game.joinGame("Xavier", "mauve");
 	        String request = String.format("{\"messageType\":\"listColors\", \"gid\":\"%s\"}", gid);
 	        String result = TrainServer.listColors(request);
-	        log.info("listColor result {}", result);;
+	        log.info("listColor result {}", result);
 	        startGame(game);
 	        String result2 = TrainServer.listColors(request);
-	        assertEquals(result, result2);
+	        log.info("listColor result {}", result2);
 	        assertTrue(result.startsWith("[\""));
+	        assertTrue(result2.startsWith("[\""));
 		} catch (GameException e) {
 			fail("Unexpected exception");
 		} 
+	}
+	
+	@Test
+	public void testUndo() {
+		try {
+			String gid = newGame("Louie", "blue", "africa");
+			Game game = TrainServer.getGame(gid);
+	        game.joinGame("Xavier", "black");
+	        startGame(game);
+			skipPastBuildingTurns(game);
+			MilepostId[] buildMileposts = new MilepostId[] {
+					new MilepostId(2,18),
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),
+					};
+        	game.buildTrack(game.getActivePlayer().name, buildMileposts);
+        	String jsonPayload = String.format("{\"messageType\":\"undo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, game.getActivePlayer().name);
+    		TrainServer.undo(jsonPayload);
+    		game = TrainServer.getGame(gid);
+        	game.buildTrack(game.getActivePlayer().name, buildMileposts);	// build was undone, so rebuild should work
+			
+			MilepostId[] moveMileposts = new MilepostId[] {
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					new MilepostId(6,10),
+					new MilepostId(6,9),
+					new MilepostId(6,8),
+					new MilepostId(5,7),	// stop in port
+					};
+			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
+    		TrainServer.undo(jsonPayload);   // undo place
+    		game = TrainServer.getGame(gid);
+			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
+			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			TrainServer.undo(jsonPayload);	// undo move
+    		game = TrainServer.getGame(gid);
+    		TrainServer.undo(jsonPayload);   // undo place
+    		game = TrainServer.getGame(gid);
+    		TrainServer.undo(jsonPayload);	// undo building
+    		game = TrainServer.getGame(gid);
+    		
+    		// we should be able to build and upgrade again
+        	game.buildTrack(game.getActivePlayer().name, buildMileposts);	// build was undone, so rebuild should work
+
+			game.endTurn(game.getActivePlayer().name);
+		} catch (GameException e) {
+			fail("Unexpected exception");
+		}
 	}
 	
 	@Test
@@ -1067,6 +1171,14 @@ public class GameTest {
         	log.info("Active player is {}", p.name);
         	log.info("Turn count is {}", game.getTurns());
         }
+	}
+	
+	private void takeTurn(Game game, String playerName) throws GameException {
+		if (!game.getActivePlayer().name.equals(playerName))
+			fail("Too bad");
+    	assertTrue(game.getActivePlayer().name.equals(playerName));
+    	game.endTurn(playerName);
+
 	}
 	
 	private void startGame(Game game) throws GameException {

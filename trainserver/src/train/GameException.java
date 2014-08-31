@@ -23,6 +23,7 @@ public class GameException extends Exception {
 	public static String EXCEEDED_ALLOWANCE = "ExceededAllowance";
 	public static String INVALID_CARD = "InvalidCard";
 	public static String TRAIN_ALREADY_STARTED = "TrainAlreadyStarted";
+	public static String NOTHING_TO_UNDO = "NothingToUndo";
 	
 	public static final long serialVersionUID = 1;
 	

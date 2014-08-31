@@ -21,13 +21,14 @@ interface AbstractGame {
 	 * the game is started.
 	 * @param pid Player who started the game
 	 * @throws GameException
+	 * @returns true if games has been started
 	 * 
 	 * Exceptions:
 	 * GAME_ALREADY_STARTED
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void startGame(String player, boolean ready) throws GameException;
+	boolean startGame(String player, boolean ready) throws GameException;
 	
 	/** Check to see if building a set of mileposts is possible
 	 * @param player	Player who is building
@@ -155,6 +156,11 @@ interface AbstractGame {
 	 * @throws GameException 
 	 */
 	void turnInCards(String player) throws GameException;
+	
+	/** Undo previous action 
+	 *
+	 */
+	Game undo() throws GameException;
 	
 	/** Player declares their turn is over.
 	 * @param pid		Player whose train is being moved
