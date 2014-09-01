@@ -223,6 +223,11 @@ var undo = function () {
     post({ messageType: 'undo', gid: gid, pid: pid }, function () { justResumed = true; });
 };
 
+//Tells server to redo the last undone action
+var redo = function () {
+    post({ messageType: 'redo', gid: gid, pid: pid }, function () { justResumed = true; });
+};
+
 //Tells server we're done with our turn
 var endTurn = function () {
     post({ messageType: 'endTurn', pid: pid, gid: gid });

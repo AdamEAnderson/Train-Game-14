@@ -87,4 +87,7 @@ public class Milepost {
 		return this.city == null ? false : this.city.equals(next.city);
 	}
 	
+	public MilepostId getMilepostId() {
+		return new MilepostId(x, y);
+	}
 }

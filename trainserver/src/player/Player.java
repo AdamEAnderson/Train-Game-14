@@ -75,7 +75,8 @@ public class Player {
 			}
 			String ownerId = rail.anyConnects(mps[i], mps[i + 1]);
 			if(ownerId.equals("") && !mps[i].isSameCity(mps[i + 1])) {
-				log.warn("Cannot move - missing track from {} to {}", mps[i].toString(), mps[i+1].toString());
+				log.warn("Cannot move - missing track from {} to {}", mps[i].getMilepostId().toString(), 
+					mps[i+1].getMilepostId().toString());
 				return false;
 			}
 			if(rail.connectsByFerry(mps[i], mps[i + 1])){

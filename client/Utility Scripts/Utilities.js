@@ -177,6 +177,8 @@ var processAjaxErrors = function (xhr, textStatus, errorThrown) {
         displayInfo('Error: Invalid delivery', 'error');
     else if (xhr.status == 400 && xhr.responseJSON == 'NothingToUndo')
         displayInfo('Error: Nothing to undo', 'error');
+    else if (xhr.status == 400 && xhr.responseJSON == 'NothingToRedo')
+        displayInfo('Error: Nothing to redo', 'error');
     else if(xhr.responseJSON)
         displayInfo('Error ' + xhr.responseJSON);
     else

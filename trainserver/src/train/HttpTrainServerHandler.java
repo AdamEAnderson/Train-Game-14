@@ -55,6 +55,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 	private final static String MOVE_TRAIN = "moveTrain";
 	private final static String TURN_IN_CARDS = "turnInCards";
 	private final static String UNDO = "undo";
+	private final static String REDO = "redo";
 	private final static String END_TURN = "endTurn";
 	private final static String END_GAME = "endGame";
 	private final static String RESIGN_GAME = "resignGame";
@@ -199,6 +200,9 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					break;
 				case UNDO:
 					TrainServer.undo(message.jsonMessage);
+					break;
+				case REDO:
+					TrainServer.redo(message.jsonMessage);
 					break;
 				case END_TURN:
 					TrainServer.endTurn(message.jsonMessage);

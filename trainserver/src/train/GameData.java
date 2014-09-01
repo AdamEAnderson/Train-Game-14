@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -46,11 +44,11 @@ class DirectoryFileFilter implements FileFilter {
  */
 public class GameData {
 
-	Queue<Card> deck;	/** Cards holding delivery possibilities */
-	TrainMap map;		/** Mileposts, cities, building costs */
-	Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
-	Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
-	String geography;	/** which game is played (africa, russia, china, etc.) */
+	private List<Card> deck;	/** Cards holding delivery possibilities */
+	private TrainMap map;		/** Mileposts, cities, building costs */
+	private Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
+	private Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
+	private String geography;	/** which game is played (africa, russia, china, etc.) */
 	
 	/** Directory where data for all games is stored */
 	static private String dataDirectoryPath = null;
@@ -66,18 +64,17 @@ public class GameData {
 		}
 		loads = new HashMap<String, Set<City>>();
 		cities = getCityData(gameType);
-		List<Card> list = getCardData(gameType);
-		Collections.shuffle(list);
-		ArrayDeque<Card> queue = new ArrayDeque<Card>();
-		queue.addAll(list);
-		deck = queue;
+		deck = getCardData(gameType);
+		Collections.shuffle(deck);
 		map = getMapData(gameType, cities);
 		geography = gameType;
 	}
 	
-	public Queue<Card> getDeck() { return deck; }
+	public List<Card> getDeck() { return deck; }
 	public Map<String,City> getCities() { return cities; }
 	public TrainMap getMap() { return map; }
+	public Map<String, Set<City>> getLoads() { return loads; }
+	public String getGeography() { return geography; }
 	
 	/** Looks for the game's data directory starting at the current working directory,
 	 * and looking at all children of the directory for a child named "data". If not 

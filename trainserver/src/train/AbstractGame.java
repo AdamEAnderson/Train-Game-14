@@ -161,6 +161,11 @@ interface AbstractGame {
 	 *
 	 */
 	Game undo() throws GameException;
+
+	/** Redo previous undone action 
+	 *
+	 */
+	Game redo() throws GameException;
 	
 	/** Player declares their turn is over.
 	 * @param pid		Player whose train is being moved

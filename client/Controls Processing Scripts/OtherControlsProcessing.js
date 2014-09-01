@@ -77,7 +77,13 @@ var resignClick = function () {
 var undoKeyUp = function (e) {
 	if (!e.ctrlKey)
 		return;
-    if (e.which == 90) 
-        undo();
+    switch (e.which) {
+        case 89:    // Control-Y
+            redo();
+            break;
+        case 90:    // Control-Z
+            undo();
+            break;
+    }
 };
 

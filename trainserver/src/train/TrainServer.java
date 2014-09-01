@@ -181,7 +181,7 @@ public class TrainServer {
 		GameStatus status = new GameStatus();
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
-		status.geography = game.gameData.geography;
+		status.geography = game.gameData.getGeography();
 		status.transaction = game.transaction();
 		status.joinable = game.getJoinable();
 		status.ended = game.isOver();
@@ -299,14 +299,14 @@ public class TrainServer {
 	
 	static private NewGameResponse newGameResponse(String gid, GameData gameData){
 		NewGameResponse response = new NewGameResponse();
-		response.mapData = gameData.map.getSerializeData();
-		response.cities = gameData.cities.values();
-		response.geography = gameData.geography;
+		response.mapData = gameData.getMap().getSerializeData();
+		response.cities = gameData.getCities().values();
+		response.geography = gameData.getGeography();
 		// Convert from loads to set of cities to loads to set of city names
 		response.loadset = new TreeMap<String, Set<String>>();
-		for (String load: gameData.loads.keySet()) {
+		for (String load: gameData.getLoads().keySet()) {
 			Set<String> cities = new HashSet<String>();
-			for (City city:gameData.loads.get(load))
+			for (City city:gameData.getLoads().get(load))
 				cities.add(city.name);
 			response.loadset.put(load, cities);
 		}
@@ -635,9 +635,33 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
+		if (game.getActivePlayer() == null)
+			throw new GameException(GameException.NOTHING_TO_UNDO);
 		if (!data.pid.equals(game.getActivePlayer().name))
 			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
 		Game newGame = game.undo();
+		if (newGame != null)
+			games.replace(data.gid, newGame);
+	}
+	
+	/** Redo the previous action
+	 * Player may redo if the previous action was undone. Player may keep redoing to 
+	 * redo multiple actions. Player may not redo actions taken by other players, or
+	 * their own actions during previous turns.
+	 * @param requestText
+	 * @throws GameException
+	 */
+	static public void redo(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		UndoData data = gson.fromJson(requestText, UndoData.class);
+		Game game = games.get(data.gid);
+		if (game == null)
+			throw new GameException(GameException.GAME_NOT_FOUND);
+		if (game.getActivePlayer() == null)
+			throw new GameException(GameException.NOTHING_TO_REDO);
+		if (!data.pid.equals(game.getActivePlayer().name))
+			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
+		Game newGame = game.redo();
 		if (newGame != null)
 			games.replace(data.gid, newGame);
 	}
