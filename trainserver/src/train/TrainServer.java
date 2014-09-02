@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 import map.Milepost;
 import map.MilepostId;
-import map.MilepostSerializer;
+import map.MilepostTypeAdapter;
 import map.TrainMap;
 
 import org.slf4j.Logger;
@@ -177,7 +177,7 @@ public class TrainServer {
 		
 		// Generate a new status message
 		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostTypeAdapter());
 		GameStatus status = new GameStatus();
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
@@ -317,7 +317,7 @@ public class TrainServer {
 	static public String buildNewGameResponse(String gid, GameData gameData) {
 		// Build a JSON string that has gid, serialized map data, list of cities and loads
 		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostTypeAdapter());
 
 		return gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
 	}
@@ -381,13 +381,7 @@ public class TrainServer {
 		game.getPlayer(data.pid);	// throws PLAYER_NOT_FOUND if player not in game
 		log.info("resumeGame(pid={})", data.pid);
 		
-		NewGameResponse response = new NewGameResponse();
-		response = newGameResponse(data.gid, game.gameData);
-		
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostSerializer());
-
-		return gsonBuilder.serializeNulls().create().toJson(response);
+		return buildNewGameResponse(data.gid, game.gameData);
 	}
 
 	static class StartGameData {

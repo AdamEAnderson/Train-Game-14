@@ -11,7 +11,6 @@ import reference.*;
 import train.Game;
 import train.GameException;
 import train.RuleSet;
-import map.Ferry;
 import map.Milepost;
 
 
@@ -35,14 +34,14 @@ public class Player {
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
 	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
-			Game game, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries){
+			Game game, Map<Milepost, Set<Rail.Track>> globalRail){
 		trains = new Train[ruleSet.numTrains];
 		for (int i = 0; i < ruleSet.numTrains; ++i) {
 			trains[i] = new Train(i);
 		}
 		this.game = game;
 		money = ruleSet.startingMoney;
-		rail = new Rail(globalRail, globalFerries, name);
+		rail = new Rail(globalRail, name);
 		cards = hand;
 		this.name = name;
 		this.color = color;
@@ -69,8 +68,8 @@ public class Player {
 		if(mps[0] == null) 
 			return false;
 		for(int i = 0, m = movesMade[tIndex]; i < mps.length - 1; i++, m++){
-			if(m > trains[tIndex].getSpeed()) {
-				log.warn("Train cannot move {} mileposts", m);
+			if(m >= trains[tIndex].getSpeed()) {
+				log.warn("Train cannot move {} mileposts, limit is {}", m + 1, trains[tIndex].getSpeed());
 				return false;
 			}
 			String ownerId = rail.anyConnects(mps[i], mps[i + 1]);
@@ -79,15 +78,13 @@ public class Player {
 					mps[i+1].getMilepostId().toString());
 				return false;
 			}
-			if(rail.connectsByFerry(mps[i], mps[i + 1])){
+			if(mps[i].isNeighborByFerry(mps[i + 1])){
 				if(m != 0) {
 					log.warn("Travelling by ferry must be at start of turn");
 					return false;
 				}
-				else{
+				else
 					m = trains[tIndex].getSpeed()/2;
-					m--;
-				}
 			}
 		}
 		return true;
@@ -107,7 +104,7 @@ public class Player {
 				owner.deposit(4);
 				owner.stats.rentalIncome += 4;
 			}
-			if(rail.connectsByFerry(mps[i], mps[i + 1])){
+			if(mps[i].isNeighborByFerry(mps[i + 1])){
 				movesMade[t] = trains[t].getSpeed()/2;
 			} else{
 				movesMade[t] ++;
@@ -322,9 +319,8 @@ public class Player {
 	/** Call this from test code only!! Just here for debugging */
 	public void turnInCards(Card[] cards)  { this.cards = cards; }
 	
-	public void fixup(Game game, Map<Milepost, Set<Rail.Track>> globalRail, Map<Milepost, Ferry> globalFerries) {
+	public void fixup(Game game, Map<Milepost, Set<Rail.Track>> globalRail) {
 		this.game = game;
-		rail.allTracks = globalRail;
-		rail.allFerries = globalFerries;
+		rail.fixup(globalRail);
 	}
 }

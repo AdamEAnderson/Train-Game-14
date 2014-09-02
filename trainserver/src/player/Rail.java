@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import train.GameException;
-
 import map.Edge;
 import map.Ferry;
 import map.Milepost;
@@ -14,28 +13,39 @@ public class Rail {
 	
 	private Map<Milepost, Set<Milepost>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
-	public Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
-	public Map<Milepost, Ferry> allFerries;
+	private transient Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
 	private String pid;
 	
-	Rail(Map<Milepost, Set<Track>> allTracks, Map<Milepost, Ferry> allFerries, String pid){
+	Rail(Map<Milepost, Set<Track>> allTracks, String pid){
 		this.allTracks = allTracks;
 		tracks = new HashMap<Milepost, Set<Milepost>>();
-		this.allFerries = allFerries;
 		this.pid = pid;
 	}
 	
-	public Map<Milepost, Set<Milepost>> getRail(){return tracks;}
+	Rail(Map<Milepost, Set<Track>> allTracks, String pid, Map<Milepost, Set<Milepost>> tracks){
+		this.allTracks = allTracks;
+		this.pid = pid;
+		this.tracks = tracks;
+	}
 	
-	boolean contains(Milepost m){return tracks.containsKey(m);}
+	public Map<Milepost, Set<Milepost>> getRail(){
+		return tracks;
+	}
+	
+	String getPid() {
+		return pid;
+	}
+	
+	/** True if the player has built to this milepost */
+	boolean contains(Milepost m){
+		return tracks.containsKey(m);
+	}
 	
 	/** Returns whether this rail connects these two mileposts.
 	 *  When the two mileposts are not neighbors, the answer is always false.
 	 */
-	boolean connects(Milepost one, Milepost two){return tracks.get(one).contains(two);}
-	
-	boolean connectsByFerry(Milepost one, Milepost two){
-		return (allFerries.containsKey(one) ? allFerries.get(one).destination.equals(two) : false);
+	boolean connects(Milepost one, Milepost two){
+		return tracks.get(one).contains(two);
 	}
 	
 	String anyConnects(Milepost one, Milepost two){
@@ -107,11 +117,7 @@ public class Rail {
 		Edge e = getEdge(origin, next);
 		if (e instanceof Ferry){
 			Edge back = getEdge(next, origin);
-			if(back instanceof Ferry){
-				allFerries.put(origin, (Ferry) e);
-				allFerries.put(next, (Ferry) back);
-			}
-			else {
+			if(!(back instanceof Ferry)){
 				erase(origin, next);
 				throw new GameException(GameException.INVALID_TRACK);
 			}
@@ -134,6 +140,21 @@ public class Rail {
 		removeTrack(two, one);
 		removeAllTrack(one, two);
 		removeAllTrack(two, one);
+	}
+	
+	/** After deserializing a game, need to fix up the Rail so the 
+	 * globalRail, globalFerry points back to the one set in the Game,
+	 * and also so that it is populated.
+	 * @param globalRail
+	 * @param globalFerries
+	 */
+	void fixup(Map<Milepost, Set<Rail.Track>> globalRail) {
+		this.allTracks = globalRail;
+		// Add player's track to the global set, since that isn't persisted
+		for (Milepost src:tracks.keySet()) {
+			for (Milepost dest: tracks.get(src))
+				addAllTrack(src, dest);
+		}
 	}
 	
 	public class Track {

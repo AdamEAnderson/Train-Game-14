@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import map.Ferry;
 import map.Milepost;
 import map.MilepostId;
+import map.MilepostShortFormTypeAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 
 import player.Player;
 import player.Rail;
+import player.RailTypeAdapter;
 import reference.Card;
 import reference.UpgradeType;
 
@@ -31,16 +32,15 @@ public class Game implements AbstractGame {
 	private List<Player> players;
 	private transient Player active;
 	private int activeIndex;		// index of active player in players array
-	private Map<Milepost, Set<Rail.Track>> globalRail;
-	private Map<Milepost, Ferry> globalFerry;
+	private transient Map<Milepost, Set<Rail.Track>> globalRail;
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
 	private boolean joinable;	// game has not yet started
 	private boolean ended; // game has ended
 	private transient int transaction;
 	private transient Date lastChange;
 	private String name;
-	private UndoRedoStack undoStack;
-	private UndoRedoStack redoStack;
+	private transient UndoRedoStack undoStack;
+	private transient UndoRedoStack redoStack;
 	private int currentCard = 0;
 		
 	private static Logger log = LoggerFactory.getLogger(Game.class);
@@ -57,7 +57,6 @@ public class Game implements AbstractGame {
 		lastChange = new Date();
 		players = new ArrayList<Player>();
 		globalRail = new HashMap<Milepost, Set<Rail.Track>>();
-		globalFerry = new HashMap<Milepost, Ferry>();
 		turns = 0;
 		joinable = true;
 		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
@@ -78,7 +77,7 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < hand.length; i++){
 			hand[i] = dealCard();
 		}
-		players.add(new Player(ruleSet, hand, pid, color, this, globalRail, globalFerry));
+		players.add(new Player(ruleSet, hand, pid, color, this, globalRail));
 		registerTransaction();
 	}
 
@@ -141,14 +140,14 @@ public class Game implements AbstractGame {
 			log.info("{}, ", milepostIds[i]);
 		log.info("])");
 		checkActive(pid);
-		saveForUndo();
+		String originalGameState = toString();
 
 		Milepost[] mileposts = new Milepost[milepostIds.length];
 		for(int i = 0; i < mileposts.length; i++){
 			mileposts[i] = gameData.getMap().getMilepost(milepostIds[i]);
 		}
 		active.buildTrack(mileposts);	
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -156,20 +155,20 @@ public class Game implements AbstractGame {
 			throws GameException {
 		log.info("upgradeTrain(pid={}, train={}, upgradeType={})", pid, upgrade, train);
 		checkActive(pid);
-		saveForUndo();
+		String originalGameState = toString();
 
 		active.upgradeTrain(train, upgrade);
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 
 	@Override
 	public void placeTrain(String pid, int train, MilepostId where) throws GameException {
 		log.info("placeTrain(pid={}, train={}, where={})", pid, train, where);
 		checkActive(pid);
+		String originalGameState = toString();
 
-		saveForUndo();
 		active.placeTrain(gameData.getMap().getMilepost(where), train);
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -198,7 +197,7 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		checkBuilding();
-		saveForUndo();
+		String originalGameState = toString();
 
 		Milepost[] mps = new Milepost[mileposts.length + 1];
 		mps[0] = active.getTrains()[train].getLocation();
@@ -206,7 +205,7 @@ public class Game implements AbstractGame {
 			mps[i + 1] = gameData.getMap().getMilepost(mileposts[i]);
 		}
 		active.moveTrain(train, mps);
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 	
 	@Override
@@ -214,9 +213,9 @@ public class Game implements AbstractGame {
 		log.info("pickupLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
 		checkBuilding();
-		saveForUndo();
+		String originalGameState = toString();
 		active.pickupLoad(train, load);
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -225,18 +224,18 @@ public class Game implements AbstractGame {
 		log.info("deliverLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
 		checkBuilding();
-		saveForUndo();
+		String originalGameState = toString();
 		active.deliverLoad(card, train, dealCard());
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 
 	@Override
 	public void dumpLoad(String pid, int train, String load) throws GameException {
 		log.info("dumpLoad(pid={}, train={}, load={})", pid, train, load);
 		checkActive(pid);
-		saveForUndo();
+		String originalGameState = toString();
 		active.dropLoad(train, load);
-		registerTransaction();
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -245,7 +244,6 @@ public class Game implements AbstractGame {
 		checkActive(player);
 		if(active.turnInProgress()) 
 			throw new GameException("TurnAlreadyStarted");
-		saveForUndo();
 
 		Card[] cards = new Card[ruleSet.handSize];
 		for(int i = 0; i < cards.length; i++){
@@ -255,27 +253,37 @@ public class Game implements AbstractGame {
 		endTurn(player);
 	}
 	
-	public void saveForUndo() {
+	/** To undo, clients should first save off the original game state, 
+	 * then do whatever action they're doing, then call saveForUndo. That
+	 * way if the action throws an exception, it won't go on the undo stack.
+	 * @param gameState
+	 */
+	private void saveForUndo(String gameState) {
 		redoStack.clear();
-		undoStack.push(this);
+		undoStack.push(gameState);
 	}
 	
 	@Override
 	public Game undo() throws GameException {
 		log.info("undo");
-		registerTransaction();
-		redoStack.push(this);
-		String gameString = undoStack.pop();
-		return Game.fromString(gameString, this);
+		String originalGameState = toString();
+		String gameState = undoStack.pop();
+		log.debug("Serialized game: {}", gameState);
+		Game newGame = Game.fromString(gameState, this);
+		newGame.registerTransaction();
+		newGame.redoStack.push(originalGameState);
+		return newGame;
 	}
 	
 	@Override
 	public Game redo() throws GameException {
 		log.info("redo");
-		registerTransaction();
-		undoStack.push(this);
+		String originalGameState = toString();
 		String gameString = redoStack.pop();
-		return Game.fromString(gameString, this);
+		Game newGame = Game.fromString(gameString, this);
+		newGame.registerTransaction();
+		newGame.undoStack.push(originalGameState);
+		return newGame;
 	}
 
 	@Override
@@ -346,18 +354,17 @@ public class Game implements AbstractGame {
 	}
 	
 	public String toString() {
-		/*StringBuilder builder = new StringBuilder(4096);
-		builder.append("{");
-		builder.append("}");*/
 		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new map.MilepostSerializer());
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(this));
+		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(this));
 		Gson gson = gsonBuilder.create();
 		return gson.toJson(this);
 	}
 	
 	public static Game fromString(String gameString, Game refGame) {
 		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new map.MilepostSerializer(refGame));
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
+		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(refGame));
 		Gson gson = gsonBuilder.create();
 		Game newGame = gson.fromJson(gameString, Game.class);
 		
@@ -368,8 +375,9 @@ public class Game implements AbstractGame {
 		newGame.lastChange = refGame.lastChange;
 		newGame.undoStack = refGame.undoStack;
 		newGame.redoStack = refGame.redoStack;
+		newGame.globalRail = new HashMap<Milepost, Set<Rail.Track>>();
 		for (Player p: newGame.players) 
-			p.fixup(newGame, newGame.globalRail, newGame.globalFerry);
+			p.fixup(newGame, newGame.globalRail);
 		newGame.setActive(newGame.players.get(refGame.activeIndex));
 		
 		return newGame;
@@ -408,6 +416,10 @@ public class Game implements AbstractGame {
 	
 	public int getTurns() { return turns; }
 
+	public Map<Milepost, Set<Rail.Track>> getGlobalRail() {
+		return globalRail;
+	}
+	
 	private void checkActive(String pid) throws GameException {
 		if (!(getPlayer(pid) == active)) 
 			throw new GameException("PlayerNotActive");
@@ -435,6 +447,11 @@ public class Game implements AbstractGame {
 	private void registerTransaction() {
 		lastChange = new Date();
 		++transaction;
+	}
+	
+	private void registerTransaction(String originalGameState) {
+		saveForUndo(originalGameState);
+		registerTransaction();
 	}
 	
 	private Card dealCard() {

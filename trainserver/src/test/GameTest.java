@@ -2,6 +2,8 @@ package test;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import map.MilepostId;
 
 import org.junit.Test;
@@ -536,8 +538,8 @@ public class GameTest {
 	        new MilepostId(26,50),
 	        new MilepostId(25,49),
 	        new MilepostId(25,48),
-	        new MilepostId(24,47),
-	        new MilepostId(25,46),
+	        //new MilepostId(24,47),
+	        //new MilepostId(25,46),
         };
 
 		try {
@@ -960,7 +962,23 @@ public class GameTest {
 			
 			// Cross back to mainland, try to return to Dakar (should fail because 
 			// after ferry crossing goes half speed)
-			/** Following is commented out due to bug */
+			moveMileposts = new MilepostId[] {
+					new MilepostId(2,17), 
+					new MilepostId(3,16), 
+					new MilepostId(3,15),
+					new MilepostId(4,14),
+					new MilepostId(4,13),
+					new MilepostId(5,12),
+					new MilepostId(5,11),
+					};
+        	reverse(moveMileposts);
+        	try {
+        		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        		fail("Expected move exception here -- didn't get one");
+        	} catch (GameException e) {
+        	}
+        	
+        	// Try the same again, but moving in increments -- should fail
 			moveMileposts = new MilepostId[] {
 					new MilepostId(2,17), 
 					new MilepostId(3,16), 
@@ -976,9 +994,12 @@ public class GameTest {
 					};
         	reverse(moveMileposts);
         	try {
-        		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        		game.moveTrain(game.getActivePlayer().name, 0, Arrays.copyOfRange(moveMileposts, 0, 4));
+        		game.moveTrain(game.getActivePlayer().name, 0, Arrays.copyOfRange(moveMileposts, 4, moveMileposts.length));
         		fail("Expected move exception here -- didn't get one");
         	} catch (GameException e) {
+        		// Undo first move (which succeeded) so we return to ferry stop
+        		game = undo(gid, game.getActivePlayer().name);
         	}
         	
         	// Now try moving legal amount (6)
@@ -1083,8 +1104,6 @@ public class GameTest {
 				new MilepostId(5,7),	// stop in port
 				};
 		String gid = null;
-		String undoPayload = null;
-		String redoPayload = null;
 		try {
 			gid = newGame("Louie", "blue", "africa");
 			game = TrainServer.getGame(gid);
@@ -1092,23 +1111,16 @@ public class GameTest {
 	        startGame(game);
 			skipPastBuildingTurns(game);
         	game.buildTrack(game.getActivePlayer().name, buildMileposts);
-        	undoPayload = String.format("{\"messageType\":\"undo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, game.getActivePlayer().name);
-        	redoPayload = String.format("{\"messageType\":\"redo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, game.getActivePlayer().name);
-    		TrainServer.undo(undoPayload);
-    		game = TrainServer.getGame(gid);
+    		game = undo(gid, game.getActivePlayer().name);
         	game.buildTrack(game.getActivePlayer().name, buildMileposts);	// build was undone, so rebuild should work
 			
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
-    		TrainServer.undo(undoPayload);   // undo place
-    		game = TrainServer.getGame(gid);
+    		game = undo(gid, game.getActivePlayer().name);
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
 			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
-			TrainServer.undo(undoPayload);	// undo move
-    		game = TrainServer.getGame(gid);
-    		TrainServer.undo(undoPayload);   // undo place
-    		game = TrainServer.getGame(gid);
-    		TrainServer.undo(undoPayload);	// undo building
-    		game = TrainServer.getGame(gid);
+    		game = undo(gid, game.getActivePlayer().name);	// undo move
+    		game = undo(gid, game.getActivePlayer().name);	// undo place
+    		game = undo(gid, game.getActivePlayer().name);	// undo building
 		} catch (GameException e) {
 			fail("Unexpected exception");
 		}
@@ -1125,20 +1137,16 @@ public class GameTest {
 			fail("Unexpected exception");
 		}
 		try {
-			TrainServer.redo(redoPayload);
+    		game = redo(gid, game.getActivePlayer().name);
 			fail("Expected a NothingToRedo error");
 		} catch (GameException e) {
 			// expected case
 		}
 		try {
-    		TrainServer.undo(undoPayload);	// undo building
-    		game = TrainServer.getGame(gid);
-    		TrainServer.redo(redoPayload);	// redo building
-    		game = TrainServer.getGame(gid);
-    		TrainServer.undo(undoPayload);	// undo building - check that we can undo the redo
-    		game = TrainServer.getGame(gid);
-    		TrainServer.redo(redoPayload);	// redo building
-    		game = TrainServer.getGame(gid);
+    		game = undo(gid, game.getActivePlayer().name);	// undo building
+    		game = redo(gid, game.getActivePlayer().name);	// redo building
+    		game = undo(gid, game.getActivePlayer().name);	// undo building
+    		game = redo(gid, game.getActivePlayer().name);	// redo building
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
 			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
 			game.endTurn(game.getActivePlayer().name);
@@ -1146,10 +1154,28 @@ public class GameTest {
 				fail("Unexpected exception");
 		}
 		try {
-			game.undo();
+    		game = undo(gid, game.getActivePlayer().name);
 			fail("Expected a NothingToUndo error");
 		} catch (GameException e) {
 			// expected case
+		}
+
+		// Test undoing & redoing ferry building (requires special fixup)
+        // Build to Tenarife
+		MilepostId[] ferryMileposts = new MilepostId[] {
+				new MilepostId(5,7),
+				new MilepostId(0,6)		// Tenarife via ferry
+				};
+		try {
+			game.endTurn(game.getActivePlayer().name);
+			game.buildTrack(game.getActivePlayer().name, ferryMileposts);
+    		game = undo(gid, game.getActivePlayer().name);	// undo building
+			game.buildTrack(game.getActivePlayer().name, ferryMileposts);
+    		game = undo(gid, game.getActivePlayer().name);	// undo building
+    		game = redo(gid, game.getActivePlayer().name);	// redo building
+    		game = undo(gid, game.getActivePlayer().name);	// undo building - check that we can undo the redo
+		} catch (GameException e) {
+			fail("Unexpected exception");
 		}
 	}
 	
@@ -1214,6 +1240,18 @@ public class GameTest {
 	      left++;
 	      right--;
 	   }
+	}
+	
+	private Game undo(String gid, String pid) throws GameException {
+    	String undoPayload = String.format("{\"messageType\":\"undo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, pid);
+		TrainServer.undo(undoPayload);
+		return TrainServer.getGame(gid);
+	}
+	
+	private Game redo(String gid, String pid) throws GameException {
+    	String redoPayload = String.format("{\"messageType\":\"redo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, pid);
+		TrainServer.redo(redoPayload);
+		return TrainServer.getGame(gid);
 	}
 	
 	private void skipPastBuildingTurns(Game game) throws GameException {

@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -79,7 +79,7 @@ var moveClick = function (e) {
     }
     if (findPid(data.players, pid).trains.length > 1)
         $('#placeControls').show();
-    $(document).keyup(function (e) {
+    var moveKeyup = function (e) {
         if ($('#placeControls > .ui-state-active').length == 0 && findPid(data.players, pid).trains.length > 1)
             return;
 
@@ -130,7 +130,7 @@ var moveClick = function (e) {
         drawTrain(train, pid, mpsvg.x, mpsvg.y);
         refreshMovesRemaining(player.trains);
         testMoveTrain(train, movesMade[train]);
-    });
+    };
     $('#acceptBuild').click(function () {
         for (var i = 0; i < movesMade.length; i++) {
             moveTrain(i, movesMade[i]);
@@ -138,7 +138,7 @@ var moveClick = function (e) {
         checkMoveButton();
         $(this).off('click');
         $('#acceptBuild').off('click');
-        $(document).off('keyup');
+        $(document).off('keyup',moveKeyup);
         $('#okControls').hide();
         $('#placeControls').hide();
         $('#turnControls').show();
@@ -161,7 +161,7 @@ var moveClick = function (e) {
         checkLoadButtons(lastStatusMessage.players);
         $(this).off('click');
         $('#acceptBuild').off('click');
-        $(document).off('keyup');
+        $(document).off('keyup',moveKeyup);
         $('#okControls').hide();
         $('#placeControls').hide();
         $('#turnControls').show();
@@ -198,7 +198,8 @@ var placeTrainClick = function (e) {
             $('#acceptBuild').button('option', 'disabled', false);
         else
             $('#acceptBuild').button('option', 'disabled', true);
-    };
+    }
+    $(document).keyup(moveKeyup);
     $('#milepostsGroup > *:not(path)').click(milepostClick);
     $('#acceptBuild').click(function () {
         if (placeTrainLocations.length != findPid(data.players, pid).trains.length)

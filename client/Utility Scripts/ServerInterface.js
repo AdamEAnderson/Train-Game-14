@@ -18,8 +18,6 @@ var joinGame = function (GID, color, handle) {
         gameData = data;
         gid = GID;
         pid = handle;
-        for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
-            gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
         geography = data.geography;
         console.log("join game: " + gid);
         enterGame();
@@ -38,8 +36,6 @@ var resumeGame = function (GID, handle) {
         gid = GID;
         pid = handle;
         justResumed = true;
-        for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i)
-            gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
         geography = gameData.geography;
         console.log("resume game: " + gid);
         enterGame();
@@ -262,9 +258,6 @@ var newGame = function (color, handle, gameGeo, gameName, handSize, startingMone
         $('#loading').show();
         loading = true;
         gameData = data;
-        for (var i = 0; i < gameData.mapData.orderedMileposts.length; ++i) {
-            gameData.mapData.orderedMileposts[i] = JSON.parse(gameData.mapData.orderedMileposts[i]);
-        }
         gid = data.gid;
         pid = handle;
         geography = gameGeo;

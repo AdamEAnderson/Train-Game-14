@@ -9,10 +9,10 @@ class UndoRedoStack {
 
 	UndoRedoStack(String error) {
 		this.stack = new Stack<String>();
+		this.error = error;
 	}
 
-	void push(Game game) { 
-		String gameState = game.toString();
+	void push(String gameState) { 
 		stack.push(gameState); 
 	}
 		

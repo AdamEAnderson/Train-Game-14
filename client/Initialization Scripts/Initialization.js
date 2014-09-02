@@ -305,7 +305,7 @@ var processResume = function (data) {
             continue;
         $('#move').show();
         $('#drop').show();
-        var milepost = JSON.parse(player.trains[i].loc);
+        var milepost = player.trains[i].loc;
         trainLocations[i] = { x: milepost.x, y: milepost.y };
         var mpsvg = findMilepost(milepost.x, milepost.y);
         drawTrain(i, pid, mpsvg.x, mpsvg.y);
@@ -329,5 +329,8 @@ var processResume = function (data) {
     
     checkMoveButton();
     checkLoadButtons(lastStatusMessage.players, true);
+    refreshTrains(player.trains,lastStatusMessage.activeid == pid);
+    refreshCards(player.hand);
+    refreshMoney(player.money);
     justResumed = false;
 };

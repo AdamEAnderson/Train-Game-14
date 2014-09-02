@@ -42,6 +42,14 @@ public class Milepost {
 		return false;
 	}
 	
+	public boolean isNeighborByFerry(Milepost m){
+		for(int i = 0; i < 6; i++){
+			if(edges[i] != null && edges[i].destination.equals(m) && edges[i] instanceof Ferry) 
+				return true;
+		}
+		return false;
+	}
+	
 	public @Override boolean equals(Object obj){
 		if(obj instanceof Milepost){
 			return (this.x == ((Milepost) obj).x) && 
@@ -51,38 +59,6 @@ public class Milepost {
 		}
 	}
 		
-	public String toString() {
-		StringBuilder builder = new StringBuilder(128);
-		builder.append("{" + "\"x\":" + x + "," + "\"y\":" + y + "," + "\"type\":\"" + type.name() + "\"");
-		if (city != null) {
-			builder.append(",\"city\":{\"name\":\"" + city.name + "\",\"loads\":[");
-			boolean first = true;
-			for (String load: city.loads) {
-				if (!first)
-					builder.append(",");
-				builder.append("\"");
-				builder.append(load);
-				builder.append("\"");
-				first = false;
-			}
-			builder.append("]}");
-		}
-		builder.append(",\"edges\":[");
-		boolean firstEdge = true;
-		for (Edge edge: edges) {
-			if (!firstEdge)	// prevent trailing comma. yuck. don't see a better way to do this right now
-				builder.append(",");
-			firstEdge = false;
-			if (edge != null) {
-				builder.append("{" + "\"x\":" + edge.destination.x + "," + "\"y\":" + edge.destination.y + ",\"cost\":" + edge.cost + "}");
-			}else {
-				builder.append("null");
-			}
-		}
-		builder.append("]}");
-		return builder.toString();
-	}
-
 	public boolean isSameCity(Milepost next) {
 		return this.city == null ? false : this.city.equals(next.city);
 	}
