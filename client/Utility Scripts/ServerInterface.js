@@ -130,10 +130,13 @@ var testMoveTrain = function (train, vertices) {
         },
         error: function (xhr, textStatus, errorThrown) {
             processAjaxErrors(xhr, textStatus, errorThrown);
-            if (!movesMade || !movesMade[train])
+            if (!movesMade || !movesMade[train] || !movesMade[train][-1])
                 return;
-            if (lastSuccessfulMove && !lastSuccessfulMove[train])
+            if (lastSuccessfulMove && (!lastSuccessfulMove[train] || lastSuccessfulMove[train].length == 0)){
+                var start = JSON.parse(JSON.stringify(movesMade[train][-1]));
                 movesMade[train] = [];
+                movesMade[train][-1] = start;
+            }
             else {
                 movesMade[train] = lastSuccessfulMove[train].clone();
                 if (lastSuccessfulMove[train][-1])

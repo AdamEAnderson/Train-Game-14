@@ -131,13 +131,14 @@ var moveClick = function (e) {
         refreshMovesRemaining(player.trains);
         testMoveTrain(train, movesMade[train]);
     };
+    $(document).keyup(moveKeyup);
     $('#acceptBuild').click(function () {
         for (var i = 0; i < movesMade.length; i++) {
             moveTrain(i, movesMade[i]);
         }
         checkMoveButton();
         $(this).off('click');
-        $('#acceptBuild').off('click');
+        $('#cancelBuild').off('click');
         $(document).off('keyup',moveKeyup);
         $('#okControls').hide();
         $('#placeControls').hide();
@@ -199,7 +200,7 @@ var placeTrainClick = function (e) {
         else
             $('#acceptBuild').button('option', 'disabled', true);
     }
-    $(document).keyup(moveKeyup);
+    //$(document).keyup(moveKeyup);
     $('#milepostsGroup > *:not(path)').click(milepostClick);
     $('#acceptBuild').click(function () {
         if (placeTrainLocations.length != findPid(data.players, pid).trains.length)
