@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -103,7 +103,7 @@ var pickupClick = function (e) {
     var player = findPid(lastStatusMessage.players, pid);
     var validTrains = [];
     for (var i = 0; i < player.trains.length; i++) {
-        var milepost = JSON.parse(player.trains[i].loc);
+        var milepost = player.trains[i].loc;
         if (milepost.type == 'CITY' || milepost.type == 'MAJORCITY') {
             validTrains.push(player.trains[i]);
         }

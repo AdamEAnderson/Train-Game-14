@@ -387,7 +387,7 @@ public class Game implements AbstractGame {
 		for(Player p : players){
 			if (p.getPid().equals(pid)) return p;
 		}
-		throw new GameException("PlayerNotFound");
+		throw new GameException(GameException.PLAYER_NOT_FOUND);
 	}
 	
 	Player getLastPlayer(){	return players.get(players.size() - 1); }
@@ -422,11 +422,11 @@ public class Game implements AbstractGame {
 	
 	private void checkActive(String pid) throws GameException {
 		if (!(getPlayer(pid) == active)) 
-			throw new GameException("PlayerNotActive");
+			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
 	}
 
 	private void checkBuilding() throws GameException{
-		if(turns < 3) throw new GameException("InvalidMove");
+		if(turns < 3) throw new GameException(GameException.INVALID_MOVE);
 	}
 
 	/** Returns player whose turn it is */
