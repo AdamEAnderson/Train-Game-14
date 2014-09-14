@@ -5227,21 +5227,21 @@
 	<text transform="matrix(1 0 0 1 252.9819 49.707)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Sweden</text>
 	<text transform="matrix(1 0 0 1 472.9819 49.707)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Finland</text>
 	<text transform="matrix(1 0 0 1 110.9819 94.707)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Denmark</text>
-	<text transform="matrix(1 0 0 1 6.9819 214.707)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Germany</text>
-	<text transform="matrix(1 0 0 1 231.9116 358.7427)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Poland</text>
+	<text transform="matrix(1 0 0 1 6.9819 206.707)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Germany</text>
+	<text transform="matrix(1 0 0 1 231.9116 358.7393)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Poland</text>
 	<text transform="matrix(1 0 0 1 128.8188 468.7944)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Hungary</text>
 	<text transform="matrix(1 0 0 1 203.7949 555.2256)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Romania</text>
 	<text transform="matrix(1 0 0 1 186.0923 660.8145)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Bulgaria</text>
 	<text transform="matrix(1 0 0 1 88.2061 657.2773)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="12">Macedonia</text>
 	<text transform="matrix(1 0 0 1 331.2061 551.2773)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="12">Moldova</text>
-	<text transform="matrix(1 0 0 1 364.1616 359.4541)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Belarus</text>
+	<text transform="matrix(1 0 0 1 364.1616 358.7393)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Belarus</text>
 	<text transform="matrix(1 0 0 1 336.4175 247.4023)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Lithuania</text>
-	<text transform="matrix(1 0 0 1 402.6914 231.3691)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Latvia</text>
+	<text transform="matrix(1 0 0 1 402.6914 229.3691)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Latvia</text>
 	<text transform="matrix(1 0 0 1 424.5601 180.3433)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Estonia</text>
 	<text transform="matrix(1 0 0 1 293.8545 256.4858)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="12">Russia</text>
 	<text transform="matrix(1 0 0 1 38.9712 396.8413)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Austria</text>
 	<text transform="matrix(1 0 0 1 140.9395 420.27)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Slovakia</text>
-	<text transform="matrix(1 0 0 1 90.9551 356.8877)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Czech Rep</text>
+	<text transform="matrix(1 0 0 1 90.9551 357.606)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="18">Czech Rep</text>
 	<text transform="matrix(1 0 0 1 23.1851 469.748)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Croatia</text>
 	<text transform="matrix(1 0 0 1 31.7642 529.5005)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Bosnia</text>
 	<text transform="matrix(1 0 0 1 101.2856 575.2524)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="24">Serbia</text>
@@ -5266,8 +5266,8 @@
 	<text transform="matrix(1 0 0 1 635.877 507.8911)" fill="#25408E" font-family="'Helvetica'" font-size="12">Don</text>
 	<text transform="matrix(1 0 0 1 726.5562 527.5112)" fill="#25408E" font-family="'Helvetica'" font-size="12">Volga</text>
 	<text transform="matrix(1 0 0 1 593.8896 287.5112)" fill="#25408E" font-family="'Helvetica'" font-size="12">Volga</text>
-	<text transform="matrix(1 0 0 1 646.5566 139.1777)" fill="#25408E" font-family="'Helvetica'" font-size="12">Lake Onega</text>
-	<text transform="matrix(1 0 0 1 543.8901 138.6768)" fill="#25408E" font-family="'Helvetica'" font-size="12">Lake Ladoga</text>
+	<text transform="matrix(1 0 0 1 646.5566 138.9272)" fill="#25408E" font-family="'Helvetica'" font-size="12">Lake Onega</text>
+	<text transform="matrix(1 0 0 1 543.8901 138.9272)" fill="#25408E" font-family="'Helvetica'" font-size="12">Lake Ladoga</text>
 	<text transform="matrix(1 0 0 1 932.6592 354.731)" fill="#25408E" font-family="'Helvetica'" font-size="12">Kama</text>
 	<text transform="matrix(1 0 0 1 974.3076 114.4409)" fill="#25408E" font-family="'Helvetica'" font-size="12">Pechora</text>
 	<text transform="matrix(1 0 0 1 1114.8467 72.6899)" fill="#25408E" font-family="'Helvetica'" font-size="12">Ob</text>
@@ -5285,37 +5285,37 @@
 	<text transform="matrix(1 0 0 1 1465.9834 614.5371)" fill="#25408E" font-family="'Helvetica'" font-size="12">Lake Balkhash</text>
 	<text transform="matrix(1 0 0 1 49.3325 247.624)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Berlin</text>
 	<text transform="matrix(1 0 0 1 72.332 313.957)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Praha</text>
-	<text transform="matrix(1 0 0 1 1.999 331.291)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Munchen</text>
+	<text transform="matrix(1 0 0 1 1.999 333.7354)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Munchen</text>
 	<text transform="matrix(1 0 0 1 64.6655 378.2905)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Wien</text>
-	<text transform="matrix(1 0 0 1 386.9985 335.1235)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Minsk</text>
-	<text transform="matrix(1 0 0 1 312.999 312.2905)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Vilnius</text>
+	<text transform="matrix(1 0 0 1 384.9985 333.7354)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Minsk</text>
+	<text transform="matrix(1 0 0 1 312.999 313.2905)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Vilnius</text>
 	<text transform="matrix(1 0 0 1 229.9985 94.7905)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Stockholm</text>
 	<text transform="matrix(1 0 0 1 416.9995 205.29)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Riga</text>
 	<text transform="matrix(1 0 0 1 406.6655 160.957)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Tallinn</text>
 	<text transform="matrix(1 0 0 1 467.9995 94.791)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Helsinki</text>
-	<text transform="matrix(1 0 0 1 781.9995 335.1235)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Nizhniy Novgorad</text>
+	<text transform="matrix(1 0 0 1 785.9995 335.1235)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Nizhniy Novgorad</text>
 	<text transform="matrix(1 0 0 1 419.772 695.0991)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Sevastopol</text>
 	<text transform="matrix(1 0 0 1 1119.333 312.957)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Yekaterinburg</text>
-	<text transform="matrix(1 0 0 1 616.9995 640.29)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Rostov</text>
+	<text transform="matrix(1 0 0 1 618.9995 640.29)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Rostov</text>
 	<text transform="matrix(1 0 0 1 797.666 530.79)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Samara</text>
-	<text transform="matrix(1 0 0 1 1118.999 377.2471)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Chelyabinsk</text>
+	<text transform="matrix(1 0 0 1 1120.999 377.2471)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Chelyabinsk</text>
 	<text transform="matrix(1 0 0 1 735.3325 595.9136)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Volgograd</text>
-	<text transform="matrix(1 0 0 1 976.333 421.9092)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Ufa</text>
+	<text transform="matrix(1 0 0 1 979.333 421.9092)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Ufa</text>
 	<text transform="matrix(1 0 0 1 1553.666 879.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Shashe</text>
-	<text transform="matrix(1 0 0 1 1495.666 268.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Novasibirsk</text>
-	<text transform="matrix(1 0 0 1 1519.666 159.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Krasnoyarsk</text>
-	<text transform="matrix(1 0 0 1 1113.666 1052.2275)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Mashad</text>
+	<text transform="matrix(1 0 0 1 1495.666 269.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Novasibirsk</text>
+	<text transform="matrix(1 0 0 1 1517.666 160.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Krasnoyarsk</text>
+	<text transform="matrix(1 0 0 1 1115.666 1054.2275)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Mashad</text>
 	<text transform="matrix(1 0 0 1 878.666 1076.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Tehran</text>
-	<text transform="matrix(1 0 0 1 596.5728 880.8652)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Yerevan</text>
+	<text transform="matrix(1 0 0 1 592.5728 878.8652)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Yerevan</text>
 	<text transform="matrix(1 0 0 1 700.46 858.1133)" fill="#D2232A" font-family="'Helvetica'" font-size="18">T’bilisi</text>
 	<text transform="matrix(1 0 0 1 696.666 966.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Tabriz</text>
-	<text transform="matrix(1 0 0 1 652.666 1118.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Baghdad</text>
+	<text transform="matrix(1 0 0 1 654.666 1118.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Baghdad</text>
 	<text transform="matrix(1 0 0 1 302.666 748.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Istanbul</text>
-	<text transform="matrix(1 0 0 1 291.666 835.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Ankara</text>
+	<text transform="matrix(1 0 0 1 287.666 835.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Ankara</text>
 	<text transform="matrix(1 0 0 1 309.3862 1067.7822)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Bayrut</text>
 	<text transform="matrix(1 0 0 1 762.666 900.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Baku</text>
 	<text transform="matrix(1 0 0 1 690.666 704.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Astrakhan</text>
-	<text transform="matrix(1 0 0 1 1392.666 727.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Alma Ata</text>
+	<text transform="matrix(1 0 0 1 1392.666 726.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Alma Ata</text>
 	<text transform="matrix(1 0 0 1 1390.2549 1054.2275)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Kabul</text>
 	<text transform="matrix(1 0 0 1 1258.666 814.5762)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Tashkent</text>
 	<text transform="matrix(1 0 0 1 1318.665 355.9102)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Omsk</text>
@@ -5324,13 +5324,13 @@
 	<text transform="matrix(1 0 0 1 515.9995 530.79)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Kharkov</text>
 	<text transform="matrix(1 0 0 1 447.9214 465.6235)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Kiyev</text>
 	<text transform="matrix(1 0 0 1 303.332 596.4351)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Odessa</text>
-	<text transform="matrix(1 0 0 1 178.6655 639.9565)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Sofiya</text>
+	<text transform="matrix(1 0 0 1 180.6655 639.9565)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Sofiya</text>
 	<text transform="matrix(1 0 0 1 189.332 596.4351)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Bucuresti</text>
-	<text transform="matrix(1 0 0 1 755.6665 52.2905)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Arkhangelsk</text>
-	<text transform="matrix(1 0 0 1 585.9995 181.957)" fill="#D2232A" font-family="'Helvetica'" font-size="18">St Peterburg</text>
+	<text transform="matrix(1 0 0 1 757.6665 52.2905)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Arkhangelsk</text>
+	<text transform="matrix(1 0 0 1 521.9995 226.957)" fill="#D2232A" font-family="'Helvetica'" font-size="18">St Peterburg</text>
 	<text transform="matrix(1 0 0 1 549.333 335.1235)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Moskva</text>
 	<text transform="matrix(1 0 0 1 175.332 443.291)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Budapest</text>
-	<text transform="matrix(1 0 0 1 193.6655 334.791)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Warsawa</text>
+	<text transform="matrix(1 0 0 1 193.6655 333.7354)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Warsawa</text>
 	<text transform="matrix(1 0 0 1 101.3325 138.9575)" fill="#D2232A" font-family="'Helvetica'" font-size="18">Kobenhavn</text>
 	<g>
 		<text transform="matrix(1 0 0 1 287.332 464.9575)" fill="none" stroke="#E8E196" font-family="'Helvetica'" font-size="36">Ukraine</text>
@@ -9189,22 +9189,22 @@
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="260.887" cy="448.602" r="3.6"/>
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1496.492" cy="448.602" r="3.6"/>
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1521.708" cy="448.602" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="1061.159" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="1017.405" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="973.651" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="929.896" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="886.143" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="842.389" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="798.635" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="754.88" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="711.126" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="667.372" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="623.618" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="579.864" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="536.11" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="1059.159" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="1015.548" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="971.937" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="928.325" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="884.714" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="841.103" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="797.491" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="753.88" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="710.269" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="666.658" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="623.046" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="579.436" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="535.824" r="3.6"/>
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1546.924" cy="448.602" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="492.355" r="3.6"/>
-	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1660.398" cy="470.479" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1673.006" cy="492.213" r="3.6"/>
+	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1660.398" cy="470.407" r="3.6"/>
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1572.141" cy="448.602" r="3.601"/>
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1597.357" cy="448.602" r="3.6"/>
 	<circle stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="1622.574" cy="448.602" r="3.6"/>
