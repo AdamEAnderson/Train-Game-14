@@ -36,6 +36,15 @@ var firstMajorCityMilepost = function (mp) {
 		 gameData.mapData.orderedMileposts[mp + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY');
 };
 
+// Return number of center rows in major city (some cities are elongated). Check 2 rows down,
+// one milepost before to see if it's part of the city.
+var majorCityRowCount = function (mp) {
+    if ((mp + 2) + (gameData.mapData.mpWidth * 2) < gameData.mapData.orderedMileposts.length &&
+		 gameData.mapData.orderedMileposts[(mp + 2) + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY')
+        return 2;
+    return 1;
+};
+
 //Given an array of players out of the status message returns the object of the player with ID PID
 var findPid = function (players, pid) {
     for (var i = 0; i < players.length; i++)

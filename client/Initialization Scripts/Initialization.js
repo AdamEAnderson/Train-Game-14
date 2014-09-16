@@ -224,13 +224,25 @@ var drawMileposts = function () {
                     // left) milepost of the city, so the stroke will come out below the
                     // mileposts. 
                     if (firstMajorCityMilepost(mp)) {
+                        var rowCount = majorCityRowCount(mp);
                         var pathString = "M" + x + " " + y +
-							"L" + (x + xDelta) + " " + y +
-							"L" + (x + (xDelta * 1.5)) + " " + (y + yDelta) +
-							"L" + (x + xDelta) + " " + (y + (yDelta * 2)) +
-							"L" + x + " " + (y + (yDelta * 2)) +
-							"L" + (x - (xDelta / 2)) + " " + (y + yDelta) +
-							"L" + x + " " + y;
+							"L" + (x + xDelta) + " " + y;
+                        // Cities are either hexagons or elongated hexagons
+                        var xpos = x + xDelta;
+                        for (mcRow = 0; mcRow < rowCount; ++mcRow) {
+                            xpos += (xDelta * .5);
+                            pathString += "L" + xpos + " " + (y + (yDelta * (mcRow + 1)));
+                        }
+                        xpos -= (xDelta * .5);
+                        pathString += 
+							"L" + xpos + " " + (y + (yDelta * (rowCount + 1))) +
+							"L" + (xpos - xDelta) + " " + (y + (yDelta * (rowCount + 1)));
+                        xpos -= xDelta;
+                        for (mcRow = rowCount - 1; mcRow >= 0; --mcRow) {
+                            xpos -= (xDelta * .5);
+                            pathString += "L" + xpos + " " + (y + (yDelta * (mcRow + 1)));
+                        }
+				        pathString += "L" + x + " " + y;
                         milepostsGroup.push(paper.path(pathString));
                         $('#milepostsGroup > path:last').attr({ 'stroke-width': '4px', 'stroke': '#d00' });
                     }
