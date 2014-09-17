@@ -96,7 +96,7 @@ public class Player {
 		trains[t].moveTrain(mps[mps.length - 1]);
 		for(int i = 0; i < mps.length - 1; i++){
 			String ownerID = rail.anyConnects(mps[i], mps[i + 1]);
-			Player owner = game.getPlayer(ownerID);
+			Player owner = ownerID.length() > 0 ? game.getPlayer(ownerID) : null;
 			if(!rentingFrom.contains(ownerID) && !ownerID.equals(name) && owner != null){
 				rentingFrom.add(ownerID);
 				money -= 4;
@@ -148,7 +148,10 @@ public class Player {
 		for(int i = 0; i < mileposts.length -1 ; i++){
 			projectSpending += rail.getCost(mileposts[i], mileposts[i + 1]);
 			if(projectSpending > 20) return false;
-			if(mileposts[i].isSameCity(mileposts[i + 1])) return false;
+			if(mileposts[i].isSameCity(mileposts[i + 1])) {
+				log.info("Cannot build through major city");
+				return false;
+			}
 			if(rail.anyConnects(mileposts[i], mileposts[i + 1]) != "") {
 				log.warn("Track is already built there ({}, {}) and ({}, {})",
 						mileposts[i].x, mileposts[i].y, mileposts[i + 1].x, mileposts[i + 1].y);
