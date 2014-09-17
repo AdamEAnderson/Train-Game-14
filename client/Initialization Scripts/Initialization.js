@@ -199,6 +199,15 @@ var enterGame = function () {
     }
 }
 
+// Return number of center rows in major city (some cities are elongated). Check 2 rows down,
+// one milepost before to see if it's part of the city.
+var majorCityRowCount = function (mp) {
+    if ((mp + 2) + (gameData.mapData.mpWidth * 2) < gameData.mapData.orderedMileposts.length &&
+		 gameData.mapData.orderedMileposts[(mp + 2) + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY')
+        return 2;
+    return 1;
+};
+
 var drawMileposts = function () {
     var xDelta = gameData.mapData.mapWidth / gameData.mapData.mpWidth;
     var yDelta = gameData.mapData.mapHeight / gameData.mapData.mpHeight;
@@ -206,6 +215,7 @@ var drawMileposts = function () {
     var mp = 0;
     var oddRowOffset = xDelta / 2;
     var milepostsGroup = paper.group(0, []);
+    var majorCities = [];
     $('#map > svg > g:last').attr('id', 'milepostsGroup');
     for (var h = 0; h < gameData.mapData.mpHeight; ++h) {
         for (var w = 0; w < gameData.mapData.mpWidth; ++w) {
@@ -220,10 +230,17 @@ var drawMileposts = function () {
                     $('#milepostsGroup > circle:last').attr('id', 'milepost' + w.toString() + ',' + h.toString());
                     break;
                 case 'MAJORCITY':
-                    // Draw the outline of the major city when we get to the first (top
-                    // left) milepost of the city, so the stroke will come out below the
-                    // mileposts. 
-                    if (firstMajorCityMilepost(mp)) {
+                    var cityName = gameData.mapData.orderedMileposts[mp].city.name;
+                    var firstMP = true;
+                    var iName;
+                    for (iName = 0; iName < majorCities.length; ++iName)
+                        if (cityName == majorCities[iName])
+                            firstMP = false;
+                    
+                    // Draw the outline of the major city when we get to the first milepost 
+                    // of the city, so the stroke will come out below the mileposts. 
+                    if (firstMP) {
+                        majorCities[majorCities.length] = cityName;
                         var rowCount = majorCityRowCount(mp);
                         var pathString = "M" + x + " " + y +
 							"L" + (x + xDelta) + " " + y;

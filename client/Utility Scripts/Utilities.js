@@ -25,26 +25,6 @@ var drawLineBetweenMileposts = function (x1, y1, x2, y2, PID) {
     return jQ;
 };
 
-// Return true if the milepost is top left of major city.
-// Top left will have preceding milepost not major city, following milepost is 
-// major city, and two rows below is not major city.
-// NOTE: incomplete major cities could mess this logic up
-var firstMajorCityMilepost = function (mp) {
-    return ((mp < 0 || gameData.mapData.orderedMileposts[mp - 1].type != 'MAJORCITY') &&
-		 gameData.mapData.orderedMileposts[mp + 1].type == 'MAJORCITY' &&
-		 mp + (gameData.mapData.mpWidth * 2) < gameData.mapData.orderedMileposts.length &&
-		 gameData.mapData.orderedMileposts[mp + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY');
-};
-
-// Return number of center rows in major city (some cities are elongated). Check 2 rows down,
-// one milepost before to see if it's part of the city.
-var majorCityRowCount = function (mp) {
-    if ((mp + 2) + (gameData.mapData.mpWidth * 2) < gameData.mapData.orderedMileposts.length &&
-		 gameData.mapData.orderedMileposts[(mp + 2) + (gameData.mapData.mpWidth * 2)].type == 'MAJORCITY')
-        return 2;
-    return 1;
-};
-
 //Given an array of players out of the status message returns the object of the player with ID PID
 var findPid = function (players, pid) {
     for (var i = 0; i < players.length; i++)
