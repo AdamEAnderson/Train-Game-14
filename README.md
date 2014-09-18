@@ -21,7 +21,7 @@ To start the Java server, cd to trainserver/bin and do:
 
 java -jar trains.jar
 
-Once that’s done you can go to a browser window and bring up the
+Once that's done you can go to a browser window and bring up the
 game by going to:
 
 <yourserverip>:3000/client/
