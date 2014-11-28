@@ -91,10 +91,10 @@ var refreshTrainLocations = function (players) {
             if (!players[i].trains[j].loc)
                 continue;
             $(document.getElementById('train' + players[i].pid + j)).remove();
-            var milepost = JSON.parse(players[i].trains[j].loc);
+            var milepost = players[i].trains[j].loc;
             var mpsvg = findMilepost(milepost.x, milepost.y);
             $('#trains' + players[i].pid).append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'train' + players[i].pid + j, 'cx': mpsvg.x, 'cy': mpsvg.y, 'r': 10, 'fill': players[i].color }).click(function () {
-                $(document.getElementById('milepost' + JSON.parse(lastStatusMessage.players[i].trains[j].loc).x + ',' + JSON.parse(lastStatusMessage.players[i].trains[j].loc).y)).click();
+                $(document.getElementById('milepost' + lastStatusMessage.players[i].trains[j].loc.x + ',' + lastStatusMessage.players[i].trains[j].loc.y)).click();
             }));
         }
     }
