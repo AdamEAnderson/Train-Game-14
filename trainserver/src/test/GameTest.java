@@ -958,6 +958,7 @@ public class GameTest {
 					};
 			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
 			assertEquals(6, game.getActivePlayer().getMovesMade(0));
+			assertEquals("Tenerife", game.getActivePlayer().getTrains()[0].getLocation().city.name);
 			game.endTurn(game.getActivePlayer().name);
 			
 			// Cross back to mainland, try to return to Dakar (should fail because 

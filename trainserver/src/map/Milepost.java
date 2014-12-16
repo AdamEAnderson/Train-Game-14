@@ -1,6 +1,7 @@
 package map;
 
 import reference.City;
+import train.GameException;
 
 public class Milepost {
 	public final int x;
@@ -12,7 +13,7 @@ public class Milepost {
 		//type: only City or MajorCity if hasCity not null
 	
 	public enum Type {
-		CITY, MAJORCITY, NORMAL, BLANK, DESERT, MOUNTAIN, ALPINE, JUNGLE, FOREST, CHUNNEL, FERRY
+		CITY, MAJORCITY, NORMAL, BLANK, DESERT, MOUNTAIN, ALPINE, JUNGLE, FOREST, CHUNNEL
 	}
 
 	Milepost(int x, int y, Type type){
@@ -31,7 +32,10 @@ public class Milepost {
 		this.y = y;
 	}
 	
-	void updateEdges(Edge[] edges){
+	void updateEdges(Edge[] edges) throws GameException{
+		if(edges.length != this.edges.length){
+			throw new GameException("BAD_MAP_DATA");
+		}
 		this.edges = edges;
 	}
 	

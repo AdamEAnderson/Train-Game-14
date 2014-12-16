@@ -93,7 +93,7 @@ public final class TrainMap {
 					mpType = Milepost.Type.BLANK;
 					break;
 				case "y":
-					mpType = Milepost.Type.FERRY;
+					mpType = Milepost.Type.BLANK;
 					break;
 				case "d":
 					mpType = Milepost.Type.DESERT;
@@ -161,7 +161,7 @@ public final class TrainMap {
 	
 	private Edge generateEdge(Milepost source, MilepostId destinationId,
 			Map<MilepostId, Set<MilepostId>> riverCrossings,
-			Map<MilepostId, Set<MilepostId>> seaCrossings, Map<MilepostId, Set<MilepostId>> ferryCrossings) {
+			Map<MilepostId, Set<MilepostId>> seaCrossings, Map<MilepostId, MilepostId[]> ferryCrossings) {
 		Edge edge = null;
 		Milepost destination = milepostIndex.get(destinationId);
 		MilepostId sourceId = new MilepostId(source.x, source.y);
@@ -171,18 +171,7 @@ public final class TrainMap {
 		boolean isSeaCrossing = isCrossing(sourceId, destinationId, seaCrossings);
 		
 		if(destination == null) return null;
-		if(destination.type == Milepost.Type.FERRY && ferryCrossings.containsKey(sourceId)){
-				Set<MilepostId> dests = ferryCrossings.get(sourceId);
-				MilepostId destId = null;
-				for(MilepostId itr : dests){
-					Milepost dest = milepostIndex.get(itr);
-					destId = itr;
-					edge = new Ferry(dest);
-					break;
-				}
-				dests.remove(destId);
-				return edge;	
-		} else if (destination.type != Milepost.Type.BLANK) {
+		if(destination.type != Milepost.Type.BLANK) {
 			edge = new Edge(destination, isRiverCrossing, isSeaCrossing);
 			log.debug("Generating edge from milepost [{}, {}] to milepost [{},{}], cost {}", source.y, source.x,
 					destination.y, destination.x, edge.cost);
@@ -219,16 +208,52 @@ public final class TrainMap {
 		return crossings;
 	}
 	
+	private Map<MilepostId, MilepostId[]> readFerries(BufferedReader ferryReader) throws IOException, GameException{
+		//ID -> ID && ID -> edge(marked /w target ID)
+		Map<MilepostId, MilepostId[]> ferries = new HashMap<MilepostId, MilepostId[]>(); 
+		String line = "";
+		while((line = ferryReader.readLine()) != null){
+			String[] splits = line.split(",");
+			int[] data = new int[6];
+			for(int i = 0; i < 6; i++){
+				data[i] = Integer.parseInt(splits[i]);
+			}
+			MilepostId source = new MilepostId(data[0], data[1]);
+			MilepostId dest = new MilepostId(data[3], data[4]);
+			if(ferries.containsKey(source)){
+				MilepostId[] targets = ferries.get(source);
+				if(targets[data[2]] != null){
+					throw new GameException("BAD_MAP_DATA");
+				} targets[data[2]] = dest;
+			}else{
+				MilepostId[] targets = new MilepostId[6];
+				ferries.put(source, targets);
+				targets[data[2]] = dest;
+			}
+			if(ferries.containsKey(dest)){
+				MilepostId[] targets = ferries.get(dest);
+				if(targets[data[5]] != null){
+					throw new GameException("BAD_MAP_DATA");
+				} targets[data[5]] = source;
+			}else{
+				MilepostId[] targets = new MilepostId[6];
+				targets[data[5]] = source;
+				ferries.put(dest, targets);
+			}
+		}
+		return ferries;
+	}
+	
 	private void generateEdges(BufferedReader riverReader, BufferedReader seaReader, BufferedReader ferryReader) 
 				throws IOException, GameException {
 		Map<MilepostId, Set<MilepostId>> riverCrossings = readCrossings(riverReader);
 		Map<MilepostId, Set<MilepostId>> seaInletCrossings = readCrossings(seaReader);
-		Map<MilepostId, Set<MilepostId>> ferryCrossings = readCrossings(ferryReader);
+		Map<MilepostId, MilepostId[]> ferryCrossings = readFerries(ferryReader);
 		
 		for (MilepostId mpId: milepostIndex.keySet())  {
 			Milepost mp = milepostIndex.get(mpId);
 			Edge[] edges = new Edge[6];
-			if (mp.type != Milepost.Type.BLANK && mp.type != Milepost.Type.FERRY) {
+			if (mp.type != Milepost.Type.BLANK) {
 				if (mp.y % 2 == 0) {	// even row 
 					edges[0] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);	// NE
 					edges[1] = generateEdge(mp, new MilepostId(mp.x + 1, mp.y), riverCrossings, seaInletCrossings, ferryCrossings);		// E
@@ -246,6 +271,16 @@ public final class TrainMap {
 					edges[5] = generateEdge(mp, new MilepostId(mp.x, mp.y - 1), riverCrossings, seaInletCrossings, ferryCrossings);		// NW
 					}
 				}
+			if(ferryCrossings.containsKey(mpId)){
+				MilepostId[] targets = ferryCrossings.get(mpId);
+				for(int i = 0; i < 6; i++){
+					if(targets[i] != null && milepostIndex.containsKey(targets[i])){
+						log.debug("Generating ferry from milepost [{}, {}] to milepost [{},{}], overwriting edge {}", 
+								mpId.y, mpId.x, targets[i].y, targets[i].x, edges[i]);
+						edges[i] = new Ferry(milepostIndex.get(targets[i]));
+					}
+				}
+			}
 			mp.updateEdges(edges);
 		}
 	}
