@@ -13,9 +13,14 @@ public class Rail {
 	
 	private Map<Milepost, Set<Milepost>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
-	private transient Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
+//	private transient Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
 	private String pid;
 	
+	public Rail(String pid){
+		this.pid = pid;
+		tracks = new HashMap<Milepost, Set<Milepost>>();
+	}
+	/*
 	Rail(Map<Milepost, Set<Track>> allTracks, String pid){
 		this.allTracks = allTracks;
 		tracks = new HashMap<Milepost, Set<Milepost>>();
@@ -26,7 +31,7 @@ public class Rail {
 		this.allTracks = allTracks;
 		this.pid = pid;
 		this.tracks = tracks;
-	}
+	}*/
 	
 	public Map<Milepost, Set<Milepost>> getRail(){
 		return tracks;

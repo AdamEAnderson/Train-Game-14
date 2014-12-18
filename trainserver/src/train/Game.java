@@ -20,6 +20,7 @@ import com.google.gson.GsonBuilder;
 import player.Player;
 import player.Rail;
 import player.RailTypeAdapter;
+import player.TurnData;
 import reference.Card;
 import reference.UpgradeType;
 
@@ -29,19 +30,31 @@ public class Game implements AbstractGame {
 
 	public transient GameData gameData;
 	private transient RuleSet ruleSet;
-	private List<Player> players;
-	private transient Player active;
-	private int activeIndex;		// index of active player in players array
-	private transient Map<Milepost, Set<Rail.Track>> globalRail;
-	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
-	private boolean joinable;	// game has not yet started
+	
+	//joinable can be represented by "turnData == null"
+//	private boolean joinable;	// game has not yet started
 	private boolean ended; // game has ended
+	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
+
+	//new structures
+	private TurnData turnData; //data for the active player
+	private List<String> pids; //list of the player-ids in order
+	private Map<String, Player> players; //maps pid to player
+	private Map<String, Rail> rails; //maps pid to their track
+	
+	//obsolete data
+//	private List<Player> players;
+//	private transient Player active;
+//	private int activeIndex;		// index of active player in players array
+//	private transient Map<Milepost, Set<Rail.Track>> globalRail;
+//	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
+	
+	//useful for undo and deletion
 	private transient int transaction;
 	private transient Date lastChange;
 	private String name;
 	private transient UndoRedoStack undoStack;
 	private transient UndoRedoStack redoStack;
-	private int currentCard = 0;
 		
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
@@ -53,6 +66,23 @@ public class Game implements AbstractGame {
 		this.gameData = gameData;
 		this.ruleSet = ruleSet;
 		this.name = name;
+		
+		//we don't construct a TurnData until the game starts 
+		pids = new ArrayList<String>();
+		players = new HashMap<String, Player>();
+		rails = new HashMap<String, Rail>();
+		
+		turns = 0;
+		ended = false;
+		transaction = 1;
+		lastChange = new Date();
+		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
+		redoStack = new UndoRedoStack(GameException.NOTHING_TO_REDO);
+	}
+	/*public Game(String name, GameData gameData, RuleSet ruleSet){
+		this.gameData = gameData;
+		this.ruleSet = ruleSet;
+		this.name = name;
 		transaction = 1;
 		lastChange = new Date();
 		players = new ArrayList<Player>();
@@ -61,8 +91,103 @@ public class Game implements AbstractGame {
 		joinable = true;
 		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
 		redoStack = new UndoRedoStack(GameException.NOTHING_TO_REDO);
+	}*/
+	
+	@Override
+	public void joinGame(String pid, String color) throws GameException {
+		// TODO Auto-generated method stub
+		log.info("joinGame(pid={}, color={})", pid, color);
+
+		pids.add(pid);
+		players.put(pid, new Player(ruleSet, pid, color, this));
+		rails.put(pid, new Rail(pid));
+		
+		for (String oid : pids) {
+			if (oid.equals(pid))
+				throw new GameException(GameException.PLAYER_ALREADY_JOINED);
+		}
+		for(Player p : players.values()){
+			if (p.color.equals(color))
+				throw new GameException(GameException.COLOR_NOT_AVAILABLE);
+		}
+	}
+
+	@Override
+	public boolean startGame(String player, boolean ready) throws GameException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean testBuildTrack(String pid, MilepostId[] mileposts)
+			throws GameException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void buildTrack(String pid, MilepostId[] mileposts)
+			throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void upgradeTrain(String player, int train, UpgradeType upgrade)
+			throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void placeTrain(String player, int train, MilepostId where)
+			throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String testMoveTrain(String player, String track, int train,
+			MilepostId[] mileposts) throws GameException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void moveTrain(String player, String track, int train,
+			MilepostId mileposts) throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pickupLoad(String player, int train, String load)
+			throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deliverLoad(String player, int train, String load, int card)
+			throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dumpLoad(String player, int train, String load)
+			throws GameException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void turnInCards(String player) throws GameException {
+		// TODO Auto-generated method stub
+		
 	}
 	
+	/*
 	@Override
 	public void joinGame(String pid, String color) throws GameException {
 		log.info("joinGame(pid={}, color={})", pid, color);
@@ -251,7 +376,7 @@ public class Game implements AbstractGame {
 		}
 		active.turnInCards(cards);
 		endTurn(player);
-	}
+	}*/
 	
 	/** To undo, clients should first save off the original game state, 
 	 * then do whatever action they're doing, then call saveForUndo. That
@@ -335,23 +460,23 @@ public class Game implements AbstractGame {
 		p.readyToEnd(ready);
 		
 		boolean end = true;
-		for (Player player: players)
+		for (Player player: players.values())
 			if (!player.readyToEnd())
 				end = false;
 		
 		if (end) {	// All players are ready to end - end the game
 			log.info("ending game");
 			ended = true;
-			setActive(null);
+//			setActive(null);
 		}
 		registerTransaction();
 		return ended;
 	}
 
-	private void setActive(Player p) {
-		active = p;
-		activeIndex = players.indexOf(p);
-	}
+//	private void setActive(Player p) {
+//		active = p;
+//		activeIndex = players.indexOf(p);
+//	}
 	
 	public String toString() {
 		GsonBuilder gsonBuilder = new GsonBuilder();
@@ -361,6 +486,7 @@ public class Game implements AbstractGame {
 		return gson.toJson(this);
 	}
 	
+	//serialization
 	public static Game fromString(String gameString, Game refGame) {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
@@ -384,53 +510,51 @@ public class Game implements AbstractGame {
 	}
 
 	public Player getPlayer(String pid) throws GameException {
-		for(Player p : players){
-			if (p.getPid().equals(pid)) return p;
-		}
+		if(players.containsKey(pid)) return players.get(pid);
 		throw new GameException(GameException.PLAYER_NOT_FOUND);
 	}
 	
 	Player getLastPlayer(){	return players.get(players.size() - 1); }
 	
-	Player getPrevPlayer(Player p){
-		int index = players.indexOf(p);
-		if (index < 0)	// player not found
-			return null;
-		if (index == 0)  // wraparound
-			return players.get(players.size() - 1);
-		return players.get(index - 1);
-	}
+//	Player getPrevPlayer(Player p){
+//		int index = players.indexOf(p);
+//		if (index < 0)	// player not found
+//			return null;
+//		if (index == 0)  // wraparound
+//			return players.get(players.size() - 1);
+//		return players.get(index - 1);
+//	}
 	
-	Player getNextPlayer(Player p){
-		int index = players.indexOf(p);
-		if (index < 0)	// player not found
-			return null;
-		if (index >= players.size() - 1)  // wraparound
-			return players.get(0);
-		return players.get(index + 1);
-	}
+//	Player getNextPlayer(Player p){
+//		int index = players.indexOf(p);
+//		if (index < 0)	// player not found
+//			return null;
+//		if (index >= players.size() - 1)  // wraparound
+//			return players.get(0);
+//		return players.get(index + 1);
+//	}
 	
-	public List<Player> getPlayers(){ return players; }
+//	public List<Player> getPlayers(){ return players; }
 	
 	boolean getJoinable() {return joinable;}
 	
 	public int getTurns() { return turns; }
 
-	public Map<Milepost, Set<Rail.Track>> getGlobalRail() {
-		return globalRail;
-	}
+//	public Map<Milepost, Set<Rail.Track>> getGlobalRail() {
+//		return globalRail;
+//	}
 	
-	private void checkActive(String pid) throws GameException {
+	/*private void checkActive(String pid) throws GameException {
 		if (!(getPlayer(pid) == active)) 
 			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
-	}
+	}*/
 
 	private void checkBuilding() throws GameException{
 		if(turns < 3) throw new GameException(GameException.INVALID_MOVE);
 	}
 
 	/** Returns player whose turn it is */
-	public Player getActivePlayer() { return active; }
+//	public Player getActivePlayer() { return active; }
 	
 	public RuleSet getRuleSet() { return ruleSet; }
 	
@@ -455,7 +579,11 @@ public class Game implements AbstractGame {
 	}
 	
 	private Card dealCard() {
-		return gameData.getDeck().get(currentCard++);
+		return gameData.draw();
 	}
+
+
+
+
 	
 }

@@ -19,12 +19,12 @@ public class Player {
 	public final String color;
 	private Train[] trains;
 	private int money;
-	private Rail rail;
+	//private Rail rail;
 	private Card[] cards;
-	private int spendings;
-	private int[] movesMade;
-	private boolean turnInProgress;
-	private ArrayList<String> rentingFrom;
+	//private int spendings;
+	//private int[] movesMade;
+	//private boolean turnInProgress;
+	//private ArrayList<String> rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	private boolean hasResigned;
@@ -33,27 +33,40 @@ public class Player {
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
-	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
-			Game game, Map<Milepost, Set<Rail.Track>> globalRail){
-		trains = new Train[ruleSet.numTrains];
-		for (int i = 0; i < ruleSet.numTrains; ++i) {
-			trains[i] = new Train(i);
-		}
-		this.game = game;
-		money = ruleSet.startingMoney;
-		rail = new Rail(globalRail, name);
-		cards = hand;
-		this.name = name;
+	public Player(RuleSet ruleSet, String pid, String color, Game game){
+		name = pid;
 		this.color = color;
-		spendings = 0;
-		turnInProgress = false;
-		movesMade = new int[ruleSet.numTrains];
-		rentingFrom = new ArrayList<String>();
+		trains = new Train[ruleSet.numTrains];
+		money = ruleSet.startingMoney;
+		cards = new Card[ruleSet.handSize];
 		readyToStart = false;
 		readyToEnd = false;
 		hasResigned = false;
-		stats = new Stats();
+		this.game = game;
 	}
+	
+	//old constructor
+//	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
+//			Game game, Map<Milepost, Set<Rail.Track>> globalRail){
+//		trains = new Train[ruleSet.numTrains];
+//		for (int i = 0; i < ruleSet.numTrains; ++i) {
+//			trains[i] = new Train(i);
+//		}
+//		this.game = game;
+//		money = ruleSet.startingMoney;
+//		rail = new Rail(globalRail, name);
+//		cards = hand;
+//		this.name = name;
+//		this.color = color;
+//		spendings = 0;
+//		turnInProgress = false;
+//		movesMade = new int[ruleSet.numTrains];
+//		rentingFrom = new ArrayList<String>();
+//		readyToStart = false;
+//		readyToEnd = false;
+//		hasResigned = false;
+//		stats = new Stats();
+//	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
 		turnInProgress = true;
@@ -270,7 +283,7 @@ public class Player {
 	
 	public boolean readyToEnd() { return readyToEnd; }
 	
-	public boolean turnInProgress() { return turnInProgress; }
+//	public boolean turnInProgress() { return turnInProgress; }
 	
 	public boolean hasResigned() {return hasResigned; }
 		
@@ -278,17 +291,17 @@ public class Player {
 		
 	public int getMoney() {	return money; }
 	
-	public int getSpending(){ return spendings; }
+//	public int getSpending(){ return spendings; }
 	
-	public int[] getMovesMade(){ return movesMade; }
+//	public int[] getMovesMade(){ return movesMade; }
 	
-	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
+//	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
 	
 	public Card[] getCards(){ return cards; }
 	
 	public Train[] getTrains(){ return trains; }
 	
-	public Rail getRail(){ return rail; }
+//	public Rail getRail(){ return rail; }
 	
 	public Stats stats() { 
 		stats.money = money;
