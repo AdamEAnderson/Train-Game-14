@@ -114,7 +114,7 @@ public class RentalTest extends GameTest {
 	        	//new MilepostId(2,20),
 	        };
 	        Player player1 = game.getActivePlayer();
-        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts); //moves on own track
         	game.endTurn(game.getActivePlayer().name);
         	
         	// Second player starts in Kano, heads to Dakar
@@ -134,8 +134,8 @@ public class RentalTest extends GameTest {
     		};
         	reverse(moveMileposts);
 	        Player player2 = game.getActivePlayer();
-	        game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20, 21));
-        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+	        game.placeTrain(game.getActivePid(), 0, new MilepostId(20, 21));
+        	game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts); //moving on own track
         	game.upgradeTrain(game.getActivePlayer().name, 0, UpgradeType.SPEED);
         	game.endTurn(game.getActivePlayer().name);
         	
@@ -168,7 +168,7 @@ public class RentalTest extends GameTest {
         	int landlordMoneyAtStartOfTurn = player2.getMoney();
         	reverse(moveMileposts);
         	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20,21));
-        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	game.moveTrain(game.getActivePid(), player2.name, 0, moveMileposts);
         	game.endTurn(game.getActivePlayer().name);
         	assertEquals(renterMoneyAtStartOfTurn - 4, player3.getMoney());	// check that rent was deducted from total
         	assertEquals(landlordMoneyAtStartOfTurn + 4, player2.getMoney()); // check that rent money is received
@@ -185,7 +185,18 @@ public class RentalTest extends GameTest {
 		        };
         	renterMoneyAtStartOfTurn = player1.getMoney();
         	landlordMoneyAtStartOfTurn = player2.getMoney();
-        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	//this should now throw an exception
+        	try{
+        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+        		fail("Allowed player to move off their track in a single build.");
+        	}catch(GameException e){ }
+        	//this also throws an exception
+        	try{
+        		game.moveTrain(game.getActivePid(), player2.name, 0, moveMileposts);
+        		fail("Allowed player to move along own track and rent in a single build");
+        	}catch(GameException e){ }
+        	//TODO
+        	//WE NEED TO DO THE TWO MOVES SEPARATELY HERE
         	game.endTurn(game.getActivePlayer().name);
         	assertEquals(renterMoneyAtStartOfTurn - 4, player1.getMoney());	// check that rent was deducted from total
         	assertEquals(landlordMoneyAtStartOfTurn + 4, player2.getMoney()); // check that rent money is received
@@ -210,7 +221,12 @@ public class RentalTest extends GameTest {
         		};
         	renterMoneyAtStartOfTurn = player2.getMoney();
         	landlordMoneyAtStartOfTurn = player1.getMoney();
-        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	try{
+        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+        		fail("Allowed player to move off her own track in a single build.");
+        	}catch(GameException e){
+        		
+        	}
         	game.endTurn(game.getActivePlayer().name);
         	assertEquals(renterMoneyAtStartOfTurn - 4, player2.getMoney());	// check that rent was deducted from total
         	assertEquals(landlordMoneyAtStartOfTurn + 4, player1.getMoney()); // check that rent money is received
@@ -242,7 +258,13 @@ public class RentalTest extends GameTest {
         	int player1MoneyAtStartOfTurn = player1.getMoney();
         	int player2MoneyAtStartOfTurn = player2.getMoney();
         	renterMoneyAtStartOfTurn = player3.getMoney();
-        	game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        	try{
+        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+        		fail("Player was not moving on the given track at all.");
+        	}catch(GameException e){
+        		
+        	}
+        	
         	game.endTurn(game.getActivePlayer().name);
         	assertEquals(renterMoneyAtStartOfTurn - 8, player3.getMoney());	// check that rent was deducted from total
         	assertEquals(player1MoneyAtStartOfTurn + 4, player1.getMoney()); // check that rent money is received

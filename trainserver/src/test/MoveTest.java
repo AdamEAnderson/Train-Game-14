@@ -64,7 +64,7 @@ public class MoveTest extends GameTest{
         	game.buildTrack(game.getActivePlayer().name, mileposts);
 			skipPastBuildingTurns(game);
 			game.placeTrain("Louie", 0, new MilepostId(34,56));
-			game.moveTrain("Louie", 0, moveMileposts);
+			game.moveTrain("Louie", "Louie", 0, moveMileposts);
 	        game.endGame("Louie", true);
 		} catch (GameException e) {
 			log.error("Unexpected exception {}", e);

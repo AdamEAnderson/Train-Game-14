@@ -55,7 +55,7 @@ public class UndoTest extends GameTest{
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
     		game = undo(gid, game.getActivePlayer().name);
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
-			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
     		game = undo(gid, game.getActivePlayer().name);	// undo move
     		game = undo(gid, game.getActivePlayer().name);	// undo place
     		game = undo(gid, game.getActivePlayer().name);	// undo building
@@ -86,7 +86,7 @@ public class UndoTest extends GameTest{
     		game = undo(gid, game.getActivePlayer().name);	// undo building
     		game = redo(gid, game.getActivePlayer().name);	// redo building
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
-			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
 			game.endTurn(game.getActivePlayer().name);
 		} catch (GameException e) {
 				fail("Unexpected exception");

@@ -38,8 +38,8 @@ public class FerryTest extends GameTest{
 					new MilepostId(5,7),
 					new MilepostId(0,6)		// Tenarife via ferry
 					};
-			game.buildTrack(game.getActivePlayer().name, buildMileposts);
-			assertEquals(19, game.getActivePlayer().getSpending());
+			game.buildTrack(game.getActivePid(), buildMileposts);
+			assertEquals(19, game.getTurnData().getSpending());
 			skipPastBuildingTurns(game);
 			
 			// Start in Dakar and go to port for Tenarife
@@ -57,15 +57,15 @@ public class FerryTest extends GameTest{
 					new MilepostId(5,7),	// stop in port
 					};
 			game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(2,18));
-			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+			game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
 			game.endTurn(game.getActivePlayer().name);
 
 			// Cross to Tenarife
 			moveMileposts = new MilepostId[] {
 					new MilepostId(0,6)		// Tenarife via ferry
 					};
-			game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
-			assertEquals(6, game.getActivePlayer().getMovesMade(0));
+			game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+			assertEquals(6, game.getTurnData().getMovesMade(0));
 			assertEquals("Tenerife", game.getActivePlayer().getTrains()[0].getLocation().city.name);
 			game.endTurn(game.getActivePlayer().name);
 			
@@ -82,7 +82,7 @@ public class FerryTest extends GameTest{
 					};
         	reverse(moveMileposts);
         	try {
-        		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
+        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
         		fail("Expected move exception here -- didn't get one");
         	} catch (GameException e) {
         	}
@@ -103,8 +103,8 @@ public class FerryTest extends GameTest{
 					};
         	reverse(moveMileposts);
         	try {
-        		game.moveTrain(game.getActivePlayer().name, 0, Arrays.copyOfRange(moveMileposts, 0, 4));
-        		game.moveTrain(game.getActivePlayer().name, 0, Arrays.copyOfRange(moveMileposts, 4, moveMileposts.length));
+        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, Arrays.copyOfRange(moveMileposts, 0, 4));
+        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, Arrays.copyOfRange(moveMileposts, 4, moveMileposts.length));
         		fail("Expected move exception here -- didn't get one");
         	} catch (GameException e) {
         		// Undo first move (which succeeded) so we return to ferry stop
@@ -121,8 +121,8 @@ public class FerryTest extends GameTest{
 					new MilepostId(5,7),	// stop in port
 					};
         	reverse(moveMileposts);
-    		game.moveTrain(game.getActivePlayer().name, 0, moveMileposts);
-			game.endTurn(game.getActivePlayer().name);
+    		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+			game.endTurn(game.getActivePid());
         	
 			endGame(game);
 		} catch (GameException e) {
