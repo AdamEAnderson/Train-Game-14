@@ -108,7 +108,7 @@ interface AbstractGame {
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */
-	void moveTrain(String player, String track, int train, MilepostId mileposts) throws GameException;
+	void moveTrain(String player, String track, int train, MilepostId[] mileposts) throws GameException;
 //	void moveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
 	
 	/** Player picks up a new load

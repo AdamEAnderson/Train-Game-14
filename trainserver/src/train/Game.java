@@ -1,6 +1,7 @@
 package train;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import player.GlobalRail;
 import player.Player;
 import player.Rail;
 import player.RailTypeAdapter;
@@ -38,9 +40,10 @@ public class Game implements AbstractGame {
 
 	//new structures
 	private TurnData turnData; //data for the active player
+	private int activeIndex;  //index of the active player in the pids list
 	private List<String> pids; //list of the player-ids in order
 	private Map<String, Player> players; //maps pid to player
-	private Map<String, Rail> rails; //maps pid to their track
+	private GlobalRail rail; //all of the track drawn for this game, organized by pid
 	
 	//obsolete data
 //	private List<Player> players;
@@ -70,7 +73,7 @@ public class Game implements AbstractGame {
 		//we don't construct a TurnData until the game starts 
 		pids = new ArrayList<String>();
 		players = new HashMap<String, Player>();
-		rails = new HashMap<String, Rail>();
+		rail = new GlobalRail(name);
 		
 		turns = 0;
 		ended = false;
@@ -95,13 +98,7 @@ public class Game implements AbstractGame {
 	
 	@Override
 	public void joinGame(String pid, String color) throws GameException {
-		// TODO Auto-generated method stub
-		log.info("joinGame(pid={}, color={})", pid, color);
-
-		pids.add(pid);
-		players.put(pid, new Player(ruleSet, pid, color, this));
-		rails.put(pid, new Rail(pid));
-		
+		log.info("joinGame(pid={}, color={})", pid, color);		
 		for (String oid : pids) {
 			if (oid.equals(pid))
 				throw new GameException(GameException.PLAYER_ALREADY_JOINED);
@@ -110,6 +107,11 @@ public class Game implements AbstractGame {
 			if (p.color.equals(color))
 				throw new GameException(GameException.COLOR_NOT_AVAILABLE);
 		}
+
+		pids.add(pid);
+		players.put(pid, new Player(ruleSet, pid, color, this));
+		rail.join(pid);
+		registerTransaction();
 	}
 
 	@Override
@@ -121,15 +123,37 @@ public class Game implements AbstractGame {
 	@Override
 	public boolean testBuildTrack(String pid, MilepostId[] mileposts)
 			throws GameException {
-		// TODO Auto-generated method stub
-		return false;
+		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		
+		checkActive(pid);
+		Milepost[] mps = new Milepost[mileposts.length];
+		for(int i = 0; i < mileposts.length; i++){
+			mps[i] = gameData.getMilepost(mileposts[i]);
+		}
+		int cost = rail.checkBuild(pid, mps);
+		return (cost != -1 && turnData.checkSpending(cost));
 	}
 
 	@Override
 	public void buildTrack(String pid, MilepostId[] mileposts)
 			throws GameException {
-		// TODO Auto-generated method stub
-		
+		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		checkActive(pid);
+		if(!testBuildTrack(pid, mileposts)){
+			throw new GameException("Invalid Track");
+		}
+		Milepost[] mps = new Milepost[mileposts.length];
+		for(int i = 0; i < mileposts.length; i++){
+			mps[i] = gameData.getMap().getMilepost(mileposts[i]);
+		}	
+		int cost = rail.checkBuild(pid, mps);
+		turnData.spend(cost);
 	}
 
 	@Override
@@ -155,7 +179,7 @@ public class Game implements AbstractGame {
 
 	@Override
 	public void moveTrain(String player, String track, int train,
-			MilepostId mileposts) throws GameException {
+			MilepostId[] mileposts) throws GameException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -414,39 +438,43 @@ public class Game implements AbstractGame {
 	@Override
 	public void endTurn(String pid) throws GameException {
 		log.info("endTurn(pid={},activeIndex={})", pid, activeIndex);
-		active.endTurn();
+
+		String next = pid;
 		switch(turns){
 		case 0:
-			if (activeIndex == players.size() - 1)	// player goes again
+			if (activeIndex == players.size() - 1){	// player goes again
 				turns++;
-			else
-				setActive(players.get(activeIndex + 1));
+			}else
+				next = pids.get(activeIndex + 1);
+				activeIndex++;
 			break;
 		case 1:
-			if(activeIndex == 0)
+			if(activeIndex == 0){
 				turns++;
-			else
-				setActive(getPrevPlayer(active));
+			}else{
+				next = pids.get(activeIndex - 1);
+				activeIndex--;
+			}
 			break;
 		default:
-			if (activeIndex == players.size() - 1) {
+			if (activeIndex == pids.size() - 1) {
 				turns++;
-				setActive(players.get(0));
+				next = pids.get(0);
 			}
-			else setActive(players.get(activeIndex + 1));
+			else next = (pids.get(activeIndex + 1));
 		}
 			
 		registerTransaction();
 		undoStack.clear();
 		
 		// If the player has resigned, skip their turn.
-		if (active != null && active.hasResigned())
-			endTurn(active.getPid());
+//		if (active != null && active.hasResigned())
+//			endTurn(active.getPid());
 	}
 
 	public void resign(String pid) throws GameException { 
 		log.info("resign requestText: pid={}", pid);
-		if (getPlayer(pid).equals(active))
+		if (pid.equals(turnData.getPid()))
 			endTurn(pid);
 		getPlayer(pid).resign(); 
 		undoStack.clear();
@@ -501,10 +529,10 @@ public class Game implements AbstractGame {
 		newGame.lastChange = refGame.lastChange;
 		newGame.undoStack = refGame.undoStack;
 		newGame.redoStack = refGame.redoStack;
-		newGame.globalRail = new HashMap<Milepost, Set<Rail.Track>>();
-		for (Player p: newGame.players) 
-			p.fixup(newGame, newGame.globalRail);
-		newGame.setActive(newGame.players.get(refGame.activeIndex));
+//		newGame.globalRail = new HashMap<Milepost, Set<Rail.Track>>();
+//		for (Player p: newGame.players) 
+//			p.fixup(newGame, newGame.globalRail);
+//		newGame.setActive(newGame.players.get(refGame.activeIndex));
 		
 		return newGame;
 	}
@@ -534,9 +562,7 @@ public class Game implements AbstractGame {
 //		return players.get(index + 1);
 //	}
 	
-//	public List<Player> getPlayers(){ return players; }
-	
-	boolean getJoinable() {return joinable;}
+	public Collection<Player> getPlayers(){ return players.values(); }
 	
 	public int getTurns() { return turns; }
 
@@ -544,21 +570,30 @@ public class Game implements AbstractGame {
 //		return globalRail;
 //	}
 	
-	/*private void checkActive(String pid) throws GameException {
-		if (!(getPlayer(pid) == active)) 
+	private void checkActive(String pid) throws GameException {
+		if (!(getPlayer(pid).equals(turnData.getPid()))) 
 			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
-	}*/
+	}
 
 	private void checkBuilding() throws GameException{
 		if(turns < 3) throw new GameException(GameException.INVALID_MOVE);
 	}
 
 	/** Returns player whose turn it is */
-//	public Player getActivePlayer() { return active; }
+	public String getActivePid() { 
+		if(turnData == null) return null;
+		return turnData.getPid();
+	}
+	
+	public Player getActivePlayer(){
+		return players.get(getActivePid());
+	}
+	
+	public TurnData getTurnData(){ return turnData; }
 	
 	public RuleSet getRuleSet() { return ruleSet; }
 	
-	public boolean isJoinable() { return joinable; }
+	public boolean isJoinable() { return turnData != null; }
 	
 	public boolean isOver() { return ended; }
 

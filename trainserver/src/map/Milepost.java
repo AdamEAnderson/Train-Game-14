@@ -40,10 +40,7 @@ public class Milepost {
 	}
 	
 	public boolean isNeighbor(Milepost m){
-		for(int i = 0; i < 6; i++){
-			if(edges[i] != null && edges[i].destination.equals(m)) return true;
-		}
-		return false;
+		return getEdge(m) != null;
 	}
 	
 	public boolean isNeighborByFerry(Milepost m){
@@ -69,5 +66,20 @@ public class Milepost {
 	
 	public MilepostId getMilepostId() {
 		return new MilepostId(x, y);
+	}
+	
+	public int getCost(Milepost m){
+		Edge e = getEdge(m);
+		if(e == null) return -1;
+		return e.cost;
+	}
+	
+	public Edge getEdge(Milepost m){
+		for(int i = 0; i < edges.length; i++){
+			if(edges[i] != null && edges[i].destination.equals(m)){
+				return edges[i];
+			}
+		}
+		return null;
 	}
 }

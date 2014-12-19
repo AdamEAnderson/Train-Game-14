@@ -24,6 +24,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import map.Milepost;
+import map.MilepostId;
 import map.TrainMap;
 import reference.Card;
 import reference.City;
@@ -284,4 +286,7 @@ public class GameData {
 		return geographyList;
 	}
 
+	public Milepost getMilepost(MilepostId mid){
+		return map.getMilepost(mid);
+	}
 }

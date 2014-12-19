@@ -9,8 +9,9 @@ import train.GameException;
 import train.RuleSet;
 
 public class TurnData {
+	public final String gid;
+	
 	private String pid;
-	private int pIndex;
 	private int moneyMade;
 	private int moneySpent;
 	private int[] movesMade;
@@ -19,30 +20,31 @@ public class TurnData {
 	private UpgradeType upgrade;
 	private int upgradedTrain;
 	
-	public TurnData(RuleSet r, String startingPid, int startingIndex){
+	public TurnData(String gid, RuleSet r, String startingPid){
+		this.gid = gid;
 		movesMade = new int[r.numTrains];
 		rentedFrom = new ArrayList<String>();
 		isBuilding = true;
 		upgradedTrain = -1;
 		pid = startingPid;
-		pIndex = startingIndex;
 	}
 	
-	void checkMovesLength(int t, int moves, int limit) throws GameException{
-		if(moves + movesMade[t] > limit){
+	public boolean checkMovesLength(int t, int moves, int limit) throws GameException{
+		return (moves + movesMade[t] <= limit);
+	}
+	
+	//only increments move counter -> trains are accessed through player
+	public void move(int t, int moves, int limit) throws GameException{
+		if(!checkMovesLength(t, moves, limit)){
 			throw new GameException("InvalidMove");
 		}
-	}
-	
-	void move(int t, int moves, int limit) throws GameException{
-		checkMovesLength(t, moves, limit);
 		movesMade[t] += moves;
 	}
 	
 	/** Returns true iff the renter must pay the rentee, and false otherwise
 	 * 
 	 */
-	boolean rent(int t, int moves, int limit, String pid) throws GameException{
+	public boolean rent(int t, int moves, int limit, String pid) throws GameException{
 		checkMovesLength(t, moves, limit);
 		if(!rentedFrom.contains(pid)){
 			rentedFrom.add(pid);
@@ -54,12 +56,12 @@ public class TurnData {
 		}
 	}
 	
-	void deliver(int money){
+	public void deliver(int money){
 		moneyMade += money;
 	}
 	
-	void checkSpending(int money) throws GameException{
-		if(money + moneySpent > 20) throw new GameException("ExceededAllowance");
+	public boolean checkSpending(int money){
+		return (money + moneySpent <= 20);
 	}
 	
 	/** Adds money to the turn's spendings 
@@ -67,24 +69,20 @@ public class TurnData {
 	 * @param money
 	 * @throws GameException if you have exceeded your allowance of $20
 	 */
-	void spend(int money) throws GameException{
-		checkSpending(money);
+	public void spend(int money) throws GameException{
+		if(!checkSpending(money))
+			throw new GameException("ExceededAllowance");
 		moneySpent += money;
 	}
 	
 	//need something to indicate end of a round
-	void endTurn(List<String> pids, Map<String, Player> players){
+	public void endTurn(String next, Map<String, Player> players) throws GameException{
 		Player player = players.get(pid);
-		player.subtractMoney(moneySpent);
-		player.addMoney(moneyMade); //this one needs to handle debt
+		player.spend(moneySpent);
+		player.deposit(moneyMade); //this one needs to handle debt
 		player.upgradeTrain(upgradedTrain, upgrade);
 		
-		if(pIndex < pids.size() - 1){
-			pid = pids.get(pIndex++);
-		}else{
-			pid = pids.get(0);
-			pIndex = 0;
-		}
+		pid = next;
 		
 		moneyMade = 0;
 		moneySpent = 0;
@@ -94,4 +92,10 @@ public class TurnData {
 		upgrade = null;
 		upgradedTrain = -1;
 	}
+
+	
+	public String getPid() {return pid;}
+	public int getSpending() {return moneySpent;}
+	public int getMoneyMade() {return moneyMade;}
+	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
 }
