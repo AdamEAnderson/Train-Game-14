@@ -34,7 +34,6 @@ public class Game implements AbstractGame {
 	private transient RuleSet ruleSet;
 	
 	//joinable can be represented by "turnData == null"
-//	private boolean joinable;	// game has not yet started
 	private boolean ended; // game has ended
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
 
@@ -44,13 +43,6 @@ public class Game implements AbstractGame {
 	private List<String> pids; //list of the player-ids in order
 	private Map<String, Player> players; //maps pid to player
 	private GlobalRail rail; //all of the track drawn for this game, organized by pid
-	
-	//obsolete data
-//	private List<Player> players;
-//	private transient Player active;
-//	private int activeIndex;		// index of active player in players array
-//	private transient Map<Milepost, Set<Rail.Track>> globalRail;
-//	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
 	
 	//useful for undo and deletion
 	private transient int transaction;
@@ -82,19 +74,6 @@ public class Game implements AbstractGame {
 		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
 		redoStack = new UndoRedoStack(GameException.NOTHING_TO_REDO);
 	}
-	/*public Game(String name, GameData gameData, RuleSet ruleSet){
-		this.gameData = gameData;
-		this.ruleSet = ruleSet;
-		this.name = name;
-		transaction = 1;
-		lastChange = new Date();
-		players = new ArrayList<Player>();
-		globalRail = new HashMap<Milepost, Set<Rail.Track>>();
-		turns = 0;
-		joinable = true;
-		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
-		redoStack = new UndoRedoStack(GameException.NOTHING_TO_REDO);
-	}*/
 	
 	@Override
 	public void joinGame(String pid, String color) throws GameException {
@@ -109,7 +88,13 @@ public class Game implements AbstractGame {
 		}
 
 		pids.add(pid);
-		players.put(pid, new Player(ruleSet, pid, color, this));
+		
+		Card[] cards = new Card[ruleSet.handSize];
+		for(int i = 0; i < cards.length; i++){
+			cards[i] = dealCard();
+		}
+		Player p = new Player(ruleSet, pid, color, cards, this);
+		players.put(pid, p);
 		rail.join(pid);
 		registerTransaction();
 	}
@@ -148,6 +133,7 @@ public class Game implements AbstractGame {
 		if(!testBuildTrack(pid, mileposts)){
 			throw new GameException("Invalid Track");
 		}
+		turnData.startTurn();
 		Milepost[] mps = new Milepost[mileposts.length];
 		for(int i = 0; i < mileposts.length; i++){
 			mps[i] = gameData.getMap().getMilepost(mileposts[i]);
@@ -157,10 +143,18 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void upgradeTrain(String player, int train, UpgradeType upgrade)
+	public void upgradeTrain(String pid, int train, UpgradeType upgrade)
 			throws GameException {
-		// TODO Auto-generated method stub
+		log.info("upgradeTrain(pid={}, train={}, upgradeType={})", pid, upgrade, train);
+		checkActive(pid);
+		String originalGameState = toString();
 		
+		if(!turnData.checkSpending(20)) throw new GameException("ExceededAllowance");
+		if(!getActivePlayer().testUpgradeTrain(train, upgrade)) throw new GameException("InvalidUpgrade");
+
+		turnData.upgrade(train, upgrade);
+		registerTransaction(originalGameState);
+		turnData.startTurn();
 	}
 
 	@Override
@@ -180,13 +174,14 @@ public class Game implements AbstractGame {
 	@Override
 	public void moveTrain(String player, String track, int train,
 			MilepostId[] mileposts) throws GameException {
-		// TODO Auto-generated method stub
-		
+		turnData.startMoving();
+		// TODO Auto-generated method stub	
 	}
 
 	@Override
 	public void pickupLoad(String player, int train, String load)
 			throws GameException {
+		turnData.startTurn();
 		// TODO Auto-generated method stub
 		
 	}
@@ -194,6 +189,7 @@ public class Game implements AbstractGame {
 	@Override
 	public void deliverLoad(String player, int train, String load, int card)
 			throws GameException {
+		turnData.startTurn();
 		// TODO Auto-generated method stub
 		
 	}
@@ -201,35 +197,30 @@ public class Game implements AbstractGame {
 	@Override
 	public void dumpLoad(String player, int train, String load)
 			throws GameException {
+		turnData.startTurn();
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void turnInCards(String player) throws GameException {
-		// TODO Auto-generated method stub
+	public void turnInCards(String pid) throws GameException {
+		log.info("turnInCards requestText: pid={}", pid);
+		checkActive(pid);
+		if(turnData.turnInProgress()) 
+			throw new GameException("TurnAlreadyStarted");
 		
+		String origState = toString();
+
+		Card[] cards = new Card[ruleSet.handSize];
+		for(int i = 0; i < cards.length; i++){
+			cards[i] = dealCard();
+		}
+		getActivePlayer().turnInCards(cards);
+		endTurn(pid);
+		registerTransaction(origState);
 	}
 	
 	/*
-	@Override
-	public void joinGame(String pid, String color) throws GameException {
-		log.info("joinGame(pid={}, color={})", pid, color);
-		// Check that this player is unique, and color is available
-		for (Player p: players) {
-			if (p.name.equals(pid))
-				throw new GameException(GameException.PLAYER_ALREADY_JOINED);
-			else if (p.color.equals(color))
-				throw new GameException(GameException.COLOR_NOT_AVAILABLE);
-		}
-		Card [] hand = new Card[ruleSet.handSize];
-		for(int i = 0; i < hand.length; i++){
-			hand[i] = dealCard();
-		}
-		players.add(new Player(ruleSet, hand, pid, color, this, globalRail));
-		registerTransaction();
-	}
-
 	@Override
 	public boolean startGame(String pid, boolean ready) throws GameException {
 		log.info("startGame(pid={}, ready={})", pid, ready);
@@ -385,21 +376,6 @@ public class Game implements AbstractGame {
 		String originalGameState = toString();
 		active.dropLoad(train, load);
 		registerTransaction(originalGameState);
-	}
-
-	@Override
-	public void turnInCards(String player) throws GameException {
-		log.info("turnInCards requestText: pid={}", player);
-		checkActive(player);
-		if(active.turnInProgress()) 
-			throw new GameException("TurnAlreadyStarted");
-
-		Card[] cards = new Card[ruleSet.handSize];
-		for(int i = 0; i < cards.length; i++){
-			cards[i] = dealCard();
-		}
-		active.turnInCards(cards);
-		endTurn(player);
 	}*/
 	
 	/** To undo, clients should first save off the original game state, 
@@ -500,16 +476,11 @@ public class Game implements AbstractGame {
 		registerTransaction();
 		return ended;
 	}
-
-//	private void setActive(Player p) {
-//		active = p;
-//		activeIndex = players.indexOf(p);
-//	}
 	
 	public String toString() {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(this));
-		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(this));
+//		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(this));
 		Gson gson = gsonBuilder.create();
 		return gson.toJson(this);
 	}
@@ -518,7 +489,7 @@ public class Game implements AbstractGame {
 	public static Game fromString(String gameString, Game refGame) {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
-		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(refGame));
+		//gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(refGame));
 		Gson gson = gsonBuilder.create();
 		Game newGame = gson.fromJson(gameString, Game.class);
 		
@@ -544,33 +515,11 @@ public class Game implements AbstractGame {
 	
 	public String getLastPid(){	return pids.get(pids.size() - 1); }
 	
-//	Player getPrevPlayer(Player p){
-//		int index = players.indexOf(p);
-//		if (index < 0)	// player not found
-//			return null;
-//		if (index == 0)  // wraparound
-//			return players.get(players.size() - 1);
-//		return players.get(index - 1);
-//	}
-	
-//	Player getNextPlayer(Player p){
-//		int index = players.indexOf(p);
-//		if (index < 0)	// player not found
-//			return null;
-//		if (index >= players.size() - 1)  // wraparound
-//			return players.get(0);
-//		return players.get(index + 1);
-//	}
-	
 	public Collection<Player> getPlayers(){ return players.values(); }
 	
 	public Set<String> getPids(){ return players.keySet(); }
 	
 	public int getTurns() { return turns; }
-
-//	public Map<Milepost, Set<Rail.Track>> getGlobalRail() {
-//		return globalRail;
-//	}
 	
 	private void checkActive(String pid) throws GameException {
 		if (!(getPlayer(pid).equals(turnData.getPid()))) 

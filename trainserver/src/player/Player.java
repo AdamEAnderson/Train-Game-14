@@ -19,12 +19,7 @@ public class Player {
 	public final String color;
 	private Train[] trains;
 	private int money;
-	//private Rail rail;
 	private Card[] cards;
-	//private int spendings;
-	//private int[] movesMade;
-	//private boolean turnInProgress;
-	//private ArrayList<String> rentingFrom;
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	private boolean hasResigned;
@@ -34,45 +29,21 @@ public class Player {
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
-	public Player(RuleSet ruleSet, String pid, String color, Game game){
+	public Player(RuleSet ruleSet, String pid, String color, Card[] cards, Game game){
 		name = pid;
 		this.color = color;
 		trains = new Train[ruleSet.numTrains];
 		money = ruleSet.startingMoney;
-		cards = new Card[ruleSet.handSize];
+		this.cards = cards;
 		readyToStart = false;
 		readyToEnd = false;
 		hasResigned = false;
 		this.game = game;
 	}
 	
-	//old constructor
-//	public Player(RuleSet ruleSet, Card[] hand, String name, String color, 
-//			Game game, Map<Milepost, Set<Rail.Track>> globalRail){
-//		trains = new Train[ruleSet.numTrains];
-//		for (int i = 0; i < ruleSet.numTrains; ++i) {
-//			trains[i] = new Train(i);
-//		}
-//		this.game = game;
-//		money = ruleSet.startingMoney;
-//		rail = new Rail(globalRail, name);
-//		cards = hand;
-//		this.name = name;
-//		this.color = color;
-//		spendings = 0;
-//		turnInProgress = false;
-//		movesMade = new int[ruleSet.numTrains];
-//		rentingFrom = new ArrayList<String>();
-//		readyToStart = false;
-//		readyToEnd = false;
-//		hasResigned = false;
-//		stats = new Stats();
-//	}
-	
 	public void placeTrain(Milepost m, int t) throws GameException{
-		//turnInProgress = true;
-		if (trains[t].getLocation() == null) 
-			trains[t].moveTrain(m);
+		if (trains[t] == null) 
+			trains[t] = new Train(t, m);
 		else 
 			throw new GameException("TrainAlreadyPlaced");
 		log.info("after place");
@@ -126,10 +97,20 @@ public class Player {
 		}
 		stats.milesTravelled += mps.length;
 	}*/
+	
+	public boolean testUpgradeTrain(int t, UpgradeType u){
+		switch(u) {
+		case SPEED:
+			return trains[t].testUpgradeSpeed();
+		case CAPACITY:
+			return trains[t].testUpgradeLoads();
+		default:
+			return false;
+		}
+	}
 		
 	public void upgradeTrain(int t, UpgradeType u) throws GameException {
-		//turnInProgress = true;
-//		if(spendings > 0) throw new GameException("ExceededAllowance");
+		if(!testUpgradeTrain(t, u)) throw new GameException("InvalidUpgrade");
 		switch (u) {
 			case SPEED:
 				trains[t].upgradeSpeed();
@@ -138,8 +119,6 @@ public class Player {
 				trains[t].upgradeLoads();
 				break;
 		}
-//		spendings += 20;
-		
 	}
 
 	/*public boolean testBuildTrack(Milepost[] mileposts){
@@ -199,36 +178,27 @@ public class Player {
 //		spendings += cost;
 	}
 	
-	
-	
 	public void pickupLoad(int t, String load) throws GameException{ 
-//		turnInProgress = true;
 		trains[t].addLoad(load); 
 	}
 	
-	
-	
 	public void dropLoad(int t, String load) throws GameException{ 
-//		turnInProgress = true;
 		trains[t].dropLoad(load); 
 	}
 	
-	
-	
-	/** Delivers a load on the given card.
+	/** Delivers a load on the given card. Returns the money to be deposited.
 	 * @param index is the location of the card in the player's hand, array-wise
 	 * @param next is the card drawn to replace that one
 	 */
-	public void deliverLoad(int cIndex, int tIndex, Card next) throws GameException {
-//		turnInProgress = true;
+	public int deliverLoad(int cIndex, int tIndex, Card next) throws GameException {
 		Card c = cards[cIndex];
 		Trip t = canDeliver(tIndex, c);
 		if(t == null) throw new GameException("InvalidDelivery");
 		trains[tIndex].dropLoad(t.load);
 		cards[cIndex] = next; 
-		deposit(t.cost);
 		++stats.deliveryCount;
 		stats.deliveryIncome += t.cost;
+		return t.cost;
 	}
 	
 	private Trip canDeliver(int ti, Card c){
@@ -241,16 +211,6 @@ public class Player {
 		}
 		return null;
 	}
-	
-//	public void endTurn(){
-//		turnInProgress = true;
-//		money -= spendings;
-//		spendings = 0;
-//		rentingFrom.clear();
-//		for(int i = 0; i < movesMade.length; i++){
-//			movesMade[i] = 0;
-//		}
-//	}
 	
 	public void resign() {
 		hasResigned = true;
@@ -287,25 +247,15 @@ public class Player {
 	
 	public boolean readyToEnd() { return readyToEnd; }
 	
-//	public boolean turnInProgress() { return turnInProgress; }
-	
 	public boolean hasResigned() {return hasResigned; }
 		
 	public String getPid(){ return name; }
 		
 	public int getMoney() {	return money; }
 	
-//	public int getSpending(){ return spendings; }
-	
-//	public int[] getMovesMade(){ return movesMade; }
-	
-//	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
-	
 	public Card[] getCards(){ return cards; }
 	
 	public Train[] getTrains(){ return trains; }
-	
-//	public Rail getRail(){ return rail; }
 	
 	public Stats stats() { 
 		stats.money = money;
@@ -336,11 +286,6 @@ public class Player {
 		return max;
 	}
 	
-	/** Call this from test code only!! Just here for debugging */
 	public void turnInCards(Card[] cards)  { this.cards = cards; }
 	
-//	public void fixup(Game game, Map<Milepost, Set<Rail.Track>> globalRail) {
-//		this.game = game;
-//		rail.fixup(globalRail);
-//	}
 }

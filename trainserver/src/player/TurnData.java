@@ -17,6 +17,7 @@ public class TurnData {
 	private int[] movesMade;
 	private List<String> rentedFrom;
 	private boolean isBuilding;
+	private boolean turnInProgress;
 	private UpgradeType upgrade;
 	private int upgradedTrain;
 	
@@ -55,27 +56,18 @@ public class TurnData {
 			return false;
 		}
 	}
-	
-	public void deliver(int money){
-		moneyMade += money;
-	}
-	
-	public boolean checkSpending(int money){
-		return (money + moneySpent <= 20);
-	}
-	
-	/** Adds money to the turn's spendings 
-	 * 
-	 * @param money
-	 * @throws GameException if you have exceeded your allowance of $20
-	 */
-	public void spend(int money) throws GameException{
-		if(!checkSpending(money))
+
+	public void upgrade(int t, UpgradeType u) throws GameException{
+		if(!checkSpending(20)){
 			throw new GameException("ExceededAllowance");
-		moneySpent += money;
+		}
+		spend(20);
+		upgrade = u;
+		upgradedTrain = t;
 	}
 	
-	//need something to indicate end of a round
+	
+	//need something to indicate end of a round ?
 	public void endTurn(String next, Map<String, Player> players) throws GameException{
 		Player player = players.get(pid);
 		player.spend(moneySpent);
@@ -89,13 +81,31 @@ public class TurnData {
 		movesMade = new int[movesMade.length];
 		rentedFrom.clear();
 		isBuilding = true;
+		turnInProgress = false;
 		upgrade = null;
 		upgradedTrain = -1;
 	}
-
+	
+	/** Adds money to the turn's spendings 
+	 * 
+	 * @param money
+	 * @throws GameException if you have exceeded your allowance of $20
+	 */
+	public void spend(int money) throws GameException{
+		if(!checkSpending(money))
+			throw new GameException("ExceededAllowance");
+		moneySpent += money;
+	}
+	
+	public void deliver(int money){ moneyMade += money; }
+	public boolean checkSpending(int money){ return (money + moneySpent <= 20);}
+	public void startTurn(){ turnInProgress = true;	}
+	public void startMoving() { isBuilding = false; turnInProgress = true;}
 	
 	public String getPid() {return pid;}
 	public int getSpending() {return moneySpent;}
 	public int getMoneyMade() {return moneyMade;}
 	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
+	public boolean turnInProgress(){ return turnInProgress;}
+	public boolean isBuilding(){ return isBuilding; }
 }
