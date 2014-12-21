@@ -8,17 +8,18 @@ import train.GameException;
 import map.Edge;
 import map.Ferry;
 import map.Milepost;
+import map.MilepostId;
 
 public class Rail {
 	
-	private Map<Milepost, Set<Milepost>> tracks; 
+	private Map<MilepostId, Set<MilepostId>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
 //	private transient Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
 	private String pid;
 	
 	public Rail(String pid){
 		this.pid = pid;
-		tracks = new HashMap<Milepost, Set<Milepost>>();
+		tracks = new HashMap<MilepostId, Set<MilepostId>>();
 	}
 	/*
 	Rail(Map<Milepost, Set<Track>> allTracks, String pid){
@@ -33,7 +34,7 @@ public class Rail {
 		this.tracks = tracks;
 	}*/
 	
-	public Map<Milepost, Set<Milepost>> getRail(){
+	public Map<MilepostId, Set<MilepostId>> getRail(){
 		return tracks;
 	}
 	
@@ -42,14 +43,14 @@ public class Rail {
 	}
 	
 	/** True if the player has built to this milepost */
-	boolean contains(Milepost m){
+	boolean contains(MilepostId m){
 		return tracks.containsKey(m);
 	}
 	
 	/** Returns whether this rail connects these two mileposts.
 	 *  When the two mileposts are not neighbors, the answer is always false.
 	 */
-	boolean connects(Milepost one, Milepost two){
+	boolean connects(MilepostId one, MilepostId two){
 		return tracks.get(one).contains(two);
 	}
 	
@@ -64,9 +65,9 @@ public class Rail {
 //		return "";
 //	}
 	
-	private void addTrack(Milepost one, Milepost two) {
+	private void addTrack(MilepostId one, MilepostId two) {
 		if(!tracks.containsKey(one)){
-			tracks.put(one, new HashSet<Milepost>());
+			tracks.put(one, new HashSet<MilepostId>());
 		}
 		tracks.get(one).add(two);
 	}
@@ -90,8 +91,8 @@ public class Rail {
 //		}
 //	}
 	
-	private void removeTrack(Milepost one, Milepost two){
-		Set<Milepost> s = tracks.get(one);
+	private void removeTrack(MilepostId one, MilepostId two){
+		Set<MilepostId> s = tracks.get(one);
 		s.remove(two);
 	}
 
@@ -119,15 +120,15 @@ public class Rail {
 		if(!origin.isNeighbor(next) || !next.isNeighbor(origin)){
 			throw new GameException("InvalidTrack");
 		}
-		addTrack(origin, next);
-		addTrack(next, origin);
+		addTrack(origin.getMilepostId(), next.getMilepostId());
+		addTrack(next.getMilepostId(), origin.getMilepostId());
 //		addAllTrack(origin, next);
 //		addAllTrack(next, origin);
 		Edge e = origin.getEdge(next);
 		if (e instanceof Ferry){
 			Edge back = next.getEdge(origin);
 			if(!(back instanceof Ferry)){
-				erase(origin, next);
+				erase(origin.getMilepostId(), next.getMilepostId());
 				throw new GameException(GameException.INVALID_TRACK);
 			}
 		}
@@ -145,7 +146,7 @@ public class Rail {
 //		return null;
 //	}
 	
-	void erase(Milepost one, Milepost two){
+	void erase(MilepostId one, MilepostId two){
 		removeTrack(one, two);
 		removeTrack(two, one);
 //		removeAllTrack(one, two);
@@ -167,17 +168,17 @@ public class Rail {
 //		}
 //	}
 	
-	public class Track {
-		final String pid;
-		Set<Milepost> dests;
-		
-		Track(String p){
-			pid = p;
-			dests = new HashSet<Milepost>();
-		}
-		
-		void add(Milepost m){dests.add(m);}
-		
-		void remove(Milepost m){dests.remove(m);}
-	}
+//	public class Track {
+//		final String pid;
+//		Set<Milepost> dests;
+//		
+//		Track(String p){
+//			pid = p;
+//			dests = new HashSet<Milepost>();
+//		}
+//		
+//		void add(Milepost m){dests.add(m);}
+//		
+//		void remove(Milepost m){dests.remove(m);}
+//	}
 }

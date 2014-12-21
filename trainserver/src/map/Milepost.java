@@ -33,9 +33,6 @@ public class Milepost {
 	}
 	
 	void updateEdges(Edge[] edges) throws GameException{
-		if(edges.length != this.edges.length){
-			throw new GameException("BAD_MAP_DATA");
-		}
 		this.edges = edges;
 	}
 	

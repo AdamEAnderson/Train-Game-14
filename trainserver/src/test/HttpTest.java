@@ -282,7 +282,7 @@ public class HttpTest {
 	}
 	
 	// Send a stream of requests to the server check the results
-	@Test
+	//@Test
 	public void testTrain() throws Exception {
 		Thread serverThread = startServer();
 		

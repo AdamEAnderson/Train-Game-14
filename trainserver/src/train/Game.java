@@ -542,7 +542,7 @@ public class Game implements AbstractGame {
 		throw new GameException(GameException.PLAYER_NOT_FOUND);
 	}
 	
-	Player getLastPlayer(){	return players.get(players.size() - 1); }
+	public String getLastPid(){	return pids.get(pids.size() - 1); }
 	
 //	Player getPrevPlayer(Player p){
 //		int index = players.indexOf(p);

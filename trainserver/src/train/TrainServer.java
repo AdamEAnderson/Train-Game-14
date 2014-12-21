@@ -121,9 +121,9 @@ public class TrainServer {
 		public int money;
 		public Card[] hand;
 		public Stats stats;
-		public RailStatus rail;
+		public Map<MilepostId, Set<MilepostId>> rail;
 		PlayerStatus() {}
-		PlayerStatus(Player p, RailStatus r) {
+		PlayerStatus(Player p, Map<MilepostId, Set<MilepostId>> r) {
 			pid = p.name;
 			color = p.color;
 			trains = p.getTrains();
@@ -131,25 +131,6 @@ public class TrainServer {
 			stats = p.stats();
 			hand = p.getCards();
 			rail = r;
-		}
-	}
-	
-	static class RailStatus{
-		String gid;
-		String pid;
-		Map<MilepostId, Set<MilepostId>> rail;
-		public RailStatus(String gid, String pid, GlobalRail g){
-			Rail r = g.getRail(pid);
-			Map<Milepost, Set<Milepost>> railMileposts = r.getRail();
-			Map<MilepostId, Set<MilepostId>> railIds = new HashMap<MilepostId, Set<MilepostId>>();
-			for(Milepost outer : railMileposts.keySet()){
-				Set<MilepostId> inner = new HashSet<MilepostId>();
-				railIds.put(new MilepostId(outer.x, outer.y), inner);
-				for(Milepost m : railMileposts.get(outer)){
-					inner.add(new MilepostId(m.x, m.y));
-				}
-			}
-			rail = railIds;
 		}
 	}
 	
@@ -161,7 +142,6 @@ public class TrainServer {
 		public boolean ended;
 		public int turns;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
-		public List<RailStatus> rails;
 		public int transaction;
 		GameStatus() {}
 	}
@@ -194,13 +174,10 @@ public class TrainServer {
 		status.turnData = game.getTurnData();
 		status.ended = game.isOver();
 		status.turns = game.getTurns();
-		Player activePlayer = game.getActivePlayer();
-		Player lastPlayer = game.getLastPlayer();
-		status.lastid = lastPlayer != null ? lastPlayer.name : "";
+		status.lastid = game.getLastPid();
 		
 		for(String pid : game.getPids()){
-			RailStatus r = new RailStatus(status.gid, pid, game.getGlobalRail());
-			PlayerStatus p = new PlayerStatus(game.getPlayer(pid), r);
+			PlayerStatus p = new PlayerStatus(game.getPlayer(pid), game.getGlobalRail().getRail(pid).getRail());
 			status.players.add(p);
 		}
 		
