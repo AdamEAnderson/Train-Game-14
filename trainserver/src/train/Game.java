@@ -530,7 +530,7 @@ public class Game implements AbstractGame {
 
 	/** Returns player whose turn it is */
 	public String getActivePid() { 
-		if(turnData == null) return null;
+		if(turnData == null) return pids.get(0);
 		return turnData.getPid();
 	}
 	
