@@ -28,6 +28,7 @@ public class Player {
 	private boolean readyToStart;
 	private boolean readyToEnd;
 	private boolean hasResigned;
+	
 	private Stats stats;
 	private transient Game game;
 	

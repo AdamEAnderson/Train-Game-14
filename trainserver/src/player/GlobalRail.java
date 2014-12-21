@@ -74,4 +74,8 @@ public class GlobalRail {
 		}
 		return false;
 	}
+
+	public Rail getRail(String pid){
+		return rails.get(pid);
+	}
 }

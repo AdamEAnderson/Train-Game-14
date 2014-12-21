@@ -171,7 +171,7 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public String testMoveTrain(String player, String track, int train,
+	public String testMoveTrain(String player, int train,
 			MilepostId[] mileposts) throws GameException {
 		// TODO Auto-generated method stub
 		return null;
@@ -564,6 +564,8 @@ public class Game implements AbstractGame {
 	
 	public Collection<Player> getPlayers(){ return players.values(); }
 	
+	public Set<String> getPids(){ return players.keySet(); }
+	
 	public int getTurns() { return turns; }
 
 //	public Map<Milepost, Set<Rail.Track>> getGlobalRail() {
@@ -590,6 +592,8 @@ public class Game implements AbstractGame {
 	}
 	
 	public TurnData getTurnData(){ return turnData; }
+	
+	public GlobalRail getGlobalRail() {return rail; }
 	
 	public RuleSet getRuleSet() { return ruleSet; }
 	
