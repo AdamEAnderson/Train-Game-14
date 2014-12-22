@@ -2,18 +2,12 @@ package test;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-
 import map.MilepostId;
 
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import player.Player;
-import reference.Card;
-import reference.Trip;
-import reference.UpgradeType;
 import train.Game;
 import train.GameException;
 import train.TrainServer;

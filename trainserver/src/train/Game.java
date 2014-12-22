@@ -20,8 +20,6 @@ import com.google.gson.GsonBuilder;
 
 import player.GlobalRail;
 import player.Player;
-import player.Rail;
-import player.RailTypeAdapter;
 import player.TurnData;
 import reference.Card;
 import reference.UpgradeType;

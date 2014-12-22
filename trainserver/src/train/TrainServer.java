@@ -21,9 +21,7 @@ import map.TrainMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import player.GlobalRail;
 import player.Player;
-import player.Rail;
 import player.Stats;
 import player.Train;
 import player.TurnData;
