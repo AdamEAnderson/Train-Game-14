@@ -24,7 +24,7 @@ public class GlobalRail {
 	public int checkBuild(String pid, Milepost[] mps) throws GameException{
 		int cost = 0;
 		Milepost fst = mps[0];
-		if(!contains(pid, fst.getMilepostId())) 
+		if(!(contains(pid, fst.getMilepostId()) || fst.isMajorCity()))
 			return -1;
 		for(int i = 1; i < mps.length; i++){
 			Milepost snd = mps[i];

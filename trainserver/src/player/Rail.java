@@ -51,19 +51,10 @@ public class Rail {
 	 *  When the two mileposts are not neighbors, the answer is always false.
 	 */
 	boolean connects(MilepostId one, MilepostId two){
-		return tracks.get(one).contains(two);
+		if(tracks.containsKey(one))
+			return tracks.get(one).contains(two);
+		return false;
 	}
-	
-//	String anyConnects(Milepost one, Milepost two){
-//		Set<Track> tracks = allTracks.get(one);
-//		if(tracks == null) return "";
-//		for(Track t : tracks){
-//			for(Milepost m : t.dests){
-//				if(m.equals(two)) return t.pid;
-//			}
-//		}
-//		return "";
-//	}
 	
 	private void addTrack(MilepostId one, MilepostId two) {
 		if(!tracks.containsKey(one)){
@@ -72,45 +63,11 @@ public class Rail {
 		tracks.get(one).add(two);
 	}
 	
-//	private void addAllTrack(Milepost one, Milepost two){
-//		if(!allTracks.containsKey(one)){
-//			allTracks.put(one, new HashSet<Track>());
-//		}
-//		for(Track t : allTracks.get(one)){
-//			if(t.pid.equals(pid)){
-//				t.add(two);
-//				return;
-//			}
-//		}
-//		allTracks.get(one).add(new Track(pid));
-//		for(Track t : allTracks.get(one)){
-//			if(t.pid.equals(pid)){
-//				t.add(two);
-//				return;
-//			}
-//		}
-//	}
-	
 	private void removeTrack(MilepostId one, MilepostId two){
 		Set<MilepostId> s = tracks.get(one);
 		s.remove(two);
 	}
 
-//	private void removeAllTrack(Milepost one, Milepost two){
-//		for(Track t : allTracks.get(one)){
-//			if(t.pid.equals(pid)){
-//				t.remove(two);
-//			}
-//		}
-//	}
-	
-	//moved to Milepost class
-//	int getCost(Milepost origin, Milepost next){
-//		Edge e = getEdge(origin, next);
-//		if(e == null) return -1;
-//		return e.cost;
-//	}
-//	
 	/** Adds the given track to the player's rails, if and only if the track can be legally built.
 	 * @param origin: the milepost already attached to the rail; next is where
 	 * you build towards.
@@ -122,8 +79,6 @@ public class Rail {
 		}
 		addTrack(origin.getMilepostId(), next.getMilepostId());
 		addTrack(next.getMilepostId(), origin.getMilepostId());
-//		addAllTrack(origin, next);
-//		addAllTrack(next, origin);
 		Edge e = origin.getEdge(next);
 		if (e instanceof Ferry){
 			Edge back = next.getEdge(origin);
@@ -149,8 +104,6 @@ public class Rail {
 	void erase(MilepostId one, MilepostId two){
 		removeTrack(one, two);
 		removeTrack(two, one);
-//		removeAllTrack(one, two);
-//		removeAllTrack(two, one);
 	}
 	
 	/** After deserializing a game, need to fix up the Rail so the 

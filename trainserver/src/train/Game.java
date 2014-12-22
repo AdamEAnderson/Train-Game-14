@@ -100,9 +100,39 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public boolean startGame(String player, boolean ready) throws GameException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean startGame(String pid, boolean ready) throws GameException {
+		log.info("startGame(pid={}, ready={})", pid, ready);
+		Player p = getPlayer(pid);
+		p.readyToStart(ready);
+		
+		boolean start = true;
+		for (Player player: players.values())
+			if (!player.readyToStart())
+				start = false;
+		
+		if (start) {	// All players are ready to start - start the game
+			log.info("Starting game");
+			
+			// Turn starts with player with the highest cards
+			// Reorder players list so it matches playering order
+			String startid = pids.get(0);
+			for (int i = 1; i < pids.size(); i++){
+				if (players.get(startid).getMaxTrip() < players.get(pids.get(i)).getMaxTrip()) 
+					startid = pids.get(i);
+			}
+
+			// Add all the players to the new players list, starting with the first player
+			List<String> newPids = new ArrayList<String>();
+			newPids.add(startid);
+			for (String oid: pids){
+				if (oid != startid)
+					newPids.add(oid);
+			}
+			pids = newPids;
+			turnData = new TurnData(name, ruleSet, startid);
+			registerTransaction();
+		}
+		return start;
 	}
 
 	@Override
@@ -114,12 +144,9 @@ public class Game implements AbstractGame {
 		log.info("])");
 		
 		checkActive(pid);
-		Milepost[] mps = new Milepost[mileposts.length];
-		for(int i = 0; i < mileposts.length; i++){
-			mps[i] = gameData.getMilepost(mileposts[i]);
-		}
+		Milepost[] mps = convert(mileposts);
 		int cost = rail.checkBuild(pid, mps);
-		return (cost != -1 && turnData.checkSpending(cost));
+		return ((cost != -1) && turnData.checkSpending(cost));
 	}
 
 	@Override
@@ -133,13 +160,13 @@ public class Game implements AbstractGame {
 		if(!testBuildTrack(pid, mileposts)){
 			throw new GameException("Invalid Track");
 		}
+		String originalGameState = toString();
 		turnData.startTurn();
-		Milepost[] mps = new Milepost[mileposts.length];
-		for(int i = 0; i < mileposts.length; i++){
-			mps[i] = gameData.getMap().getMilepost(mileposts[i]);
-		}	
+		Milepost[] mps = convert(mileposts);
 		int cost = rail.checkBuild(pid, mps);
 		turnData.spend(cost);
+		rail.build(pid, mps);
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -158,10 +185,14 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void placeTrain(String player, int train, MilepostId where)
+	public void placeTrain(String pid, int train, MilepostId where)
 			throws GameException {
-		// TODO Auto-generated method stub
-		
+		log.info("placeTrain(pid={}, train={}, where={})", pid, train, where);
+		checkActive(pid);
+		String originalGameState = toString();
+
+		getPlayer(pid).placeTrain(gameData.getMap().getMilepost(where), train);
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -179,26 +210,39 @@ public class Game implements AbstractGame {
 	}
 
 	@Override
-	public void pickupLoad(String player, int train, String load)
+	public void pickupLoad(String pid, int train, String load)
 			throws GameException {
+		log.info("pickupLoad(pid={}, train={}, load={})", pid, train, load);
+		checkActive(pid);
+		checkBuilding();
+		String originalGameState = toString();
 		turnData.startTurn();
-		// TODO Auto-generated method stub
-		
+		getActivePlayer().pickupLoad(train, load);
+		registerTransaction(originalGameState);
 	}
 
 	@Override
-	public void deliverLoad(String player, int train, String load, int card)
+	public void deliverLoad(String pid, int train, String load, int card)
 			throws GameException {
-		turnData.startTurn();
-		// TODO Auto-generated method stub
-		
+		log.info("deliverLoad(pid={}, train={}, load={})", pid, train, load);
+		checkActive(pid);
+		checkBuilding();
+		String originalGameState = toString();
+		turnData.startMoving();
+		int deposit = getActivePlayer().deliverLoad(card, train, dealCard());
+		turnData.deliver(deposit);
+		registerTransaction(originalGameState);
 	}
 
 	@Override
-	public void dumpLoad(String player, int train, String load)
+	public void dumpLoad(String pid, int train, String load)
 			throws GameException {
+		log.info("dumpLoad(pid={}, train={}, load={})", pid, train, load);
+		checkActive(pid);
+		String originalGameState = toString();
 		turnData.startTurn();
-		// TODO Auto-generated method stub
+		getActivePlayer().dropLoad(train, load);
+		registerTransaction(originalGameState);
 		
 	}
 
@@ -222,58 +266,6 @@ public class Game implements AbstractGame {
 	
 	/*
 	@Override
-	public boolean startGame(String pid, boolean ready) throws GameException {
-		log.info("startGame(pid={}, ready={})", pid, ready);
-		Player p = getPlayer(pid);
-		p.readyToStart(ready);
-		
-		boolean start = true;
-		for (Player player: players)
-			if (!player.readyToStart())
-				start = false;
-		
-		if (start) {	// All players are ready to start - start the game
-			log.info("Starting game");
-			
-			// Turn starts with player with the highest cards
-			// Reorder players list so it matches playering order
-			Player first = players.get(0);
-			for (int i = 1; i < players.size(); i++){
-				if (first.getMaxTrip() < players.get(i).getMaxTrip()) 
-					first = players.get(i);
-			}
-
-			// Add all the players to the new players list, starting with the first player
-			List<Player> newPlayers = new ArrayList<Player>();
-			newPlayers.add(first);
-			for (Player player: players){
-				if (player != first)
-					newPlayers.add(player);
-			}
-			players = newPlayers;
-			setActive(first);
-			
-			joinable = false;
-			registerTransaction();
-		}
-		return start;
-	}
-
-	@Override
-	public boolean testBuildTrack(String pid, MilepostId[] mileposts) throws GameException {
-		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
-		log.info("])");
-		checkActive(pid);
-		Milepost[] array = new Milepost[mileposts.length];
-		for(int i = 0; i < mileposts.length; i++){
-			array[i] = gameData.getMap().getMilepost(mileposts[i]);
-		}
-		return active.testBuildTrack(array);	
-	}
-
-	@Override
 	public void buildTrack(String pid, MilepostId[] milepostIds) throws GameException {
 		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, milepostIds.length);
 		for (int i = 0; i < milepostIds.length; ++i)
@@ -287,27 +279,6 @@ public class Game implements AbstractGame {
 			mileposts[i] = gameData.getMap().getMilepost(milepostIds[i]);
 		}
 		active.buildTrack(mileposts);	
-		registerTransaction(originalGameState);
-	}
-
-	@Override
-	public void upgradeTrain(String pid, int train, UpgradeType upgrade)
-			throws GameException {
-		log.info("upgradeTrain(pid={}, train={}, upgradeType={})", pid, upgrade, train);
-		checkActive(pid);
-		String originalGameState = toString();
-
-		active.upgradeTrain(train, upgrade);
-		registerTransaction(originalGameState);
-	}
-
-	@Override
-	public void placeTrain(String pid, int train, MilepostId where) throws GameException {
-		log.info("placeTrain(pid={}, train={}, where={})", pid, train, where);
-		checkActive(pid);
-		String originalGameState = toString();
-
-		active.placeTrain(gameData.getMap().getMilepost(where), train);
 		registerTransaction(originalGameState);
 	}
 
@@ -367,15 +338,6 @@ public class Game implements AbstractGame {
 		String originalGameState = toString();
 		active.deliverLoad(card, train, dealCard());
 		registerTransaction(originalGameState);
-	}
-
-	@Override
-	public void dumpLoad(String pid, int train, String load) throws GameException {
-		log.info("dumpLoad(pid={}, train={}, load={})", pid, train, load);
-		checkActive(pid);
-		String originalGameState = toString();
-		active.dropLoad(train, load);
-		registerTransaction(originalGameState);
 	}*/
 	
 	/** To undo, clients should first save off the original game state, 
@@ -420,9 +382,10 @@ public class Game implements AbstractGame {
 		case 0:
 			if (activeIndex == players.size() - 1){	// player goes again
 				turns++;
-			}else
+			}else{
 				next = pids.get(activeIndex + 1);
 				activeIndex++;
+			}
 			break;
 		case 1:
 			if(activeIndex == 0){
@@ -437,8 +400,13 @@ public class Game implements AbstractGame {
 				turns++;
 				next = pids.get(0);
 			}
-			else next = (pids.get(activeIndex + 1));
+			else {
+				next = (pids.get(activeIndex + 1));
+				activeIndex++;
+			}
 		}
+		
+		turnData.endTurn(next, players);
 			
 		registerTransaction();
 		undoStack.clear();
@@ -452,7 +420,8 @@ public class Game implements AbstractGame {
 		log.info("resign requestText: pid={}", pid);
 		if (pid.equals(turnData.getPid()))
 			endTurn(pid);
-		getPlayer(pid).resign(); 
+		getPlayer(pid).resign();
+		pids.remove(pid);
 		undoStack.clear();
 		redoStack.clear();
 	}
@@ -522,7 +491,9 @@ public class Game implements AbstractGame {
 	public int getTurns() { return turns; }
 	
 	private void checkActive(String pid) throws GameException {
-		if (!(getPlayer(pid).equals(turnData.getPid()))) 
+		if(turnData == null)
+			throw new GameException("GameNotStarted");
+		if (!(pid.equals(turnData.getPid()))) 
 			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
 	}
 
@@ -570,7 +541,13 @@ public class Game implements AbstractGame {
 		return gameData.draw();
 	}
 
-
+	private Milepost[] convert(MilepostId[] m){
+		Milepost[] mps = new Milepost[m.length];
+		for(int i = 0; i < m.length; i++){
+			mps[i] = gameData.getMap().getMilepost(m[i]);
+		}	
+		return mps;
+	}
 
 
 	

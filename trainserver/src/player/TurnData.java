@@ -72,7 +72,8 @@ public class TurnData {
 		Player player = players.get(pid);
 		player.spend(moneySpent);
 		player.deposit(moneyMade); //this one needs to handle debt
-		player.upgradeTrain(upgradedTrain, upgrade);
+		if(upgradedTrain != -1)
+			player.upgradeTrain(upgradedTrain, upgrade);
 		
 		pid = next;
 		
