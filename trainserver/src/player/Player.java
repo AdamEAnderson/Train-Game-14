@@ -282,6 +282,10 @@ public class Player {
 		return max;
 	}
 	
+	public int getMaxSpeed(int train){
+		return trains[train].getSpeed();
+	}
+	
 	public void turnInCards(Card[] cards)  { this.cards = cards; }
 	
 }

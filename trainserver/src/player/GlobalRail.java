@@ -53,6 +53,16 @@ public class GlobalRail {
 		}
 	}
 	
+	public boolean testMove(String rid, MilepostId[] mps) throws GameException{
+		if(!rails.containsKey(rid)) return false;
+		MilepostId fst = mps[0];
+		for(int i = 1; i < mps.length; i++){
+			MilepostId snd = mps[i];
+			if(!connects(rid, fst, snd)) return false;
+		}
+		return true;
+	}
+	
 	public boolean contains(String pid, MilepostId m) throws GameException{
 		if(!rails.containsKey(pid)){
 			throw new GameException("PlayerNotFound");
@@ -74,6 +84,21 @@ public class GlobalRail {
 			} catch (GameException e) {		} //the exception is thrown when the pid is not identified
 		}
 		return false;
+	}
+	
+	/** Return the player who build this pair of mileposts, or null if none. 
+	 * 
+	 * @param one
+	 * @param two
+	 * @return
+	 */
+	public String getPlayer(MilepostId one, MilepostId two){
+		for(String pid : rails.keySet()){
+			try{
+				if(connects(pid, one, two)) return pid;
+			}catch(GameException e) { }
+		}
+		return null;
 	}
 
 	public Rail getRail(String pid){

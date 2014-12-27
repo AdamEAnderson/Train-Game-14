@@ -40,7 +40,7 @@ public class Game implements AbstractGame {
 	private int activeIndex;  //index of the active player in the pids list
 	private List<String> pids; //list of the player-ids in order
 	private Map<String, Player> players; //maps pid to player
-	private GlobalRail rail; //all of the track drawn for this game, organized by pid
+	private GlobalRail globalRail; //all of the track drawn for this game, organized by pid
 	
 	//useful for undo and deletion
 	private transient int transaction;
@@ -63,7 +63,7 @@ public class Game implements AbstractGame {
 		//we don't construct a TurnData until the game starts 
 		pids = new ArrayList<String>();
 		players = new HashMap<String, Player>();
-		rail = new GlobalRail(name);
+		globalRail = new GlobalRail(name);
 		
 		turns = 0;
 		ended = false;
@@ -93,7 +93,7 @@ public class Game implements AbstractGame {
 		}
 		Player p = new Player(ruleSet, pid, color, cards, this);
 		players.put(pid, p);
-		rail.join(pid);
+		globalRail.join(pid);
 		registerTransaction();
 	}
 
@@ -143,7 +143,7 @@ public class Game implements AbstractGame {
 		
 		checkActive(pid);
 		Milepost[] mps = convert(mileposts);
-		int cost = rail.checkBuild(pid, mps);
+		int cost = globalRail.checkBuild(pid, mps);
 		return ((cost != -1) && turnData.checkSpending(cost));
 	}
 
@@ -161,9 +161,9 @@ public class Game implements AbstractGame {
 		String originalGameState = toString();
 		turnData.startTurn();
 		Milepost[] mps = convert(mileposts);
-		int cost = rail.checkBuild(pid, mps);
+		int cost = globalRail.checkBuild(pid, mps);
 		turnData.spend(cost);
-		rail.build(pid, mps);
+		globalRail.build(pid, mps);
 		registerTransaction(originalGameState);
 	}
 
@@ -173,7 +173,7 @@ public class Game implements AbstractGame {
 		log.info("upgradeTrain(pid={}, train={}, upgradeType={})", pid, upgrade, train);
 		checkActive(pid);
 		String originalGameState = toString();
-		
+		turnData.startTurn();
 		if(!turnData.checkSpending(20)) throw new GameException("ExceededAllowance");
 		if(!getActivePlayer().testUpgradeTrain(train, upgrade)) throw new GameException("InvalidUpgrade");
 
@@ -187,23 +187,34 @@ public class Game implements AbstractGame {
 			throws GameException {
 		log.info("placeTrain(pid={}, train={}, where={})", pid, train, where);
 		checkActive(pid);
+		checkBuilding();
 		String originalGameState = toString();
-
+		turnData.startTurn();
 		getPlayer(pid).placeTrain(gameData.getMap().getMilepost(where), train);
 		registerTransaction(originalGameState);
 	}
 
+	private boolean testMoveTrain(String pid, String rid, int train, MilepostId[] mileposts) 
+			throws GameException{
+		if(! globalRail.testMove(rid, mileposts)) return false;
+		Player p = getPlayer(pid);
+		if(! turnData.checkMovesLength(train, mileposts.length, p.getMaxSpeed(train))) return false;
+		return true;
+	}
+	
 	@Override
-	public String testMoveTrain(String player, int train,
+	public String testMoveTrain(String pid, int train,
 			MilepostId[] mileposts) throws GameException {
-		// TODO Auto-generated method stub
+		String rid = globalRail.getPlayer(mileposts[0], mileposts[1]);
+		if(rid == null) return null;
+		if(testMoveTrain(pid, rid, train, mileposts)) return rid;
 		return null;
 	}
 
 	@Override
 	public void moveTrain(String player, String track, int train,
 			MilepostId[] mileposts) throws GameException {
-		turnData.startMoving();
+		turnData.startTurn();
 		// TODO Auto-generated method stub	
 	}
 
@@ -226,7 +237,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		String originalGameState = toString();
-		turnData.startMoving();
+		turnData.startTurn();
 		int deposit = getActivePlayer().deliverLoad(card, train, dealCard());
 		turnData.deliver(deposit);
 		registerTransaction(originalGameState);
@@ -511,7 +522,7 @@ public class Game implements AbstractGame {
 	
 	public TurnData getTurnData(){ return turnData; }
 	
-	public GlobalRail getGlobalRail() {return rail; }
+	public GlobalRail getGlobalRail() {return globalRail; }
 	
 	public RuleSet getRuleSet() { return ruleSet; }
 	

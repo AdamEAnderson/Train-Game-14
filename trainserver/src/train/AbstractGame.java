@@ -86,6 +86,7 @@ interface AbstractGame {
 	 * @param train		Which train
 	 * @param milepost	Train's path along mileposts
 	 * @throws GameException
+	 * @return the pid for the rail moved along, if one exists, or null if the move cannot be made.
 	 * 
 	 * Exceptions:
 	 * INVALID_TRACK (train must start on a city milepost)
