@@ -71,6 +71,7 @@ public class GlobalRail {
 		for(int i = 1; i < mps.length; i++){
 			MilepostId snd = mps[i];
 			if(!connects(rid, fst, snd)) return false;
+			fst = snd;
 		}
 		return true;
 	}
