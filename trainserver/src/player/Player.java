@@ -30,6 +30,9 @@ public class Player {
 		name = pid;
 		this.color = color;
 		trains = new Train[ruleSet.numTrains];
+		for(int i = 0; i < trains.length; i++){
+			trains[i] = new Train(i);
+		}
 		money = ruleSet.startingMoney;
 		this.cards = cards;
 		readyToStart = false;
@@ -40,8 +43,9 @@ public class Player {
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
-		if (trains[t] == null) 
-			trains[t] = new Train(t, m);
+		if(trains[t] == null) throw new GameException("GameNotStarted");
+		else if (trains[t].getLocation() == null) 
+			trains[t].moveTrain(m);
 		else 
 			throw new GameException("TrainAlreadyPlaced");
 		log.info("after place");
@@ -106,6 +110,7 @@ public class Player {
 	}*/
 	
 	public boolean testUpgradeTrain(int t, UpgradeType u){
+		if(trains[t] == null) return false;
 		switch(u) {
 		case SPEED:
 			return trains[t].testUpgradeSpeed();
@@ -206,6 +211,8 @@ public class Player {
 	public Card[] getCards(){ return cards; }
 	
 	public Train[] getTrains(){ return trains; }
+	
+	public Train getTrain(int t){ return trains[t]; }
 	
 	public Stats stats() { 
 		stats.money = money;

@@ -28,7 +28,6 @@ public class TrainTest extends GameTest {
             	new MilepostId(31, 59) };
         game.buildTrack(activePlayer, mileposts);
         
-        game.placeTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
         // Stack the player's hand with cards we can deliver
         Trip[] trips = new Trip[3];
         trips[0] = new Trip("Kimberley", "Diamonds", 12);
@@ -41,6 +40,8 @@ public class TrainTest extends GameTest {
         game.getActivePlayer().turnInCards(cards);
         
         skipPastBuildingTurns(game);
+
+        game.placeTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
 
         game.pickupLoad(activePlayer, 0, "Diamonds");
         game.pickupLoad(activePlayer, 0, "Arms");

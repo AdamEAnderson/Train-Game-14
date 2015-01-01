@@ -11,11 +11,10 @@ public class Train {
 	private Milepost loc;
 	private final int index;	// where train is in array
 	
-	public Train(int newIndex, Milepost initLoc){
+	public Train(int newIndex){
 		speed = 12;
 		capacity = 2;
 		loads = new String[2];
-		loc = initLoc;
 		index = newIndex;
 	}
 		

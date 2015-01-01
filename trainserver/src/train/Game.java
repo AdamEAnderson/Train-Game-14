@@ -223,16 +223,17 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		checkBuilding();
+		int maxMoves = getPlayer(pid).getTrain(train).getSpeed();
+		turnData.checkMovesLength(train, mileposts.length, maxMoves);
 		if(!testMoveTrain(pid, rid, train, mileposts)){
 			throw new GameException("InvalidMove");
 		}
 		
-		checkActive(pid);
-		checkBuilding();
 		String originalGameState = toString();
 		turnData.startTurn();
 		
 		getPlayer(pid).moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), getPlayer(rid));
+		turnData.move(train, mileposts.length, maxMoves);
 		registerTransaction(originalGameState);
 	}
 
@@ -525,7 +526,7 @@ public class Game implements AbstractGame {
 	}
 
 	private void checkBuilding() throws GameException{
-		if(turns < 3) throw new GameException(GameException.INVALID_MOVE);
+		if(turns < 3) throw new GameException(GameException.BUILDING_TURN);
 	}
 
 	/** Returns player whose turn it is */

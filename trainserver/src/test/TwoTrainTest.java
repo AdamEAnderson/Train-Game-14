@@ -32,11 +32,12 @@ public class TwoTrainTest extends GameTest {
 	            	new MilepostId(31, 59) };
 	        game.buildTrack(activePlayer, mileposts);
 	        assertTrue(game.getTurnData().getSpending() == 5);
-	        game.placeTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
-	        game.placeTrain(activePlayer, 1, new MilepostId(31, 59));	// Kimberley!
 	        game.endTurn(game.getActivePlayer().name);
 
 	        skipPastBuildingTurns(game);
+	        
+	        game.placeTrain(activePlayer, 0, new MilepostId(34,58));	// Johannesburg!
+	        game.placeTrain(activePlayer, 1, new MilepostId(31, 59));	// Kimberley!
 	        
 	        log.info("Active player is {}", game.getActivePlayer().name);
 
