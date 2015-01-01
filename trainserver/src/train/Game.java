@@ -51,6 +51,12 @@ public class Game implements AbstractGame {
 		
 	private static Logger log = LoggerFactory.getLogger(Game.class);
 	
+	/** Default constructor for gson */
+	public Game() {
+		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
+		redoStack = new UndoRedoStack(GameException.NOTHING_TO_REDO);
+	}
+	
 	/** Constructor. 
 	 * @param map
 	 * @param ruleSet
