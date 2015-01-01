@@ -440,6 +440,7 @@ public class Game implements AbstractGame {
 			if (activeIndex == pids.size() - 1) {
 				turns++;
 				next = pids.get(0);
+				activeIndex = 0;
 			}
 			else {
 				next = (pids.get(activeIndex + 1));
@@ -461,6 +462,7 @@ public class Game implements AbstractGame {
 		log.info("resign requestText: pid={}", pid);
 		if (pid.equals(turnData.getPid()))
 			endTurn(pid);
+		if(pids.indexOf(pid) < activeIndex) activeIndex--;
 		getPlayer(pid).resign();
 		pids.remove(pid);
 		undoStack.clear();
