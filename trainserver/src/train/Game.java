@@ -10,6 +10,7 @@ import java.util.Set;
 
 import map.Milepost;
 import map.MilepostId;
+import map.MilepostIdShortFormTypeAdapter;
 import map.MilepostShortFormTypeAdapter;
 
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import com.google.gson.GsonBuilder;
 
 import player.GlobalRail;
 import player.Player;
+import player.Rail;
+import player.RailTypeAdapter;
 import player.TurnData;
 import reference.Card;
 import reference.UpgradeType;
@@ -492,7 +495,8 @@ public class Game implements AbstractGame {
 	public String toString() {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(this));
-//		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(this));
+		gsonBuilder.registerTypeAdapter(MilepostId.class, new MilepostIdShortFormTypeAdapter());
+		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter());
 		Gson gson = gsonBuilder.create();
 		return gson.toJson(this);
 	}
@@ -501,7 +505,8 @@ public class Game implements AbstractGame {
 	public static Game fromString(String gameString, Game refGame) {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
-		//gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter(refGame));
+		gsonBuilder.registerTypeAdapter(MilepostId.class, new MilepostIdShortFormTypeAdapter());
+		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter());
 		Gson gson = gsonBuilder.create();
 		Game newGame = gson.fromJson(gameString, Game.class);
 		

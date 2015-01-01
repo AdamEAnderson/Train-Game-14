@@ -14,25 +14,17 @@ public class Rail {
 	
 	private Map<MilepostId, Set<MilepostId>> tracks; 
 		//all bindings are unordered: if a milepost is in another's set, that one's set contains the milepost
-//	private transient Map<Milepost, Set<Track>> allTracks; //same object per game; holds everyone's tracks
 	private String pid;
 	
 	public Rail(String pid){
 		this.pid = pid;
 		tracks = new HashMap<MilepostId, Set<MilepostId>>();
 	}
-	/*
-	Rail(Map<Milepost, Set<Track>> allTracks, String pid){
-		this.allTracks = allTracks;
-		tracks = new HashMap<Milepost, Set<Milepost>>();
-		this.pid = pid;
-	}
 	
-	Rail(Map<Milepost, Set<Track>> allTracks, String pid, Map<Milepost, Set<Milepost>> tracks){
-		this.allTracks = allTracks;
+	public Rail(String pid, Map<MilepostId, Set<MilepostId>> tracks){
 		this.pid = pid;
 		this.tracks = tracks;
-	}*/
+	}
 	
 	public Map<MilepostId, Set<MilepostId>> getRail(){
 		return tracks;
@@ -91,16 +83,6 @@ public class Rail {
 		int cost = e.cost;
 		return cost;
 	}
-	
-	//moved to Milepost class
-//	private Edge getEdge(Milepost origin, Milepost next){
-//		for(int i = 0; i < origin.edges.length; i++){
-//			if(origin.edges[i] != null && origin.edges[i].destination.equals(next)){
-//				return origin.edges[i];
-//			}
-//		}
-//		return null;
-//	}
 	
 	void erase(MilepostId one, MilepostId two){
 		removeTrack(one, two);
