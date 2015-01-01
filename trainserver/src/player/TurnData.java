@@ -17,6 +17,7 @@ public class TurnData {
 	private int[] movesMade;
 	private List<String> rentedFrom;
 	private boolean turnInProgress;
+	private boolean ferried;
 	private UpgradeType upgrade;
 	private int upgradedTrain;
 	
@@ -80,6 +81,7 @@ public class TurnData {
 		movesMade = new int[movesMade.length];
 		rentedFrom.clear();
 		turnInProgress = false;
+		ferried = false;
 		upgrade = null;
 		upgradedTrain = -1;
 	}
@@ -98,10 +100,12 @@ public class TurnData {
 	public void deliver(int money){ moneyMade += money; }
 	public boolean checkSpending(int money){ return (money + moneySpent <= 20);}
 	public void startTurn(){ turnInProgress = true;	}
+	public void ferry() { ferried = true; }
 	
 	public String getPid() {return pid;}
 	public int getSpending() {return moneySpent;}
 	public int getMoneyMade() {return moneyMade;}
 	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
 	public boolean turnInProgress(){ return turnInProgress;}
+	public boolean hasFerried() { return ferried; }
 }

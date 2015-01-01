@@ -198,7 +198,9 @@ public class Game implements AbstractGame {
 			throws GameException{
 		if(! globalRail.testMove(rid, mileposts)) return false;
 		Player p = getPlayer(pid);
-		if(! turnData.checkMovesLength(train, mileposts.length, p.getMaxSpeed(train))) return false;
+		int max = p.getMaxSpeed(train);
+		if(turnData.hasFerried()) max /= 2;
+		if(!turnData.checkMovesLength(train, mileposts.length, max)) return false;
 		return true;
 	}
 	
@@ -206,16 +208,32 @@ public class Game implements AbstractGame {
 	public String testMoveTrain(String pid, int train,
 			MilepostId[] mileposts) throws GameException {
 		String rid = globalRail.getPlayer(mileposts[0], mileposts[1]);
+		boolean ferry = gameData.getMilepost(mileposts[0]).isNeighborByFerry(mileposts[1]);
 		if(rid == null) return null;
 		if(testMoveTrain(pid, rid, train, mileposts)) return rid;
 		return null;
 	}
 
 	@Override
-	public void moveTrain(String player, String track, int train,
+	public void moveTrain(String pid, String rid, int train,
 			MilepostId[] mileposts) throws GameException {
+		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+		checkActive(pid);
+		checkBuilding();
+		if(!testMoveTrain(pid, rid, train, mileposts)){
+			throw new GameException("InvalidMove");
+		}
+		
+		checkActive(pid);
+		checkBuilding();
+		String originalGameState = toString();
 		turnData.startTurn();
-		// TODO Auto-generated method stub	
+		
+		getPlayer(pid).moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), getPlayer(rid));
+		registerTransaction(originalGameState);
 	}
 
 	@Override
@@ -557,7 +575,5 @@ public class Game implements AbstractGame {
 		}	
 		return mps;
 	}
-
-
 	
 }

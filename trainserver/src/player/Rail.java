@@ -74,14 +74,15 @@ public class Rail {
 	 * @return the cost of the build
 	 */
 	int build(Milepost origin, Milepost next) throws GameException {
-		if(!origin.isNeighbor(next) || !next.isNeighbor(origin)){
+		if(!origin.isNeighbor(next.id) || !next.isNeighbor(origin.id)){
 			throw new GameException("InvalidTrack");
 		}
 		addTrack(origin.getMilepostId(), next.getMilepostId());
 		addTrack(next.getMilepostId(), origin.getMilepostId());
-		Edge e = origin.getEdge(next);
+		Edge e = origin.getEdge(next.id);
 		if (e instanceof Ferry){
-			Edge back = next.getEdge(origin);
+			//TODO
+			Edge back = next.getEdge(origin.id);
 			if(!(back instanceof Ferry)){
 				erase(origin.getMilepostId(), next.getMilepostId());
 				throw new GameException(GameException.INVALID_TRACK);

@@ -36,7 +36,7 @@ public class MilepostShortFormTypeAdapter extends TypeAdapter<Milepost> {
           writer.nullValue();
           return;
         }
-        String xy = value.x + "," + value.y;
+        String xy = value.id.x + "," + value.id.y;
         writer.value(xy);
 	}
 }

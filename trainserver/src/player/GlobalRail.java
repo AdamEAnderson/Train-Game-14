@@ -28,11 +28,23 @@ public class GlobalRail {
 			return -1;
 		for(int i = 1; i < mps.length; i++){
 			Milepost snd = mps[i];
-			if(!fst.isNeighbor(snd)) 
+			if(!fst.isNeighbor(snd.getMilepostId())) 
+//				log.warn("Mileposts are not contiguous ({}, {}) and ({}, {})", 
+//				mps[i].x, mps[i].y, mps[i + 1].x, mps[i + 1].y);
 				return -1;
 			if(anyConnects(fst.getMilepostId(), snd.getMilepostId()))
+//				log.warn("Track is already built there ({}, {}) and ({}, {})",
+//				mps[i].x, mps[i].y, mps[i + 1].x, mps[i + 1].y);
 				return -1;
-			cost += fst.getCost(snd);
+			if(fst.isSameCity(snd)) {
+//				log.info("Cannot build through major city");
+				return -1;
+			}
+			if(snd.type == Milepost.Type.BLANK) {
+//				log.warn("Mileposts is blank ({}, {})", mps[i + 1].x, mps[i + 1].y);
+				return -1;
+			}
+			cost += fst.getCost(snd.getMilepostId());
 			fst = snd;
 		}
 		return cost;

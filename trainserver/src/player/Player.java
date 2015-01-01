@@ -8,6 +8,7 @@ import train.Game;
 import train.GameException;
 import train.RuleSet;
 import map.Milepost;
+import map.MilepostId;
 
 
 public class Player {
@@ -71,6 +72,15 @@ public class Player {
 		return true;
 	}*/
 	
+	public void moveTrain(int t, Milepost target, Player rentalOwner){
+		//TODO
+		if(rentalOwner != null && rentalOwner != null){
+			stats.rentalExpense += 4;
+			rentalOwner.stats.rentalIncome += 4;
+		}
+		trains[t].moveTrain(target);
+	}
+	
 	/*public void moveTrain(int t, Milepost[] mps) throws GameException{
 		if(!testMoveTrain(t, mps)) 
 			throw new GameException("Invalid Move");
@@ -115,63 +125,6 @@ public class Player {
 				trains[t].upgradeLoads();
 				break;
 		}
-	}
-
-	/*public boolean testBuildTrack(Milepost[] mileposts){
-		if(mileposts.length < 1) return true;
-		
-		// Cannot build where there is no milepost
-		if (mileposts[0].type == Milepost.Type.BLANK) {
-			log.warn("Cannot build from blank milepost");
-			return false;
-		}
-
-		// Building must start from track that has been built by this player previously,
-		// or from a major city. 
-		if (!rail.contains(mileposts[0]) && mileposts[0].type != Milepost.Type.MAJORCITY) {
-			log.warn("Building must start from player's track or from major city");
-			return false;
-		}
-		int projectSpending = getSpending();
-		
-		for(int i = 0; i < mileposts.length -1 ; i++){
-			projectSpending += rail.getCost(mileposts[i], mileposts[i + 1]);
-			if(projectSpending > 20) return false;
-			if(mileposts[i].isSameCity(mileposts[i + 1])) {
-				log.info("Cannot build through major city");
-				return false;
-			}
-			if(rail.anyConnects(mileposts[i], mileposts[i + 1]) != "") {
-				log.warn("Track is already built there ({}, {}) and ({}, {})",
-						mileposts[i].x, mileposts[i].y, mileposts[i + 1].x, mileposts[i + 1].y);
-				return false;
-			}
-			if(!mileposts[i].isNeighbor(mileposts[i + 1])) {
-				log.warn("Mileposts are not contiguous ({}, {}) and ({}, {})", 
-						mileposts[i].x, mileposts[i].y, mileposts[i + 1].x, mileposts[i + 1].y);
-				return false;
-			}
-			if(mileposts[i + 1].type == Milepost.Type.BLANK) {
-				log.warn("Mileposts is blank ({}, {})", mileposts[i + 1].x, mileposts[i + 1].y);
-				return false;
-			}
-		}
-		return true;
-	}*/
-	
-	
-	public void buildTrack(Milepost[] mileposts) throws GameException{
-//		Milepost[] tester = mileposts.clone();
-//		if(!testBuildTrack(tester)){
-//			throw new GameException(GameException.INVALID_TRACK);
-//		}
-//		int cost = 0;
-//		turnInProgress = true;
-//		for(int i = 0; i < mileposts.length - 1; i++)
-//			cost += rail.build(mileposts[i], mileposts[i + 1]);
-//		stats.milepostsBuilt += mileposts.length;
-//		stats.trackExpense += cost;
-//		spendings += cost;
 	}
 	
 	public void pickupLoad(int t, String load) throws GameException{ 
