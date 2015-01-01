@@ -35,6 +35,7 @@ public class Player {
 		readyToEnd = false;
 		hasResigned = false;
 		this.game = game;
+		this.stats = new Stats();
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
