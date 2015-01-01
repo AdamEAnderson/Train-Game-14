@@ -196,8 +196,16 @@ public class Game implements AbstractGame {
 
 	private boolean testMoveTrain(String pid, String rid, int train, MilepostId[] mileposts) 
 			throws GameException{
-		if(! globalRail.testMove(rid, mileposts)) return false;
 		Player p = getPlayer(pid);
+		if(p.getTrain(train) == null || p.getTrain(train).getLocation() == null) return false;
+		MilepostId[] mps = new MilepostId[mileposts.length + 1];
+		
+		mps[0] = p.getTrain(train).getLocation().id;
+		for(int i = 0; i < mileposts.length; i++){ 
+			mps[i + 1] = mileposts[i];
+		}
+		if(! globalRail.testMove(rid, mps)) return false;
+		
 		int max = p.getMaxSpeed(train);
 		if(turnData.hasFerried()) max /= 2;
 		if(!turnData.checkMovesLength(train, mileposts.length, max)) return false;
@@ -223,8 +231,7 @@ public class Game implements AbstractGame {
 		log.info("])");
 		checkActive(pid);
 		checkBuilding();
-		int maxMoves = getPlayer(pid).getTrain(train).getSpeed();
-		turnData.checkMovesLength(train, mileposts.length, maxMoves);
+		int maxMoves = getPlayer(pid).getMaxSpeed(train);
 		if(!testMoveTrain(pid, rid, train, mileposts)){
 			throw new GameException("InvalidMove");
 		}
