@@ -93,7 +93,7 @@ public class GlobalRail {
 	public boolean anyConnects(MilepostId one, MilepostId two){
 		for(String pid : rails.keySet()){
 			try {
-				return connects(pid, one, two);
+				if(connects(pid, one, two)) return true;
 			} catch (GameException e) {		} //the exception is thrown when the pid is not identified
 		}
 		return false;
