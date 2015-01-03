@@ -72,14 +72,6 @@ public class Rail {
 		addTrack(origin.getMilepostId(), next.getMilepostId());
 		addTrack(next.getMilepostId(), origin.getMilepostId());
 		Edge e = origin.getEdge(next.id);
-		if (e instanceof Ferry){
-			//TODO
-			Edge back = next.getEdge(origin.id);
-			if(!(back instanceof Ferry)){
-				erase(origin.getMilepostId(), next.getMilepostId());
-				throw new GameException(GameException.INVALID_TRACK);
-			}
-		}
 		int cost = e.cost;
 		return cost;
 	}

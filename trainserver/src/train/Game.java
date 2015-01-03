@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import map.Ferry;
 import map.Milepost;
 import map.MilepostId;
 import map.MilepostIdShortFormTypeAdapter;
@@ -213,11 +214,20 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < mileposts.length; i++){ 
 			mps[i + 1] = mileposts[i];
 		}
-		if(! globalRail.testMove(rid, mps)) return false;
+		if (!globalRail.testMove(rid, mps)) return false;
+
+		// Any ferry crossing must be the first milepost of the move
+		boolean ferryCrossing = gameData.getMap().getMilepost(mps[0]).isNeighborByFerry(mps[1]);
+		if (ferryCrossing && turnData.getMovesMade(0) > 0)
+			throw new GameException(GameException.INVALID_MOVE);
+		for (int i = 1; i < mps.length - 1; i++) { 
+			if (gameData.getMap().getMilepost(mps[i]).isNeighborByFerry(mps[i+1]))
+				throw new GameException(GameException.INVALID_MOVE);
+		}
 		
 		int max = p.getMaxSpeed(train);
-		if(turnData.hasFerried()) max /= 2;
-		if(!turnData.checkMovesLength(train, mileposts.length, max)) return false;
+		if (ferryCrossing) max /= 2;
+		if (!turnData.checkMovesLength(train, mileposts.length, max)) return false;
 		return true;
 	}
 	
@@ -248,7 +258,12 @@ public class Game implements AbstractGame {
 		String originalGameState = toString();
 		turnData.startTurn();
 		
+		Player p = getPlayer(pid);
+		boolean ferryCrossing = p.getTrain(train).getLocation().isNeighborByFerry(mileposts[0]);
 		getPlayer(pid).moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), getPlayer(rid));
+		if (ferryCrossing) 
+			turnData.ferry();
+
 		turnData.move(train, mileposts.length, maxMoves);
 		registerTransaction(originalGameState);
 	}

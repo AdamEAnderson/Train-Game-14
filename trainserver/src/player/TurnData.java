@@ -30,6 +30,8 @@ public class TurnData {
 	}
 	
 	public boolean checkMovesLength(int t, int moves, int limit) throws GameException{
+		if (ferried)
+			limit /= 2;
 		return (moves + movesMade[t] <= limit);
 	}
 	

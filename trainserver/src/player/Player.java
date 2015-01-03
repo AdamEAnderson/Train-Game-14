@@ -78,8 +78,8 @@ public class Player {
 	}*/
 	
 	public void moveTrain(int t, Milepost target, Player rentalOwner){
-		//TODO
-		if(rentalOwner != null && rentalOwner != null){
+		//TODO - stats miles travelled
+		if(rentalOwner != null && rentalOwner != this){
 			stats.rentalExpense += 4;
 			rentalOwner.stats.rentalIncome += 4;
 		}
