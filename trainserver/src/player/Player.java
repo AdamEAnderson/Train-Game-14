@@ -4,11 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import reference.*;
-import train.Game;
 import train.GameException;
 import train.RuleSet;
 import map.Milepost;
-import map.MilepostId;
 
 
 public class Player {
@@ -22,11 +20,10 @@ public class Player {
 	private boolean hasResigned;
 	
 	private Stats stats;
-	private transient Game game;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
 
-	public Player(RuleSet ruleSet, String pid, String color, Card[] cards, Game game){
+	public Player(RuleSet ruleSet, String pid, String color, Card[] cards){
 		name = pid;
 		this.color = color;
 		trains = new Train[ruleSet.numTrains];
@@ -38,7 +35,6 @@ public class Player {
 		readyToStart = false;
 		readyToEnd = false;
 		hasResigned = false;
-		this.game = game;
 		this.stats = new Stats();
 	}
 	

@@ -9,10 +9,8 @@ import train.GameException;
 
 public class GlobalRail {
 	private Map<String, Rail> rails; //maps pid to their track
-	private String gid;
 	
-	public GlobalRail(String gid){
-		this.gid = gid;
+	public GlobalRail(){
 		rails = new HashMap<String, Rail>();
 	}
 	

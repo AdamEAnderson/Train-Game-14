@@ -206,8 +206,8 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
-	private static void moveTrain(String gid, String pid, int train, String mileposts) throws IOException, InterruptedException {
-		String jsonPayload = String.format("{\"messageType\":\"moveTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"train\":%s, \"mileposts\":%s}", gid, pid, train, mileposts);
+	private static void moveTrain(String gid, String pid, String rid, int train, String mileposts) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"moveTrain\", \"gid\":\"%s\", \"pid\":\"%s\", \"rid\":\"%s\", \"train\":%s, \"mileposts\":%s}", gid, pid, rid, train, mileposts);
 		log.info("payload {}", jsonPayload);;
 
 		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
@@ -277,7 +277,9 @@ public class HttpTest {
 
 	private String getActivePlayer(String gid) throws Exception {
         String playerName = status(gid);
-        playerName = playerName.substring(30);	// chop off start
+        String pidSig = "pid\":\"";
+        int nameLocation = playerName.indexOf(pidSig);
+        playerName = playerName.substring(nameLocation + pidSig.length());	// chop off start
         return playerName.substring(0, playerName.indexOf("\""));
 	}
 	
@@ -310,7 +312,7 @@ public class HttpTest {
         String moveMileposts = "[ {\"x\":33,\"y\":58},{\"x\":32,\"y\":58},{\"x\":31,\"y\":59}]";
         pickupLoad(gid, currentPlayer, 0, "Diamonds");
         pickupLoad(gid, currentPlayer, 0, "Arms");
-        moveTrain(gid, currentPlayer, 0, moveMileposts);
+        moveTrain(gid, currentPlayer, currentPlayer, 0, moveMileposts);
         // deliverLoad(gid, currentPlayer, "turnips");
         dumpLoad(gid, currentPlayer, 0, "Arms");
         endTurn(gid, currentPlayer);

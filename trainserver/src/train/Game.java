@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import map.Ferry;
 import map.Milepost;
 import map.MilepostId;
 import map.MilepostIdShortFormTypeAdapter;
@@ -73,7 +72,7 @@ public class Game implements AbstractGame {
 		//we don't construct a TurnData until the game starts 
 		pids = new ArrayList<String>();
 		players = new HashMap<String, Player>();
-		globalRail = new GlobalRail(name);
+		globalRail = new GlobalRail();
 		
 		turns = 0;
 		ended = false;
@@ -101,7 +100,7 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < cards.length; i++){
 			cards[i] = dealCard();
 		}
-		Player p = new Player(ruleSet, pid, color, cards, this);
+		Player p = new Player(ruleSet, pid, color, cards);
 		players.put(pid, p);
 		globalRail.join(pid);
 		registerTransaction();
@@ -235,7 +234,6 @@ public class Game implements AbstractGame {
 	public String testMoveTrain(String pid, int train,
 			MilepostId[] mileposts) throws GameException {
 		String rid = globalRail.getPlayer(mileposts[0], mileposts[1]);
-		boolean ferry = gameData.getMilepost(mileposts[0]).isNeighborByFerry(mileposts[1]);
 		if(rid == null) return null;
 		if(testMoveTrain(pid, rid, train, mileposts)) return rid;
 		return null;
@@ -258,13 +256,13 @@ public class Game implements AbstractGame {
 		String originalGameState = toString();
 		turnData.startTurn();
 		
-		Player p = getPlayer(pid);
-		boolean ferryCrossing = p.getTrain(train).getLocation().isNeighborByFerry(mileposts[0]);
-		getPlayer(pid).moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), getPlayer(rid));
+		Player activePlayer = getPlayer(pid);
+		boolean ferryCrossing = activePlayer.getTrain(train).getLocation().isNeighborByFerry(mileposts[0]);
+		activePlayer.moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), getPlayer(rid));
 		if (ferryCrossing) 
 			turnData.ferry();
 
-		turnData.move(train, mileposts.length, maxMoves);
+		turnData.move(train, mileposts.length, maxMoves, rid);
 		registerTransaction(originalGameState);
 	}
 
@@ -580,7 +578,7 @@ public class Game implements AbstractGame {
 	
 	public RuleSet getRuleSet() { return ruleSet; }
 	
-	public boolean isJoinable() { return turnData != null; }
+	public boolean isJoinable() { return turnData == null; }
 	
 	public boolean isOver() { return ended; }
 

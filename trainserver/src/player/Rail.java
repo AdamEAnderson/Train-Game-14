@@ -6,7 +6,6 @@ import java.util.Set;
 
 import train.GameException;
 import map.Edge;
-import map.Ferry;
 import map.Milepost;
 import map.MilepostId;
 
