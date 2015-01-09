@@ -358,7 +358,7 @@ var processResume = function (data) {
     
     checkMoveButton();
     checkLoadButtons(lastStatusMessage.players, true);
-    refreshTrains(player.trains,lastStatusMessage.activeid == pid);
+    refreshTrains(player.trains,lastStatusMessage.turnData.pid == pid);
     refreshCards(player.hand);
     refreshMoney(player.money);
     justResumed = false;

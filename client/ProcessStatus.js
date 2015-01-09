@@ -1,4 +1,4 @@
-﻿//Processes a status response from the server
+//Processes a status response from the server
 var processStatus = function (data) {
     if (endedGame) {
         clearInterval(statusIntervalHandle);
@@ -9,7 +9,7 @@ var processStatus = function (data) {
             lastStatusMessage = data;
         if (data.ended) endedGameHandler(data);
         var justStarted = false;
-        if (!started && data.joinable == false) {
+        if (!started && data.turnData != null) {
             justStarted = true;
             startedGame(data);
         }
@@ -30,10 +30,10 @@ var processStatus = function (data) {
         }
         var me = findPid(data.players, pid);
         refreshCards(me.hand);
-        refreshTrains(me.trains, data.activeid && data.activeid == pid);
+        refreshTrains(me.trains, data.turnData && data.turnData.pid == pid);
         refreshMoney(me.money);
         var shownMessage = false;
-        if (data.activeid && data.activeid == pid) {
+        if (data.turnData != null && data.turnData.pid == pid) {
             if (!yourTurn) {
                 var message = justStarted ? 'Started game: It\'s your turn' : 'It\'s your turn';
                 shownMessage = true;
@@ -46,14 +46,14 @@ var processStatus = function (data) {
             checkLoadButtons(data.players);
             checkMoveButton();
         }
-        else if (data.activeid && data.activeid != pid) {
+        else if (data.turnData && data.turnData.pid != pid) {
             yourTurn = false;
             $('#turnControls').buttonset('option', 'disabled', true);
 			$('#moneySpent').hide();
         }
 
         if (justStarted)
-            yourTurn = data.activeid == pid;
+            yourTurn = data.turnData.pid == pid;
 
         if (!shownMessage && justStarted)
             displayInfo('Started game', 'info');

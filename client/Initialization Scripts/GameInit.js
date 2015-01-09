@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -49,7 +49,7 @@ var startedGame = function (data) {
     $('#turnControls').append($('<button id="placeTrain">Place Train</button>').hide().click(data, placeTrainClick));
     $('#turnControls').append('<button id="endTurn">End Turn</button>').find('button:last').click(endTurn);
     $('#turnControls').buttonset();
-    $('#turnControls').buttonset('option', 'disabled', data.activeid != pid)
+    $('#turnControls').buttonset('option', 'disabled', data.turnData.pid != pid)
     $('#endControls').buttonset();
     $('#okControls').buttonset();
     $('#placeControls').buttonset();
