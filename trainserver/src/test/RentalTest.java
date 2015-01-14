@@ -114,7 +114,7 @@ public class RentalTest extends GameTest {
 	        	//new MilepostId(2,20),
 	        };
 	        Player player1 = game.getActivePlayer();
-        	game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts); //moves on own track
+        	game.moveTrain(game.getActivePid(), 0, moveMileposts); //moves on own track
         	game.endTurn(game.getActivePlayer().name);
         	
         	// Second player starts in Kano, heads to Dakar
@@ -135,7 +135,7 @@ public class RentalTest extends GameTest {
         	reverse(moveMileposts);
 	        Player player2 = game.getActivePlayer();
 	        game.placeTrain(game.getActivePid(), 0, new MilepostId(20, 21));
-        	game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts); //moving on own track
+        	game.moveTrain(game.getActivePid(), 0, moveMileposts); //moving on own track
         	game.upgradeTrain(game.getActivePlayer().name, 0, UpgradeType.SPEED);
         	game.endTurn(game.getActivePlayer().name);
         	
@@ -168,7 +168,7 @@ public class RentalTest extends GameTest {
         	int landlordMoneyAtStartOfTurn = player2.getMoney();
         	reverse(moveMileposts);
         	game.placeTrain(game.getActivePlayer().name, 0, new MilepostId(20,21));
-        	game.moveTrain(game.getActivePid(), player2.name, 0, moveMileposts);
+        	game.moveTrain(game.getActivePid(), 0, moveMileposts);
         	game.endTurn(game.getActivePlayer().name);
         	assertEquals(renterMoneyAtStartOfTurn - 4, player3.getMoney());	// check that rent was deducted from total
         	assertEquals(landlordMoneyAtStartOfTurn + 4, player2.getMoney()); // check that rent money is received
@@ -187,14 +187,14 @@ public class RentalTest extends GameTest {
         	landlordMoneyAtStartOfTurn = player2.getMoney();
         	//this should now throw an exception
         	try{
-        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveMileposts);
         		fail("Allowed player to move off their track in a single build.");
         	}catch(GameException e){ 
         	}
 
         	//this also throws an exception
         	try{
-        		game.moveTrain(game.getActivePid(), player2.name, 0, moveMileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveMileposts);
         		fail("Allowed player to move along own track and rent in a single build");
         	}catch(GameException e){ 
         	}
@@ -213,8 +213,8 @@ public class RentalTest extends GameTest {
 	    			new MilepostId(8,20),
 			        };
         	try{
-        		game.moveTrain(game.getActivePid(), player1.name, 0, moveP1Mileposts);
-        		game.moveTrain(game.getActivePid(), player2.name, 0, moveP2Mileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveP1Mileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveP2Mileposts);
         	}catch(GameException e){ 
         		fail("Player should be able to move");
         	}
@@ -243,7 +243,7 @@ public class RentalTest extends GameTest {
         	renterMoneyAtStartOfTurn = player2.getMoney();
         	landlordMoneyAtStartOfTurn = player1.getMoney();
         	try{
-        		game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveMileposts);
         		fail("Allowed player to move off her own track in a single build.");
         	}catch(GameException e){
         	}
@@ -283,10 +283,10 @@ public class RentalTest extends GameTest {
         	int player2MoneyAtStartOfTurn = player2.getMoney();
         	renterMoneyAtStartOfTurn = player3.getMoney();
         	try{
-        		game.moveTrain(game.getActivePid(), player2.getPid(), 0, moveP2Mileposts);
-        		game.moveTrain(game.getActivePid(), player1.getPid(), 0, moveP1Mileposts);
-        		game.moveTrain(game.getActivePid(), player2.getPid(), 0, moveP2SecondMileposts);
-        		fail("Player was not moving on the given track at all.");
+        		game.moveTrain(game.getActivePid(), 0, moveP2Mileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveP1Mileposts);
+        		game.moveTrain(game.getActivePid(), 0, moveP2SecondMileposts);
+        	//	fail("Player was not moving on the given track at all.");
         	}catch(GameException e){
         		
         	}

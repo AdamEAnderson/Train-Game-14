@@ -47,63 +47,17 @@ public class Player {
 		log.info("after place");
 	}
 	
-	/*public boolean testMoveTrain(int tIndex, Milepost[] mps){
-		if(mps[0] == null) 
-			return false;
-		for(int i = 0, m = movesMade[tIndex]; i < mps.length - 1; i++, m++){
-			if(m >= trains[tIndex].getSpeed()) {
-				log.warn("Train cannot move {} mileposts, limit is {}", m + 1, trains[tIndex].getSpeed());
-				return false;
-			}
-			String ownerId = rail.anyConnects(mps[i], mps[i + 1]);
-			if(ownerId.equals("") && !mps[i].isSameCity(mps[i + 1])) {
-				log.warn("Cannot move - missing track from {} to {}", mps[i].getMilepostId().toString(), 
-					mps[i+1].getMilepostId().toString());
-				return false;
-			}
-			if(mps[i].isNeighborByFerry(mps[i + 1])){
-				if(m != 0) {
-					log.warn("Travelling by ferry must be at start of turn");
-					return false;
-				}
-				else
-					m = trains[tIndex].getSpeed()/2;
-			}
-		}
-		return true;
-	}*/
-	
-	public void moveTrain(int t, Milepost target, Player rentalOwner){
-		//TODO - stats miles travelled
-		if(rentalOwner != null && rentalOwner != this){
-			stats.rentalExpense += 4;
-			rentalOwner.stats.rentalIncome += 4;
-		}
-		trains[t].moveTrain(target);
+	public void rent(Player trackOwner) {
+		spend(4);
+		stats.rentalExpense += 4;
+		trackOwner.deposit(4);
+		trackOwner.stats.rentalIncome += 4;
 	}
 	
-	/*public void moveTrain(int t, Milepost[] mps) throws GameException{
-		if(!testMoveTrain(t, mps)) 
-			throw new GameException("Invalid Move");
-		trains[t].moveTrain(mps[mps.length - 1]);
-		for(int i = 0; i < mps.length - 1; i++){
-			String ownerID = rail.anyConnects(mps[i], mps[i + 1]);
-			Player owner = ownerID.length() > 0 ? game.getPlayer(ownerID) : null;
-			if(!rentingFrom.contains(ownerID) && !ownerID.equals(name) && owner != null){
-				rentingFrom.add(ownerID);
-				money -= 4;
-				stats.rentalExpense += 4;
-				owner.deposit(4);
-				owner.stats.rentalIncome += 4;
-			}
-			if(mps[i].isNeighborByFerry(mps[i + 1])){
-				movesMade[t] = trains[t].getSpeed()/2;
-			} else{
-				movesMade[t] ++;
-			}
-		}
-		stats.milesTravelled += mps.length;
-	}*/
+	public void moveTrain(int t, Milepost target, int milepostCount){
+		stats.milesTravelled += milepostCount;
+		trains[t].moveTrain(target);
+	}
 	
 	public boolean testUpgradeTrain(int t, UpgradeType u){
 		if(trains[t] == null) return false;

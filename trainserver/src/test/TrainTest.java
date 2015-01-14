@@ -47,7 +47,7 @@ public class TrainTest extends GameTest {
         game.pickupLoad(activePlayer, 0, "Arms");
         mileposts = new MilepostId[]{ new MilepostId(33, 58), new MilepostId(32, 58),
             	new MilepostId(31, 59) };
-        game.moveTrain(activePlayer, activePlayer, 0, mileposts);				// arrive in Kimberley
+        game.moveTrain(activePlayer, 0, mileposts);				// arrive in Kimberley
         game.deliverLoad(activePlayer, 0, "Diamonds", 0);
         game.dumpLoad(activePlayer, 0, "Arms");
         game.endTurn(activePlayer);

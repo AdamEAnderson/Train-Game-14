@@ -57,12 +57,12 @@ public class TwoTrainTest extends GameTest {
 	        game.pickupLoad(activePlayer, 1, "Uranium");
 	        mileposts = new MilepostId[]{ new MilepostId(33, 58), new MilepostId(32, 58),
 	            	new MilepostId(31, 59) };
-	        game.moveTrain(activePlayer, activePlayer, 0, mileposts);				// arrive in Kimberley
+	        game.moveTrain(activePlayer, 0, mileposts);				// arrive in Kimberley
 	        game.deliverLoad(activePlayer, 0, "Diamonds", 0);
 	        game.dumpLoad(activePlayer, 0, "Arms");
 	        mileposts = new MilepostId[]{ new MilepostId(32, 58), new MilepostId(33, 58), 
 	        		new MilepostId(34,58) };
-	        game.moveTrain(activePlayer, activePlayer, 1, mileposts);				// arrive in Johannesburg
+	        game.moveTrain(activePlayer, 1, mileposts);				// arrive in Johannesburg
 	        game.deliverLoad(activePlayer, 1, "Gold", 1);
 	        game.deliverLoad(activePlayer, 1, "Uranium", 2);
 	        Player movingPlayer = game.getActivePlayer();

@@ -80,32 +80,4 @@ public class Rail {
 		removeTrack(two, one);
 	}
 	
-	/** After deserializing a game, need to fix up the Rail so the 
-	 * globalRail, globalFerry points back to the one set in the Game,
-	 * and also so that it is populated.
-	 * @param globalRail
-	 * @param globalFerries
-	 */
-//	void fixup(Map<Milepost, Set<Rail.Track>> globalRail) {
-//		this.allTracks = globalRail;
-//		// Add player's track to the global set, since that isn't persisted
-//		for (Milepost src:tracks.keySet()) {
-//			for (Milepost dest: tracks.get(src))
-//				addAllTrack(src, dest);
-//		}
-//	}
-	
-//	public class Track {
-//		final String pid;
-//		Set<Milepost> dests;
-//		
-//		Track(String p){
-//			pid = p;
-//			dests = new HashSet<Milepost>();
-//		}
-//		
-//		void add(Milepost m){dests.add(m);}
-//		
-//		void remove(Milepost m){dests.remove(m);}
-//	}
 }

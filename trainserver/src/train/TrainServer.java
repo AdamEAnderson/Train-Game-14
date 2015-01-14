@@ -466,7 +466,6 @@ public class TrainServer {
 	static class MoveTrainData {
 		public String gid;
 		public String pid;
-		public String rid; //rail id
 		public int train;
 		public MilepostId[] mileposts;
 	}
@@ -482,7 +481,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (game.testMoveTrain(data.pid, data.train, data.mileposts) == null)
+		if (game.testMoveTrain(data.pid, data.train, data.mileposts))
 			throw new GameException(GameException.INVALID_MOVE);
 	}
 
@@ -497,7 +496,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.moveTrain(data.pid, data.rid, data.train, data.mileposts);
+		game.moveTrain(data.pid, data.train, data.mileposts);
 	}
 
 	static class PickupLoadData {

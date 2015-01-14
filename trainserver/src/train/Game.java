@@ -203,8 +203,7 @@ public class Game implements AbstractGame {
 		registerTransaction(originalGameState);
 	}
 
-	private boolean testMoveTrain(String pid, String rid, int train, MilepostId[] mileposts) 
-			throws GameException{
+	public boolean testMoveTrain(String pid, int train, MilepostId[] mileposts) throws GameException{
 		Player p = getPlayer(pid);
 		if(p.getTrain(train) == null || p.getTrain(train).getLocation() == null) return false;
 		MilepostId[] mps = new MilepostId[mileposts.length + 1];
@@ -213,7 +212,28 @@ public class Game implements AbstractGame {
 		for(int i = 0; i < mileposts.length; i++){ 
 			mps[i + 1] = mileposts[i];
 		}
-		if (!globalRail.testMove(rid, mps)) return false;
+		
+		// Cases:
+		// 1. All moves are on active player's track, or on track that has already been rented
+		// 2. All moves are on a new rental player's track
+		// Moving on free track (through major cities) always ok
+		String rid = null;
+		for (int i = 0; i < mps.length - 1; ++i) {
+			String owner = globalRail.getPlayer(mps[i], mps[i + 1]);
+			if (owner == null) { // no track built - check for free track (e.g. though major city)
+				Milepost m1 = gameData.getMap().getMilepost(mps[i]);
+				Milepost m2 = gameData.getMap().getMilepost(mps[i + 1]);
+				if (!m1.isMajorCity() || !m2.isMajorCity() || !m1.isNeighbor(mps[i + 1]))
+					throw new GameException(GameException.INVALID_MOVE);
+			}
+			else if (!owner.equals(pid) && !turnData.rentedFrom(owner))  {
+				if (rid != null && !rid.equals(owner))   // We already rented from someone new, this is the second
+					throw new GameException(GameException.INVALID_MOVE);
+				if (rid == null && i > 0)   // Rental should come on the first move
+					throw new GameException(GameException.INVALID_MOVE);
+				rid = owner;
+			}
+		}
 
 		// Any ferry crossing must be the first milepost of the move
 		boolean ferryCrossing = gameData.getMap().getMilepost(mps[0]).isNeighborByFerry(mps[1]);
@@ -231,17 +251,7 @@ public class Game implements AbstractGame {
 	}
 	
 	@Override
-	public String testMoveTrain(String pid, int train,
-			MilepostId[] mileposts) throws GameException {
-		String rid = globalRail.getPlayer(mileposts[0], mileposts[1]);
-		if(rid == null) return null;
-		if(testMoveTrain(pid, rid, train, mileposts)) return rid;
-		return null;
-	}
-
-	@Override
-	public void moveTrain(String pid, String rid, int train,
-			MilepostId[] mileposts) throws GameException {
+	public void moveTrain(String pid, int train, MilepostId[] mileposts) throws GameException {
 		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
 		for (int i = 0; i < mileposts.length; ++i)
 			log.info("{}, ", mileposts[i]);
@@ -249,20 +259,29 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		int maxMoves = getPlayer(pid).getMaxSpeed(train);
-		if(!testMoveTrain(pid, rid, train, mileposts)){
+		if(!testMoveTrain(pid, train, mileposts))
 			throw new GameException("InvalidMove");
-		}
 		
 		String originalGameState = toString();
 		turnData.startTurn();
 		
 		Player activePlayer = getPlayer(pid);
+
+		// Handle track rental
+		MilepostId previous = activePlayer.getTrain(train).getLocation().getMilepostId();
+		for (int i = 0; i < mileposts.length; ++i) {
+			String owner = globalRail.getPlayer(previous, mileposts[i]);
+			if (!owner.equals(pid) && !turnData.rentedFrom(owner))  
+				turnData.rent(owner);
+			previous = mileposts[i];
+		}
+
 		boolean ferryCrossing = activePlayer.getTrain(train).getLocation().isNeighborByFerry(mileposts[0]);
-		activePlayer.moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), getPlayer(rid));
+		activePlayer.moveTrain(train, gameData.getMilepost(mileposts[mileposts.length - 1]), mileposts.length);
 		if (ferryCrossing) 
 			turnData.ferry();
 
-		turnData.move(train, mileposts.length, maxMoves, rid);
+		turnData.move(train, mileposts.length, maxMoves);
 		registerTransaction(originalGameState);
 	}
 

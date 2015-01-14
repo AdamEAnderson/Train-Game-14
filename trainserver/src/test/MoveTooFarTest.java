@@ -72,7 +72,7 @@ public class MoveTooFarTest extends GameTest {
 			fail("Unexpected exception");
 		} 
 		try {
-			game.moveTrain("Louie", "Louie", 0, moveMileposts);
+			game.moveTrain("Louie", 0, moveMileposts);
 			fail("Expected move error from moving too far");
 		} catch (GameException e) {
 		} 

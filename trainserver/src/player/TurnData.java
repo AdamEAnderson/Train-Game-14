@@ -29,6 +29,10 @@ public class TurnData {
 		pid = startingPid;
 	}
 	
+	public boolean rentedFrom(String pid) {
+		return rentedFrom.contains(pid);
+	}
+	
 	public boolean checkMovesLength(int t, int moves, int limit) throws GameException{
 		if (ferried)
 			limit /= 2;
@@ -36,28 +40,20 @@ public class TurnData {
 	}
 	
 	//only increments move counter -> trains are accessed through player
-	private void move(int t, int moves, int limit) throws GameException{
+	public void move(int t, int moves, int limit) throws GameException{
 		if(!checkMovesLength(t, moves, limit)){
 			throw new GameException("InvalidMove");
 		}
 		movesMade[t] += moves;
 	}
 	
-	/** Returns true iff the renter must pay the rentee, and false otherwise
-	 * 
-	 */
-	public boolean move(int t, int moves, int limit, String pid) throws GameException{
-		checkMovesLength(t, moves, limit);
-		if(!rentedFrom.contains(pid)){
-			rentedFrom.add(pid);
-			move(t, moves, limit);
-			return true;
-		}else{
-			move(t, moves, limit);
-			return false;
-		}
+	public boolean rent(String trackOwner) {
+		boolean newRental = !rentedFrom.contains(trackOwner);
+		if (newRental) 
+			rentedFrom.add(trackOwner);
+		return newRental;
 	}
-
+	
 	public void upgrade(int t, UpgradeType u) throws GameException{
 		if(!checkSpending(20)){
 			throw new GameException("ExceededAllowance");
@@ -81,10 +77,8 @@ public class TurnData {
 		moneyMade = 0;
 		moneySpent = 0;
 		movesMade = new int[movesMade.length];
-		for (String landlord: rentedFrom) {
-			player.spend(4);
-			players.get(landlord).deposit(4);
-		}
+		for (String landlord: rentedFrom) 
+			player.rent(players.get(landlord));	
 		rentedFrom.clear();
 		turnInProgress = false;
 		ferried = false;

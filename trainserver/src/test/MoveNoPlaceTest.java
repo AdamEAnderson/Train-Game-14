@@ -64,7 +64,7 @@ public class MoveNoPlaceTest extends GameTest {
 	        	new MilepostId(3,22),
 	        	new MilepostId(2,21),
 	        };
-        	game.moveTrain(game.getActivePid(), game.getActivePid(), 0, moveMileposts);
+        	game.moveTrain(game.getActivePid(), 0, moveMileposts);
 			fail("Expected invalid move exception");
 		} catch (GameException e) {
 		} 
