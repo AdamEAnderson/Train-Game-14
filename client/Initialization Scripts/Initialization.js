@@ -329,7 +329,7 @@ var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);
     for (var i = 0; i < player.trains.length; i++) {
-        movesMadeThisTurn[i] = player.movesMade[i];
+        movesMadeThisTurn[i] = data.turnData.movesMade[i];
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
         $('#move').show();
