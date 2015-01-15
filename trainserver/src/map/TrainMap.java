@@ -131,6 +131,8 @@ public final class TrainMap {
 						throw new GameException(GameException.BAD_MAP_DATA);
 					}
 					city = cities.get(cityName);
+					if (city == null)
+						log.warn("City milepost for " + cityName + " on map missing corresponding city in city list");
 					cityLocations.put(cityName, new MilepostId(x,y));
 					break;
 				}
