@@ -293,7 +293,9 @@ public class TrainServer {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostTypeAdapter());
 
-		return gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
+		String s = gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
+		log.info("newGameResponse " + s);
+		return s;
 	}
 	
 	/** Create a new game */
@@ -410,7 +412,8 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.buildTrack(data.pid, data.mileposts);
+		if (data.mileposts.length > 0)
+			game.buildTrack(data.pid, data.mileposts);
 	}
 
 	static class UpgradeTrainData {
@@ -481,8 +484,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (game.testMoveTrain(data.pid, data.train, data.mileposts))
-			throw new GameException(GameException.INVALID_MOVE);
+		game.testMoveTrain(data.pid, data.train, data.mileposts);
 	}
 
 	/** Move the train through a set of mileposts

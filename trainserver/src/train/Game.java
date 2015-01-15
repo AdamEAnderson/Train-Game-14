@@ -203,9 +203,11 @@ public class Game implements AbstractGame {
 		registerTransaction(originalGameState);
 	}
 
-	public boolean testMoveTrain(String pid, int train, MilepostId[] mileposts) throws GameException{
+	public void testMoveTrain(String pid, int train, MilepostId[] mileposts) throws GameException{
 		Player p = getPlayer(pid);
-		if(p.getTrain(train) == null || p.getTrain(train).getLocation() == null) return false;
+		if(p.getTrain(train) == null || p.getTrain(train).getLocation() == null) 
+			throw new GameException(GameException.INVALID_MOVE);
+
 		MilepostId[] mps = new MilepostId[mileposts.length + 1];
 		
 		mps[0] = p.getTrain(train).getLocation().id;
@@ -244,10 +246,11 @@ public class Game implements AbstractGame {
 				throw new GameException(GameException.INVALID_MOVE);
 		}
 		
+		// Make sure we didn't try to move too many mileposts
 		int max = p.getMaxSpeed(train);
 		if (ferryCrossing) max /= 2;
-		if (!turnData.checkMovesLength(train, mileposts.length, max)) return false;
-		return true;
+		if (!turnData.checkMovesLength(train, mileposts.length, max)) 
+			throw new GameException(GameException.INVALID_MOVE);
 	}
 	
 	@Override
@@ -259,8 +262,7 @@ public class Game implements AbstractGame {
 		checkActive(pid);
 		checkBuilding();
 		int maxMoves = getPlayer(pid).getMaxSpeed(train);
-		if(!testMoveTrain(pid, train, mileposts))
-			throw new GameException("InvalidMove");
+		testMoveTrain(pid, train, mileposts);
 		
 		String originalGameState = toString();
 		turnData.startTurn();
@@ -271,7 +273,7 @@ public class Game implements AbstractGame {
 		MilepostId previous = activePlayer.getTrain(train).getLocation().getMilepostId();
 		for (int i = 0; i < mileposts.length; ++i) {
 			String owner = globalRail.getPlayer(previous, mileposts[i]);
-			if (!owner.equals(pid) && !turnData.rentedFrom(owner))  
+			if (owner != null && !owner.equals(pid) && !turnData.rentedFrom(owner))  
 				turnData.rent(owner);
 			previous = mileposts[i];
 		}
@@ -339,82 +341,6 @@ public class Game implements AbstractGame {
 		endTurn(pid);
 		registerTransaction(origState);
 	}
-	
-	/*
-	@Override
-	public void buildTrack(String pid, MilepostId[] milepostIds) throws GameException {
-		log.info("buildTrack(pid={}, length={}, mileposts=[", pid, milepostIds.length);
-		for (int i = 0; i < milepostIds.length; ++i)
-			log.info("{}, ", milepostIds[i]);
-		log.info("])");
-		checkActive(pid);
-		String originalGameState = toString();
-
-		Milepost[] mileposts = new Milepost[milepostIds.length];
-		for(int i = 0; i < mileposts.length; i++){
-			mileposts[i] = gameData.getMap().getMilepost(milepostIds[i]);
-		}
-		active.buildTrack(mileposts);	
-		registerTransaction(originalGameState);
-	}
-
-	@Override
-	public boolean testMoveTrain(String pid, int train, MilepostId[] mileposts)
-			throws GameException {
-		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
-		log.info("])");
-		checkActive(pid);
-		checkBuilding();
-		Milepost[] mps = new Milepost[mileposts.length + 1];
-		mps[0] = active.getTrains()[train].getLocation();
-		for(int i = 0; i < mileposts.length; i++){
-			mps[i + 1] = gameData.getMap().getMilepost(mileposts[i]);
-		}
-		return active.testMoveTrain(train, mps);
-	}
-	
-	@Override
-	public void moveTrain(String pid, int train, MilepostId[] mileposts)
-			throws GameException {
-		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
-		log.info("])");
-		checkActive(pid);
-		checkBuilding();
-		String originalGameState = toString();
-
-		Milepost[] mps = new Milepost[mileposts.length + 1];
-		mps[0] = active.getTrains()[train].getLocation();
-		for(int i = 0; i < mileposts.length; i++){
-			mps[i + 1] = gameData.getMap().getMilepost(mileposts[i]);
-		}
-		active.moveTrain(train, mps);
-		registerTransaction(originalGameState);
-	}
-	
-	@Override
-	public void pickupLoad(String pid, int train, String load) throws GameException {
-		log.info("pickupLoad(pid={}, train={}, load={})", pid, train, load);
-		checkActive(pid);
-		checkBuilding();
-		String originalGameState = toString();
-		active.pickupLoad(train, load);
-		registerTransaction(originalGameState);
-	}
-
-	@Override
-	public void deliverLoad(String pid, int train,
-			String load, int card) throws GameException {
-		log.info("deliverLoad(pid={}, train={}, load={})", pid, train, load);
-		checkActive(pid);
-		checkBuilding();
-		String originalGameState = toString();
-		active.deliverLoad(card, train, dealCard());
-		registerTransaction(originalGameState);
-	}*/
 	
 	/** To undo, clients should first save off the original game state, 
 	 * then do whatever action they're doing, then call saveForUndo. That

@@ -86,14 +86,13 @@ interface AbstractGame {
 	 * @param train		Which train
 	 * @param milepost	Train's path along mileposts
 	 * @throws GameException
-	 * @return the pid for the rail moved along, if one exists, or null if the move cannot be made.
 	 * 
 	 * Exceptions:
 	 * INVALID_TRACK (train must start on a city milepost)
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
 	 */ 
-	boolean testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
+	void testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
 	
 	
 	/** Player moves their train
