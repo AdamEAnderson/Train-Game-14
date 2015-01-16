@@ -328,8 +328,11 @@ var populateGeographies = function() {
 var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);
+    var yourTurn = (data.turnData != null && data.turnData.pid == pid);
     for (var i = 0; i < player.trains.length; i++) {
-        movesMadeThisTurn[i] = data.turnData.movesMade[i];
+        if (yourTurn)
+            movesMadeThisTurn[i] = data.turnData.movesMade[i];
+        else movesMadeThisTurn[i] = 0;
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
         $('#move').show();
@@ -339,7 +342,9 @@ var processResume = function (data) {
         var mpsvg = findMilepost(milepost.x, milepost.y);
         drawTrain(i, pid, mpsvg.x, mpsvg.y);
     }
-    moneySpent = player.spendings;
+    if (yourTurn)
+        moneySpent = data.turnData.moneySpent;
+    else moneySpent = 0;
     checkBuildMoney();
     $('#pid' + pid).empty();
     var rail = player.rail;
@@ -360,6 +365,9 @@ var processResume = function (data) {
     checkLoadButtons(lastStatusMessage.players, true);
     refreshTrains(player.trains,lastStatusMessage.turnData.pid == pid);
     refreshCards(player.hand);
-    refreshMoney(player.money);
+    var money = player.money;
+    if (yourTurn)
+        money = money + (data.turnData.moneySpent - data.turnData.moneySpent);
+    refreshMoney(money);
     justResumed = false;
 };

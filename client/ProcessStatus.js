@@ -31,7 +31,7 @@ var processStatus = function (data) {
         var me = findPid(data.players, pid);
         refreshCards(me.hand);
         refreshTrains(me.trains, data.turnData && data.turnData.pid == pid);
-        refreshMoney(me.money);
+        var money = me.money;
         var shownMessage = false;
         if (data.turnData != null && data.turnData.pid == pid) {
             if (!yourTurn) {
@@ -45,12 +45,14 @@ var processStatus = function (data) {
             checkBuildMoney();
             checkLoadButtons(data.players);
             checkMoveButton();
+            money = money + (data.turnData.moneyMade - data.turnData.moneySpent);
         }
         else if (data.turnData && data.turnData.pid != pid) {
             yourTurn = false;
             $('#turnControls').buttonset('option', 'disabled', true);
 			$('#moneySpent').hide();
         }
+        refreshMoney(money);
 
         if (justStarted)
             yourTurn = data.turnData.pid == pid;
