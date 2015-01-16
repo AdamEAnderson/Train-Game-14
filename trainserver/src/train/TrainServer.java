@@ -294,7 +294,6 @@ public class TrainServer {
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostTypeAdapter());
 
 		String s = gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
-		log.info("newGameResponse " + s);
 		return s;
 	}
 	
