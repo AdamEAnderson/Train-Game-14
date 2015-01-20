@@ -28,9 +28,9 @@ $(document).ready(function () {
     $('#mainMenu').append('<select id="gamePicker"/>');
     $('#mainMenu').append('<h4>Game Name</h4>');
     $('#mainMenu').append('<input id="gameNamePicker" type="text" size="32" style="width:200px;"/>');
-    $('#mainMenu').append('<h4>Handle</h4>');
+    $('#mainMenu').append('<h4>Player Handle</h4>');
     $('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:200px;"/>');
-    $('#mainMenu').append('<h4>Game Color</h4>');
+    $('#mainMenu').append('<h4>Player Color</h4>');
     $('#mainMenu').append('<select id="colorPicker"/>');
     $('#mainMenu').append('<h4 id="geographyPicker-label">Geography</h4>');
     populateGeographies();
