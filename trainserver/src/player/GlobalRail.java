@@ -1,7 +1,9 @@
 package player;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import map.Milepost;
 import map.MilepostId;
@@ -18,28 +20,40 @@ public class GlobalRail {
 		rails.put(pid, new Rail(pid));
 	}
 	
-	//returns -1 if the build is invalid
-	public int checkBuild(String pid, Milepost[] mps) throws GameException{
+	/** returns -1 if the build is invalid
+	 * Rules for building:
+	 * 1. Mileposts must be contiguous
+	 * 2. Mileposts must not be blank
+	 * 3. Cannot build through a major city
+	 * 4. Track must either start from a major city, or from own player's existing track
+	 * 5. If continuousPlay is off, then no other player can have already connected the same mileposts
+	 * */
+	public int checkBuild(String pid, Milepost[] mps, boolean continuousPlay) throws GameException{
 		int cost = 0;
 		Milepost fst = mps[0];
-		if(!(contains(pid, fst.getMilepostId()) || fst.isMajorCity()))
+		// Track must either start from a major city, or from own player's existing track
+		if (!(contains(pid, fst.getMilepostId()) || fst.isMajorCity()))
 			return -1;
 		for(int i = 1; i < mps.length; i++){
 			Milepost snd = mps[i];
 			if(!fst.isNeighbor(snd.getMilepostId())) 
-//				log.warn("Mileposts are not contiguous ({}, {}) and ({}, {})", 
-//				mps[i].x, mps[i].y, mps[i + 1].x, mps[i + 1].y);
-				return -1;
-			if(anyConnects(fst.getMilepostId(), snd.getMilepostId()))
-//				log.warn("Track is already built there ({}, {}) and ({}, {})",
-//				mps[i].x, mps[i].y, mps[i + 1].x, mps[i + 1].y);
-				return -1;
-			if(fst.isSameCity(snd)) {
-//				log.info("Cannot build through major city");
+			{
+				//log.debug("Mileposts are not contiguous ({}, {}) and ({}, {})", 
+				//		mps[i].x, mps[i].y, mps[i + 1].x, mps[i + 1].y);
 				return -1;
 			}
-			if(snd.type == Milepost.Type.BLANK) {
-//				log.warn("Mileposts is blank ({}, {})", mps[i + 1].x, mps[i + 1].y);
+			if (!continuousPlay && anyConnects(fst.getMilepostId(), snd.getMilepostId()))
+			{
+				//log.warn("Track is already built there ({}, {}) and ({}, {})",
+				//		mps[i].x, mps[i].y, mps[i + 1].x, mps[i + 1].y);
+				return -1;
+			}
+			if (fst.isSameCity(snd)) {
+				//log.info("Cannot build through major city");
+				return -1;
+			}
+			if (snd.type == Milepost.Type.BLANK) {
+				// log.warn("Mileposts is blank ({}, {})", mps[i + 1].x, mps[i + 1].y);
 				return -1;
 			}
 			cost += fst.getCost(snd.getMilepostId());
@@ -52,9 +66,6 @@ public class GlobalRail {
 		if(!rails.containsKey(pid))
 			throw new GameException("PlayerNotFound");
 		Rail r = rails.get(pid);
-		if(checkBuild(pid, mps) == -1){
-			throw new GameException("InvalidTrack");
-		}
 		Milepost fst = mps[0];
 		for(int i = 1; i < mps.length; i++){
 			Milepost snd = mps[i];
@@ -97,19 +108,20 @@ public class GlobalRail {
 		return false;
 	}
 	
-	/** Return the player who build this pair of mileposts, or null if none. 
+	/** Return the players who build this pair of mileposts, or null if none. 
 	 * 
 	 * @param one
 	 * @param two
 	 * @return
 	 */
-	public String getPlayer(MilepostId one, MilepostId two){
+	public Set<String> getPlayers(MilepostId one, MilepostId two){
+		Set<String> players = new HashSet<String>();
 		for(String pid : rails.keySet()){
 			try{
-				if(connects(pid, one, two)) return pid;
+				if(connects(pid, one, two)) players.add(pid);
 			}catch(GameException e) { }
 		}
-		return null;
+		return players;
 	}
 
 	public Rail getRail(String pid){

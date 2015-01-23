@@ -267,9 +267,9 @@ public class RentalTest extends GameTest {
 	        	new MilepostId(3,23),
 	        	new MilepostId(3,22),
 	        	new MilepostId(2,21),
+    			new MilepostId(2,20),
         	};
         	MilepostId[] moveP2SecondMileposts = new MilepostId[] {
-    			new MilepostId(2,20),
     			new MilepostId(3,20),
     			new MilepostId(4,20),
     			new MilepostId(5,20),
@@ -288,7 +288,7 @@ public class RentalTest extends GameTest {
         		game.moveTrain(game.getActivePid(), 0, moveP2SecondMileposts);
         	//	fail("Player was not moving on the given track at all.");
         	}catch(GameException e){
-        		
+        		fail("Unexpected error during move");
         	}
         	
         	game.endTurn(game.getActivePlayer().name);

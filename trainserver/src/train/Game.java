@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -136,7 +138,7 @@ public class Game implements AbstractGame {
 					newPids.add(oid);
 			}
 			pids = newPids;
-			turnData = new TurnData(name, ruleSet, startid);
+			turnData = new TurnData(name, ruleSet, players.get(startid));
 			registerTransaction();
 		}
 		return start;
@@ -145,32 +147,24 @@ public class Game implements AbstractGame {
 	@Override
 	public boolean testBuildTrack(String pid, MilepostId[] mileposts)
 			throws GameException {
-		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
-		log.info("])");
-		
+		logMileposts("testBuildTrack", pid, mileposts);
 		checkActive(pid);
 		Milepost[] mps = convert(mileposts);
-		int cost = globalRail.checkBuild(pid, mps);
+		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiTrack);
 		return ((cost != -1) && turnData.checkSpending(cost));
 	}
 
 	@Override
 	public void buildTrack(String pid, MilepostId[] mileposts)
 			throws GameException {
-		log.info("testBuildTrack(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
-		log.info("])");
-		checkActive(pid);
+		logMileposts("buildTrack", pid, mileposts);
 		if(!testBuildTrack(pid, mileposts)){
 			throw new GameException("Invalid Track");
 		}
 		String originalGameState = toString();
 		turnData.startTurn();
 		Milepost[] mps = convert(mileposts);
-		int cost = globalRail.checkBuild(pid, mps);
+		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiTrack);
 		turnData.spend(cost);
 		globalRail.build(pid, mps);
 		registerTransaction(originalGameState);
@@ -205,6 +199,9 @@ public class Game implements AbstractGame {
 
 	public void testMoveTrain(String pid, int train, MilepostId[] mileposts) throws GameException{
 		Player p = getPlayer(pid);
+		if (mileposts.length == 0)	// null move is ok
+			return;
+		
 		if(p.getTrain(train) == null || p.getTrain(train).getLocation() == null) 
 			throw new GameException(GameException.INVALID_MOVE);
 
@@ -219,23 +216,26 @@ public class Game implements AbstractGame {
 		// 1. All moves are on active player's track, or on track that has already been rented
 		// 2. All moves are on a new rental player's track
 		// Moving on free track (through major cities) always ok
-		String rid = null;
+		Set<String> rid = null;
 		for (int i = 0; i < mps.length - 1; ++i) {
-			String owner = globalRail.getPlayer(mps[i], mps[i + 1]);
-			if (owner == null) { // no track built - check for free track (e.g. though major city)
+			Set<String> owners = globalRail.getPlayers(mps[i], mps[i + 1]);
+			for (String owner: owners)
+				log.info("Milepost " + i + "Owner " + owner);
+			if (owners.isEmpty()) {  // no track built - check for free track (e.g. though major city)
 				Milepost m1 = gameData.getMap().getMilepost(mps[i]);
 				Milepost m2 = gameData.getMap().getMilepost(mps[i + 1]);
 				if (!m1.isMajorCity() || !m2.isMajorCity() || !m1.isNeighbor(mps[i + 1]))
 					throw new GameException(GameException.INVALID_MOVE);
 			}
-			else if (!owner.equals(pid) && !turnData.rentedFrom(owner))  {
-				if (rid != null && !rid.equals(owner))   // We already rented from someone new, this is the second
-					throw new GameException(GameException.INVALID_MOVE);
-				if (rid == null && i > 0)   // Rental should come on the first move
-					throw new GameException(GameException.INVALID_MOVE);
-				rid = owner;
-			}
+			else {	// make sure we aren't doing travel on multiple player's track in a single move
+				if (rid == null) 
+					rid = owners;
+				else 
+					rid.retainAll(owners);
+				}
 		}
+		if (rid != null && rid.size() != 1)	// we've rented from more than one player in a single move
+			throw new GameException(GameException.INVALID_MOVE);
 
 		// Any ferry crossing must be the first milepost of the move
 		boolean ferryCrossing = gameData.getMap().getMilepost(mps[0]).isNeighborByFerry(mps[1]);
@@ -255,10 +255,7 @@ public class Game implements AbstractGame {
 	
 	@Override
 	public void moveTrain(String pid, int train, MilepostId[] mileposts) throws GameException {
-		log.info("moveTrain(pid={}, length={}, mileposts=[", pid, mileposts.length);
-		for (int i = 0; i < mileposts.length; ++i)
-			log.info("{}, ", mileposts[i]);
-		log.info("])");
+		logMileposts("moveTrain", pid, mileposts);
 		checkActive(pid);
 		checkBuilding();
 		int maxMoves = getPlayer(pid).getMaxSpeed(train);
@@ -272,9 +269,13 @@ public class Game implements AbstractGame {
 		// Handle track rental
 		MilepostId previous = activePlayer.getTrain(train).getLocation().getMilepostId();
 		for (int i = 0; i < mileposts.length; ++i) {
-			String owner = globalRail.getPlayer(previous, mileposts[i]);
-			if (owner != null && !owner.equals(pid) && !turnData.rentedFrom(owner))  
-				turnData.rent(owner);
+			Set<String> owners = globalRail.getPlayers(previous, mileposts[i]);
+			if (owners.isEmpty() && !owners.contains(pid)) {  
+				// TODO - better logic for picking owner when multiple choices for rental
+				String owner = owners.iterator().next();
+				if (!turnData.rentedFrom(owner))
+					turnData.rent(owner);
+			}
 			previous = mileposts[i];
 		}
 
@@ -283,7 +284,7 @@ public class Game implements AbstractGame {
 		if (ferryCrossing) 
 			turnData.ferry();
 
-		turnData.move(train, mileposts.length, maxMoves);
+		turnData.move(train, maxMoves, activePlayer.getTrain(train).getLocation().id, mileposts);
 		registerTransaction(originalGameState);
 	}
 
@@ -381,34 +382,35 @@ public class Game implements AbstractGame {
 
 		String next = pid;
 		switch(turns){
-		case 0:
-			if (activeIndex == players.size() - 1){	// player goes again
-				turns++;
-			}else{
-				next = pids.get(activeIndex + 1);
-				activeIndex++;
+			case 0:
+				if (activeIndex == players.size() - 1){	// player goes again
+					turns++;
+				}else{
+					next = pids.get(activeIndex + 1);
+					activeIndex++;
+				}
+				break;
+			case 1:
+				if(activeIndex == 0){
+					turns++;
+				}else{
+					next = pids.get(activeIndex - 1);
+					activeIndex--;
+				}
+				break;
+			default:
+				if (activeIndex == pids.size() - 1) {
+					turns++;
+					next = pids.get(0);
+					activeIndex = 0;
+				}
+				else {
+					next = (pids.get(activeIndex + 1));
+					activeIndex++;
+				}
 			}
-			break;
-		case 1:
-			if(activeIndex == 0){
-				turns++;
-			}else{
-				next = pids.get(activeIndex - 1);
-				activeIndex--;
-			}
-			break;
-		default:
-			if (activeIndex == pids.size() - 1) {
-				turns++;
-				next = pids.get(0);
-				activeIndex = 0;
-			}
-			else {
-				next = (pids.get(activeIndex + 1));
-				activeIndex++;
-			}
-		}
 		
+		calculateRent(players.get(pid));
 		turnData.endTurn(next, players);
 			
 		registerTransaction();
@@ -419,6 +421,108 @@ public class Game implements AbstractGame {
 //			endTurn(active.getPid());
 	}
 
+	private void calculateRent(Player player) {
+		MilepostId previous = null;
+		for (List<MilepostId> mileposts: turnData.getTrainMoves())  {
+			Set<String> requiredOwners = new HashSet<String>();
+			Set<String> optionalOwners = new HashSet<String>();
+			if (mileposts.isEmpty())	// no move, no rent
+				continue;
+			previous = mileposts.get(0);
+			// First step is to identify all those we MUST rent from in order to travel
+			// If there are multiple players that have built track we are moving on, 
+			// add them to the optional owners list. We'll have to figure out later which
+			// optional owner to pick to rent from.
+			for (int i = 1; i < mileposts.size(); ++i) {
+				Set<String> owners = globalRail.getPlayers(previous, mileposts.get(i));
+				for (String owner: owners)
+					log.info("Found owner " + owner);
+				if (!owners.isEmpty() && !owners.contains(player.getPid())) { 
+					if (owners.size() == 1) 
+						requiredOwners.add(owners.iterator().next());
+					else {
+						for (String owner: owners)
+							if (!requiredOwners.contains(owner))
+								optionalOwners.add(owner);
+					}
+				}
+				previous = mileposts.get(i);
+			}
+			// Remove optional owners that we have to rent from anyway because they
+			// are required.
+			if (optionalOwners.size() > 0) {
+				optionalOwners.clear();
+				previous = mileposts.get(0);
+				for (int i = 1; i < mileposts.size(); ++i) {
+					Set<String> owners = globalRail.getPlayers(previous, mileposts.get(i));
+					if (!owners.isEmpty() && !owners.contains(player.getPid())) {
+						boolean foundOwner = false;
+						for (String owner: owners) {
+							if (requiredOwners.contains(owner)) {
+								foundOwner = true;
+								break;
+							}
+						}
+						if (!foundOwner)
+							optionalOwners.addAll(owners);
+					}
+					previous = mileposts.get(i);
+				}
+			}
+			// If we still have optional renters, we need to figure out the minimal set
+			// For each optional owner, try making it required and see what the resulting count
+			// of required owners is
+			if (optionalOwners.size() > 0) {
+				List<Set<String>> milepostOwners = new ArrayList<Set<String>>();
+				previous = mileposts.get(0);
+				for (int i = 1; i < mileposts.size(); ++i) {
+					Set<String> owners = globalRail.getPlayers(previous, mileposts.get(i));
+					if (owners.size() > 1 && !owners.contains(player.getPid())) {
+						boolean foundOwner = false;
+						for (String owner: owners)
+							if (requiredOwners.contains(owner))
+								foundOwner = true;
+						if (!foundOwner) 
+							milepostOwners.add(owners);
+					}
+					previous = mileposts.get(i);
+				}
+				while (milepostOwners.size() > 0)  {
+					if (milepostOwners.size() == 1)	{ // all are equal, pick the first one in the set
+						// TODO make this random
+						requiredOwners.add(milepostOwners.iterator().next().iterator().next());
+						break;
+					}
+					else {
+						Map<String, Integer> frequencyCount = new HashMap<String, Integer>();
+						// Pick most frequent one remaining, and add it
+						for (Set<String> mpowners: milepostOwners) {
+							for (String owner: mpowners)
+								if (frequencyCount.containsKey(owner))
+									frequencyCount.put(owner, frequencyCount.get(owner) + 1);
+								else
+									frequencyCount.put(owner, 1);
+						}
+						Map.Entry<String,Integer> mostFrequent = null;
+						for (Map.Entry<String,Integer> entry: frequencyCount.entrySet())
+							if (mostFrequent == null || entry.getValue() > mostFrequent.getValue())
+								mostFrequent = entry;
+						requiredOwners.add(mostFrequent.getKey());
+					    for (Iterator<Set<String>> milepostIter = milepostOwners.iterator(); 
+					    		milepostIter.hasNext(); ) {
+					    	Set<String> mpowners = milepostIter.next();
+							if (mpowners.contains(mostFrequent.getKey()))
+								milepostIter.remove();
+						}
+					}
+						
+				}
+			}
+		for (String owner: requiredOwners)
+			turnData.rent(owner);
+	}
+}
+	
 	public void resign(String pid) throws GameException { 
 		log.info("resign requestText: pid={}", pid);
 		if (pid.equals(turnData.getPid()))
@@ -554,5 +658,14 @@ public class Game implements AbstractGame {
 		}	
 		return mps;
 	}
+	
+	private void logMileposts(String msg, String pid, MilepostId[] mileposts) {
+		log.info("{}(pid={}, length={}, mileposts=[", msg, pid, mileposts.length);
+		for (int i = 0; i < mileposts.length; ++i)
+			log.info("{}, ", mileposts[i]);
+		log.info("])");
+	}
+	
+
 	
 }

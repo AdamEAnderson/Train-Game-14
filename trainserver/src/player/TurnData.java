@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import map.MilepostId;
 import reference.UpgradeType;
 import train.GameException;
 import train.RuleSet;
@@ -20,13 +21,18 @@ public class TurnData {
 	private boolean ferried;
 	private UpgradeType upgrade;
 	private int upgradedTrain;
+	private List<List<MilepostId>> trainMoves;	// For each train, the list of mileposts it has moved through
+															// 0'th milepost is starting position
 	
-	public TurnData(String gid, RuleSet r, String startingPid){
+	public TurnData(String gid, RuleSet r, Player startingPlayer){
 		this.gid = gid;
-		movesMade = new int[r.numTrains];
 		rentedFrom = new ArrayList<String>();
 		upgradedTrain = -1;
-		pid = startingPid;
+		pid = startingPlayer.getPid();
+		movesMade = new int[r.numTrains];
+		trainMoves = new ArrayList<List<MilepostId>>(r.numTrains);
+		for (int train = 0; train < r.numTrains; ++train) 
+			trainMoves.add(new ArrayList<MilepostId>());
 	}
 	
 	public boolean rentedFrom(String pid) {
@@ -39,12 +45,15 @@ public class TurnData {
 		return (moves + movesMade[t] <= limit);
 	}
 	
-	//only increments move counter -> trains are accessed through player
-	public void move(int t, int moves, int limit) throws GameException{
-		if(!checkMovesLength(t, moves, limit)){
+	public void move(int train, int limit, MilepostId startLocation, MilepostId[] mileposts)  throws GameException{
+		if(!checkMovesLength(train, mileposts.length, limit))
 			throw new GameException("InvalidMove");
-		}
-		movesMade[t] += moves;
+		List<MilepostId> moves = trainMoves.get(train);
+		if (moves.isEmpty())	// if this is the train's first move this turn, register the starting location
+			moves.add(startLocation);
+		for (int m = 0; m < mileposts.length; ++m)
+			moves.add(mileposts[m]);
+		movesMade[train] += mileposts.length;
 	}
 	
 	public boolean rent(String trackOwner) {
@@ -84,6 +93,8 @@ public class TurnData {
 		ferried = false;
 		upgrade = null;
 		upgradedTrain = -1;
+		for (List<MilepostId> mileposts: trainMoves)
+			mileposts.clear();
 	}
 	
 	/** Adds money to the turn's spendings 
@@ -108,4 +119,5 @@ public class TurnData {
 	public int getMovesMade(int tIndex){ return movesMade[tIndex]; }
 	public boolean turnInProgress(){ return turnInProgress;}
 	public boolean hasFerried() { return ferried; }
+	public List<List<MilepostId>> getTrainMoves() { return trainMoves; }
 }
