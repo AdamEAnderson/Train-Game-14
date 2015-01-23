@@ -277,8 +277,12 @@ public final class TrainMap {
 				MilepostId[] targets = ferryCrossings.get(mpId);
 				for(int i = 0; i < 6; i++){
 					if(targets[i] != null && milepostIndex.containsKey(targets[i])){
-						log.debug("Generating ferry from milepost [{}, {}] to milepost [{},{}], overwriting edge {}", 
-								mpId.y, mpId.x, targets[i].y, targets[i].x, edges[i]);
+						if (edges[i] != null)
+							log.warn("Generating ferry from milepost [{}, {}] to milepost [{},{}], overwriting edge {}", 
+									mpId.y, mpId.x, targets[i].y, targets[i].x, edges[i]);
+						else
+							log.debug("Generating ferry from milepost [{}, {}] to milepost [{},{}], overwriting edge {}", 
+									mpId.y, mpId.x, targets[i].y, targets[i].x, edges[i]);
 						edges[i] = new Ferry(milepostIndex.get(targets[i]));
 					}
 				}
