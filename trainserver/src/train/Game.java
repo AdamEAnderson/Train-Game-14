@@ -22,6 +22,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import player.GlobalRail;
+import player.GlobalTrack;
+import player.GlobalTrackTypeAdapter;
 import player.Player;
 import player.Rail;
 import player.RailTypeAdapter;
@@ -219,9 +221,7 @@ public class Game implements AbstractGame {
 		Set<String> rid = null;
 		for (int i = 0; i < mps.length - 1; ++i) {
 			Set<String> owners = globalRail.getPlayers(mps[i], mps[i + 1]);
-			for (String owner: owners)
-				log.info("Milepost " + i + "Owner " + owner);
-			if (owners.isEmpty()) {  // no track built - check for free track (e.g. though major city)
+			if (owners == null) {  // no track built - check for free track (e.g. though major city)
 				Milepost m1 = gameData.getMap().getMilepost(mps[i]);
 				Milepost m2 = gameData.getMap().getMilepost(mps[i + 1]);
 				if (!m1.isMajorCity() || !m2.isMajorCity() || !m1.isNeighbor(mps[i + 1]))
@@ -435,9 +435,7 @@ public class Game implements AbstractGame {
 			// optional owner to pick to rent from.
 			for (int i = 1; i < mileposts.size(); ++i) {
 				Set<String> owners = globalRail.getPlayers(previous, mileposts.get(i));
-				for (String owner: owners)
-					log.info("Found owner " + owner);
-				if (!owners.isEmpty() && !owners.contains(player.getPid())) { 
+				if (owners != null && !owners.contains(player.getPid())) { 
 					if (owners.size() == 1) 
 						requiredOwners.add(owners.iterator().next());
 					else {
@@ -559,6 +557,7 @@ public class Game implements AbstractGame {
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(this));
 		gsonBuilder.registerTypeAdapter(MilepostId.class, new MilepostIdShortFormTypeAdapter());
 		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter());
+		gsonBuilder.registerTypeAdapter(GlobalTrack.class, new GlobalTrackTypeAdapter());
 		Gson gson = gsonBuilder.create();
 		return gson.toJson(this);
 	}
@@ -569,7 +568,9 @@ public class Game implements AbstractGame {
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
 		gsonBuilder.registerTypeAdapter(MilepostId.class, new MilepostIdShortFormTypeAdapter());
 		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter());
+		gsonBuilder.registerTypeAdapter(GlobalTrack.class, new GlobalTrackTypeAdapter());
 		Gson gson = gsonBuilder.create();
+		log.info("undo " + gameString);
 		Game newGame = gson.fromJson(gameString, Game.class);
 		
 		// Must do fixups on the new game, since not all fields are serialized.

@@ -11,9 +11,14 @@ import train.GameException;
 
 public class GlobalRail {
 	private Map<String, Rail> rails; //maps pid to their track
-	
+		
+	private GlobalTrack globalTracks;
+		// Compendium of all individual player's track, indexed by milepost pairs(source, dest)
+		// each entry contains a list of the players who have connected the mileposts
+
 	public GlobalRail(){
 		rails = new HashMap<String, Rail>();
+		globalTracks = new GlobalTrack();
 	}
 	
 	public void join(String pid){
@@ -70,21 +75,23 @@ public class GlobalRail {
 		for(int i = 1; i < mps.length; i++){
 			Milepost snd = mps[i];
 			r.build(fst, snd);
+			buildGlobalTrack(fst.id, snd.id, pid);
 			fst = snd;
 		}
 	}
 	
-	public boolean testMove(String rid, MilepostId[] mps) throws GameException{
-		if(!rails.containsKey(rid)) return false;
-		MilepostId fst = mps[0];
-		for(int i = 1; i < mps.length; i++){
-			MilepostId snd = mps[i];
-			if(!connects(rid, fst, snd)) return false;
-			fst = snd;
+	private void buildGlobalTrack(MilepostId src, MilepostId dest, String pid) {
+		Set<String> owners = getPlayers(src, dest);
+		if (owners != null)
+			owners.add(pid);
+		else {
+			owners = new HashSet<String>(1);
+			owners.add(pid);
+			globalTracks.getTracks().put( new MilepostPair(src, dest),  owners);
 		}
-		return true;
-	}
+	}	
 	
+	// Returns true if the player has built to the milepost
 	public boolean contains(String pid, MilepostId m) throws GameException{
 		if(!rails.containsKey(pid)){
 			throw new GameException("PlayerNotFound");
@@ -92,20 +99,9 @@ public class GlobalRail {
 		return rails.get(pid).contains(m);
 	}
 	
-	public boolean connects(String pid, MilepostId one, MilepostId two) throws GameException{
-		if(!rails.containsKey(pid)){
-			throw new GameException("PlayerNotFound");
-		}
-		return rails.get(pid).connects(one, two);
-	}
-	
-	public boolean anyConnects(MilepostId one, MilepostId two){
-		for(String pid : rails.keySet()){
-			try {
-				if(connects(pid, one, two)) return true;
-			} catch (GameException e) {		} //the exception is thrown when the pid is not identified
-		}
-		return false;
+	// Returns true if any player has connected the two mileposts
+	public boolean anyConnects(MilepostId one, MilepostId two) {
+		return getPlayers(one, two) != null;
 	}
 	
 	/** Return the players who build this pair of mileposts, or null if none. 
@@ -114,14 +110,13 @@ public class GlobalRail {
 	 * @param two
 	 * @return
 	 */
-	public Set<String> getPlayers(MilepostId one, MilepostId two){
-		Set<String> players = new HashSet<String>();
-		for(String pid : rails.keySet()){
-			try{
-				if(connects(pid, one, two)) players.add(pid);
-			}catch(GameException e) { }
-		}
-		return players;
+	public Set<String> getPlayers(MilepostId one, MilepostId two) {
+		for (Map.Entry<MilepostPair, Set<String>> entry: globalTracks.getTracks().entrySet()) 
+			if (entry.getKey().equals(one, two)) {
+				HashSet<String> copy = (HashSet<String>)entry.getValue();
+				return (HashSet<String>)copy.clone();
+			}
+		return null;
 	}
 
 	public Rail getRail(String pid){
