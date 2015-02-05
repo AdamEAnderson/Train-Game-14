@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -76,7 +76,7 @@ var buildClick = function (e) {
             return;
         if (20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)
             return;
-        drawLineBetweenMileposts(lastX, lastY, currentX, currentY, pid);
+        drawSingleTrack(lastX, lastY, currentX, currentY, pid);
         $(document.getElementById('buildCursor')).remove();
         $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': currentX, 'cy': currentY, 'r': 2, 'fill': player.color }));
         verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });
@@ -136,7 +136,7 @@ var buildClick = function (e) {
             return;
         if (20 - (moneySpent + moneySpentThisBuild + milepostCost) < 0)
             return;
-        drawLineBetweenMileposts(lastX, lastY, currentX, currentY, pid);
+        drawSingleTrack(lastX, lastY, currentX, currentY, pid);
         $(document.getElementById('buildCursor')).remove();
         $('#map > svg').append($(document.createElementNS('http://www.w3.org/2000/svg', 'circle')).attr({ 'id': 'buildCursor', 'cx': currentX, 'cy': currentY, 'r': 2, 'fill': player.color }));
         verticesBuilt.push({ x: currentMilepost.x, y: currentMilepost.y });

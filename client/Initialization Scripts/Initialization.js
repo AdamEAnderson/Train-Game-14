@@ -41,6 +41,7 @@ $(document).ready(function () {
     $('#mainMenu').append('<input id="startingMoneyPicker" type="text" size="32"style="width:200px;" value="70"/>');
     $('#mainMenu').append('<h4>Number of Trains</h4>');
     $('#mainMenu').append('<input id="numTrainsPicker" type="text" size="32"style="width:200px;" value="1"/>');
+    $('#mainMenu').append('<input type="checkbox" id="multiPlayerTrack"><label for="multiPlayerTrack">Multi-player Track</label>');
     $('#actionPicker').selectmenu({
         change: function (event, data) {
             if (data.item.label == "New") {
@@ -60,6 +61,7 @@ $(document).ready(function () {
                 $('#numTrainsPicker').show().prev().show();
                 $('#startingMoneyPicker').show().prev().show();
                 $('#numCardsPicker').show().prev().show();
+                $('#multiPlayerTrack').show().next().show();    // show checkbox and label
             }
             else {
                 $('#gamePicker-button').show().css('display', 'block');
@@ -72,6 +74,7 @@ $(document).ready(function () {
                 $('#numTrainsPicker').hide().prev().hide();
                 $('#startingMoneyPicker').hide().prev().hide();
                 $('#numCardsPicker').hide().prev().hide();
+                $('#multiPlayerTrack').hide().next().hide();    // hide checkbox and label
                 if (data.item.label == "Join")
                     gameOption = "joinable";
                 else {
@@ -116,7 +119,9 @@ $(document).ready(function () {
         if ($('#handlePicker').val() && $('#handlePicker').val().length > 0) {
             if (document.getElementById("actionPicker").value == "New" && !isNaN(parseInt($('#numCardsPicker').val())) && !isNaN(parseInt($('#startingMoneyPicker').val())) && !isNaN(parseInt($('#numTrainsPicker').val()))) {
                 newGame(document.getElementById("colorPicker").value, $('#handlePicker').val(),
-					document.getElementById("geographyPicker").value, $('#gameNamePicker').val(), parseInt($('#numCardsPicker').val()), parseInt($('#startingMoneyPicker').val()), parseInt($('#numTrainsPicker').val()));
+					document.getElementById("geographyPicker").value, $('#gameNamePicker').val(), parseInt($('#numCardsPicker').val()), 
+                    parseInt($('#startingMoneyPicker').val()), parseInt($('#numTrainsPicker').val()), 
+                    $("#multiPlayerTrack").prop('checked'));
             } else if (document.getElementById("actionPicker").value == "Join" && $('#gamePicker')[0].value && $('#gamePicker')[0].value != '' && gamePicked) {
                 joinGame(gamePicked,
 					document.getElementById("colorPicker").value, $('#handlePicker').val());
@@ -355,9 +360,8 @@ var processResume = function (data) {
             var m2 = JSON.parse(key);
             var m1svg = findMilepost(m1.x, m1.y);
             var m2svg = findMilepost(m2.x, m2.y);
-            drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
+            drawSingleTrack(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pid);
             edgesBuiltFinal.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
-            verticesBuiltFinal.push(m1, m2);
         }
     }
     

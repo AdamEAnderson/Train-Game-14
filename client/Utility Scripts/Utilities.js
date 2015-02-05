@@ -15,14 +15,95 @@ var processGames = function (data) {
     $('#gamePicker').menu('refresh');
 };
 
-//Draws an edge of track between x1,y1 and x2,y2 in the color of a player with ID PID
-var drawLineBetweenMileposts = function (x1, y1, x2, y2, PID) {
+//Draws an edge of track between x1,y1 and x2,y2 in the color of a *single* player with ID PID
+var drawSingleTrack = function (x1, y1, x2, y2, PID) {
     var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr({ x1: x1, y1: y1, x2: x2, y2: y2 }).css({ 'stroke-width': '4px', 'stroke': findPid(lastStatusMessage.players, PID).color });
     $('#pid' + PID).append(jQ);
     if (PID == pid && justResumed == false) {
         edgesBuilt.push(jQ)
     }
     return jQ;
+};
+
+/* Draw multi-player "rainbow" track. 
+*/
+//var drawMultiTrack = function (x1, y1, x2, y2, pids) {
+//    var totalStrokeWidth = 4;   // total width of track drawing
+//    var strokeWidth = totalStrokeWidth / pids.length;   // width of stroke for each player
+//    var slope = (y2 - y1) / (x2 - x1);  // slope of the track
+//    var perpandicularSlope = (slope == 0) ? 1 : -(1 / slope);   // slope of the strokewidth
+//    var a = Math.tan(perpandicularSlope);
+//    var xDelta = strokeWidth * Math.cos(a);  // amount to adjust the drawing position after each player track in x-direction
+//    var yDelta = strokeWidth * Math.sin(a);  // amount to adjust the drawing position after each player track in y-direction
+//    var xOffset = xDelta / 2; // starting midpoint adjustment (stroke is centered)
+//    var yOffset = yDelta / 2; // starting midpoint adjustment (stroke is centered)
+//    
+//    // (x1, y1) and (x2, y2) are midpoints of a single line -- they need to be converted to 
+//    // the top left corner of the stroke.
+//    var xTopLeftDelta = (totalStrokeWidth / 2) * Math.cos(a);
+//    var yTopLeftDelta = (totalStrokeWidth / 2) * Math.sin(a);
+//    x1 -= xTopLeftDelta;
+//    y1 -= yTopLeftDelta;
+//    x2 -= xTopLeftDelta;
+//    y2 -= yTopLeftDelta;
+//    for (var i = 0; i < pids.length; ++i) {
+//        var PID = pids[i];
+//        var x1Pos = x1 + xOffset;
+//        var y1Pos = y1 + yOffset;
+//        var x2Pos = x2 + xOffset;
+//        var y2Pos = y2 + yOffset;   
+//        var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr({ x1: x1Pos, y1: y1Pos, x2: x2Pos, y2: y2Pos }).css({ 'stroke-width': String(strokeWidth) + 'px', 'stroke': findPid(lastStatusMessage.players, PID).color });
+//        $('#pid' + PID).append(jQ);
+//        if (PID == pid && justResumed == false) 
+//            edgesBuilt.push(jQ)
+//        xOffset += xDelta;
+//        yOffset += yDelta;
+//   }
+//};
+
+var drawMultiTrack = function (x1, y1, x2, y2, pids) {
+    var totalStrokeWidth = 4;   // total width of track drawing
+    var strokeWidth = totalStrokeWidth / pids.length;   // width of stroke for each player
+    var diffX = x1 - x2; //
+    var diffY = y1 - y2; // Vector along the line
+    var perpX = diffY; //
+    var perpY = -diffX; // Vector perpendicular to the line
+    var normLength = Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)); // Length of the vector perpendicular to the line
+    var normX = perpX / normLength; //
+    var normY = perpY / normLength; // Vector of length one perpendicular to the line
+    var xDelta = normX * strokeWidth; //
+    var yDelta = normY * strokeWidth; // Vector of length strokeWidth perpendicular to the line
+    var xOffsets = []; //
+    var yOffsets = []; // Array of offsets from normal line
+    if(pids.length % 2 == 0){ // If there is an even number of pids then none go in the center
+        for(var i = 0; i < pids.length/2; i++){ // Loop through and give each one its offsets
+            xOffsets.push(i*xDelta + xDelta/2);
+            xOffsets.push(-i*xDelta - xDelta/2);
+            yOffsets.push(i*yDelta + yDelta/2);
+            yOffsets.push(-i*yDelta - yDelta/2);
+        }
+    }
+    else{ // If there is an odd number of pids then one gets to go in the center
+        xOffsets.push(0); //
+        yOffsets.push(0); // The center line has no offset
+        for(var i = 1; i < (pids.length + 1)/2; i++){ // Loop through and give all the other lines offsets
+            xOffsets.push(i*xDelta);
+            xOffsets.push(-i*xDelta);
+            yOffsets.push(i*yDelta);
+            yOffsets.push(-i*yDelta);
+        }
+    }
+    for (var i = 0; i < pids.length; ++i) { // Loop through the pids and draw each line
+        var PID = pids[i];
+        var x1Pos = x1 + xOffsets[i]; //
+        var y1Pos = y1 + yOffsets[i]; //
+        var x2Pos = x2 + xOffsets[i]; //
+        var y2Pos = y2 + yOffsets[i]; // Add the original line coordinates to the offset to get the translated line
+        var jQ = $(document.createElementNS('http://www.w3.org/2000/svg', 'line')).attr({ x1: x1Pos, y1: y1Pos, x2: x2Pos, y2: y2Pos }).css({ 'stroke-width': String(strokeWidth) + 'px', 'stroke': findPid(lastStatusMessage.players, PID).color }); // Draw the line
+        $('#pid' + PID).append(jQ); // Add the line to the DOM
+        if (PID == pid && justResumed == false) // If its us, and we didn't just resume
+            edgesBuilt.push(jQ); // Add this new line element to the list of our rail elements
+   }
 };
 
 //Given an array of players out of the status message returns the object of the player with ID PID
@@ -37,8 +118,8 @@ var findMilepost = function (x, y) {
     var mpsvg = { x: 0, y: 0 };
     var mpjQ = $(document.getElementById('milepost' + x + ',' + y));
     if (mpjQ.prop('tagName') == 'circle') {
-        mpsvg.x = mpjQ.attr('cx');
-        mpsvg.y = mpjQ.attr('cy');
+        mpsvg.x = parseInt(mpjQ.attr('cx'));
+        mpsvg.y = parseInt(mpjQ.attr('cy'));
     }
     else {
         var translate = mpjQ.attr('transform').replace(/\ scale\([0-9\.]+\)/, '').replace('translate(', '').replace(')', '').split(',');

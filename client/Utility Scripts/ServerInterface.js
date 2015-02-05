@@ -59,7 +59,6 @@ var builtTrack = function (vertices, edges, cost, milepostEdges) {
         url: server,
         data: JSON.stringify(data),
         success: function () {
-            Array.prototype.push.apply(verticesBuiltFinal, vertices);
             Array.prototype.push.apply(edgesBuiltFinal, milepostEdges);
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -177,7 +176,7 @@ var testBuildTrack = function (vertices, edges, cost, milepostEdges) {
             for (var j = 0; j < milepostEdgesBuilt.length; j++) {
                 var mpsvg1 = findMilepost(milepostEdgesBuilt[j].x1, milepostEdgesBuilt[j].y1);
                 var mpsvg2 = findMilepost(milepostEdgesBuilt[j].x2, milepostEdgesBuilt[j].y2);
-                drawLineBetweenMileposts(mpsvg1.x, mpsvg1.y, mpsvg2.x, mpsvg2.y, pid);
+                drawSingleTrack(mpsvg1.x, mpsvg1.y, mpsvg2.x, mpsvg2.y, pid);
             }
             moneySpentThisBuild = cost;
             refreshMoneySpent(moneySpent + moneySpentThisBuild);
@@ -250,13 +249,14 @@ var endGame = function (checked) {
     post({ messageType: 'endGame', pid: pid, gid: gid, ready: checked });
 };
 
-var newGame = function (color, handle, gameGeo, gameName, handSize, startingMoney, numTrains) {
+var newGame = function (color, handle, gameGeo, gameName, handSize, startingMoney, numTrains, multiPlayerTrack) {
     $('#newGameButton').button('option', 'disabled', true);
     var data = { messageType: 'newGame', color: color, pid: handle, gameType: gameGeo, name: gameName };
     data["ruleSet"] = {};
     data.ruleSet["handSize"] = handSize || 4;
     data.ruleSet["startingMoney"] = startingMoney || 70;
     data.ruleSet["numTrains"] = numTrains || 1;
+    data.ruleSet["multiPlayerTrack"] = multiPlayerTrack;
     post(data, function (data) {
         $('#loading').show();
         loading = true;

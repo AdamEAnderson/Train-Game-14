@@ -1,4 +1,4 @@
-﻿/// <reference path="libraries/raphael.js" />
+/// <reference path="libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -27,7 +27,6 @@ var loading = false; //Boolean for if the gameDisplay is loading
 var moneySpent = 0; //Integer for money spent during the players turn
 var moneySpentThisBuild = 0; //Integer for money spent while building
 var verticesBuilt; //Array for mileposts built while building
-var verticesBuiltFinal = []; //Array for mileposts built and confirmed by server
 var milepostEdgesBuilt; //Array for edges built while building
 var lastTrackBuilt;
 var edgesBuiltFinal = []; //Array for edges built and confirmed by server

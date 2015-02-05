@@ -26,6 +26,7 @@ var processStatus = function (data) {
         if (started) {
             $('#0').next().addClass('ui-state-active');
             refreshRails(data.players);
+            refreshTrack(data.globalRail, data.players);
             refreshTrainLocations(data.players);
         }
         var me = findPid(data.players, pid);

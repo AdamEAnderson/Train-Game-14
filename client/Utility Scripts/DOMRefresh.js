@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/raphael.js" />
+/// <reference path="../libraries/raphael.js" />
 /// <reference path="http://code.jquery.com/jquery-2.0.0.js" /> 
 /// <reference path="http://underscorejs.org/underscore.js" /> 
 /// <reference path="http://code.jquery.com/ui/jquery-ui-1-9-git.js" /> 
@@ -101,7 +101,7 @@ var refreshTrainLocations = function (players) {
 };
 
 var refreshRails = function (players) {
-    otherPlayersEdgesBuilt = [];
+   /* otherPlayersEdgesBuilt = [];
     for (var i = 0; i < players.length; i++) {
         if (players[i].pid == pid)
             continue;
@@ -114,10 +114,31 @@ var refreshRails = function (players) {
                 var m2 = JSON.parse(key);
                 var m1svg = findMilepost(m1.x, m1.y);
                 var m2svg = findMilepost(m2.x, m2.y);
-                drawLineBetweenMileposts(m1svg.x, m1svg.y, m2svg.x, m2svg.y, players[i].pid);
+                drawSingleTrack(m1svg.x, m1svg.y, m2svg.x, m2svg.y, players[i].pid);
                 otherPlayersEdgesBuilt.push({ x1: m1.x, y1: m1.y, x2: m2.x, y2: m2.y });
             }
         }
+    } */
+};
+
+/** Redraw all other player's track */
+var refreshTrack = function (track, players) {
+    otherPlayersEdgesBuilt = [];
+    for (var i = 0; i < players.length; ++i)    // empty out existing track drawing
+        if (players[i].pid != pid)
+            $('#pid' + players[i].pid).empty();
+    for (var i = 0; i < track.globalTracks.length; ++i) {   // generate new track drawing
+        var pair = track.globalTracks[i].pair;
+        var m1svg = findMilepost(pair[0], pair[1]);
+        var m2svg = findMilepost(pair[2], pair[3]);
+        var pids = track.globalTracks[i].pids;
+        if (pids.indexOf(pid) != -1)
+            continue;
+        if (pids.length > 1)
+            drawMultiTrack(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pids);
+        else
+            drawSingleTrack(m1svg.x, m1svg.y, m2svg.x, m2svg.y, pids[0]);
+        otherPlayersEdgesBuilt.push({ x1: pair[0], y1: pair[1], x2: pair[2], y2: pair[3] });
     }
 };
 
