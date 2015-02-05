@@ -27,27 +27,32 @@ public GlobalTrack read(final JsonReader reader) throws IOException {
 	}
 	
 	Map<MilepostPair, Set<String>> tracks = new HashMap<MilepostPair, Set<String>>();
-	reader.beginObject();
+	reader.beginArray();
 	while (reader.hasNext()) {                                                                              
 		// Read each map entry                
 				
 		// read MilepostPair
-		String pairString = reader.nextName();
-		MilepostPair pair = readMilepostPair(pairString);
+		/*String pairName = */ reader.nextName();
+		reader.beginArray();
+		int xFirst = Integer.parseInt(reader.nextString());
+		int yFirst = Integer.parseInt(reader.nextString());
+		int xSecond = Integer.parseInt(reader.nextString());
+		int ySecond = Integer.parseInt(reader.nextString());
+		reader.endArray();
+		MilepostPair pair = new MilepostPair(new MilepostId(xFirst, yFirst), 
+			new MilepostId(xSecond, ySecond));	
 		
-		// read Set<String> of player names
+		/*String pidsName = */ reader.nextName();	// read Set<String> of player names
 		Set<String> pids = new HashSet<String>();
 		reader.beginArray();
-		while (reader.hasNext()) {
-			String pid = reader.nextString();
-			pids.add(pid);
-		}
+		while (reader.hasNext()) 
+			pids.add(reader.nextString());
 		if (pids.size() < 1)
 			System.out.println("Reading empty player track list " + pids.size());
 		tracks.put(pair, pids);
 		reader.endArray();
 		}
-	reader.endObject();
+	reader.endArray();
 	return new GlobalTrack(tracks);
 	}
 
@@ -58,15 +63,19 @@ public void write(final JsonWriter writer, final GlobalTrack value) throws IOExc
 		return;
 	}
 
-	writer.beginObject();
+	writer.beginArray();
 	for (Map.Entry<MilepostPair, Set<String>> entry: value.getTracks().entrySet()) {
-		// write the milepost pair
-		String first = entry.getKey().first.x + "," + entry.getKey().first.y;
-		String second = entry.getKey().second.x + "," + entry.getKey().second.y;
-		String pairString = first + "," + second;
-		writer.name(pairString);
+		writer.beginObject();
 		
-		// write the Set<String> of player names
+		writer.name("pair");	// write the milepost pair
+		writer.beginArray();
+		writer.value(entry.getKey().first.x);
+		writer.value(entry.getKey().first.y);
+		writer.value(entry.getKey().second.x);
+		writer.value(entry.getKey().second.y);
+		writer.endArray();
+		
+		writer.name("pids");	// write the Set<String> of player names
 		writer.beginArray();
 		Set<String> pids = entry.getValue();
 		if (pids.size() < 1)
@@ -75,19 +84,8 @@ public void write(final JsonWriter writer, final GlobalTrack value) throws IOExc
 			writer.value(pid);
 			}
 		writer.endArray();
+		writer.endObject();
 		}
-	writer.endObject();
+	writer.endArray();
 	}
-
-private MilepostPair readMilepostPair(String xy) throws IOException {
-	String[] parts = xy.split(",");
-	int xFirst = Integer.parseInt(parts[0]);
-	int yFirst = Integer.parseInt(parts[1]);
-	MilepostId first = new MilepostId(xFirst, yFirst);
-	int xSecond = Integer.parseInt(parts[2]);
-	int ySecond = Integer.parseInt(parts[3]);
-	return new MilepostPair(new MilepostId(xFirst, yFirst), new MilepostId(xSecond, ySecond));
-	}
-
-
 }

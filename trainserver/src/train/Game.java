@@ -152,7 +152,7 @@ public class Game implements AbstractGame {
 		logMileposts("testBuildTrack", pid, mileposts);
 		checkActive(pid);
 		Milepost[] mps = convert(mileposts);
-		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiTrack);
+		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiPlayerTrack);
 		return ((cost != -1) && turnData.checkSpending(cost));
 	}
 
@@ -166,7 +166,7 @@ public class Game implements AbstractGame {
 		String originalGameState = toString();
 		turnData.startTurn();
 		Milepost[] mps = convert(mileposts);
-		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiTrack);
+		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiPlayerTrack);
 		turnData.spend(cost);
 		globalRail.build(pid, mps);
 		registerTransaction(originalGameState);

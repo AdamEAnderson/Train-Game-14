@@ -21,6 +21,9 @@ import map.TrainMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import player.GlobalRail;
+import player.GlobalTrack;
+import player.GlobalTrackTypeAdapter;
 import player.Player;
 import player.Stats;
 import player.Train;
@@ -139,6 +142,7 @@ public class TrainServer {
 		public String geography;
 		public boolean ended;
 		public int turns;
+		public GlobalRail globalRail;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
 		public int transaction;
 		GameStatus() {}
@@ -164,6 +168,7 @@ public class TrainServer {
 		// Generate a new status message
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostTypeAdapter());
+		gsonBuilder.registerTypeAdapter(GlobalTrack.class, new GlobalTrackTypeAdapter());
 		GameStatus status = new GameStatus();
 		status.gid = gid;
 		status.players = new ArrayList<PlayerStatus>();
@@ -173,6 +178,7 @@ public class TrainServer {
 		status.ended = game.isOver();
 		status.turns = game.getTurns();
 		status.lastid = game.getLastPid();
+		status.globalRail = game.getGlobalRail();
 		
 		for(String pid : game.getPids()){
 			PlayerStatus p = new PlayerStatus(game.getPlayer(pid), game.getGlobalRail().getRail(pid).getRail());

@@ -5,12 +5,12 @@ public class RuleSet {
 	public final int startingMoney; //the money each player starts with
 	public final int numTrains; //the number of trains per player
 
-	public final boolean multiTrack;	// allow multiple players to build track between the same mileposts
+	public final boolean multiPlayerTrack;	// allow multiple players to build track between the same mileposts
 	
-	RuleSet(int handSize, int startingMoney, int numTrains, boolean multiTrack) {
+	RuleSet(int handSize, int startingMoney, int numTrains, boolean multiPlayerTrack) {
 		this.handSize = handSize;
 		this.startingMoney = startingMoney;
 		this.numTrains = numTrains;
-		this.multiTrack = multiTrack;
+		this.multiPlayerTrack = multiPlayerTrack;
 	}
 }

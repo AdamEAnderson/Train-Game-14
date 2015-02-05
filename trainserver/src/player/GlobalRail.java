@@ -81,11 +81,11 @@ public class GlobalRail {
 	}
 	
 	private void buildGlobalTrack(MilepostId src, MilepostId dest, String pid) {
-		Set<String> owners = getPlayers(src, dest);
-		if (owners != null)
-			owners.add(pid);
+		Map.Entry<MilepostPair, Set<String>> entry = findEntry(src, dest);
+		if (entry != null)
+			entry.getValue().add(pid);
 		else {
-			owners = new HashSet<String>(1);
+			Set<String> owners = new HashSet<String>(1);
 			owners.add(pid);
 			globalTracks.getTracks().put( new MilepostPair(src, dest),  owners);
 		}
@@ -121,5 +121,13 @@ public class GlobalRail {
 
 	public Rail getRail(String pid){
 		return rails.get(pid);
+	}
+	
+	private Map.Entry<MilepostPair, Set<String>> findEntry(MilepostId one, MilepostId two) {
+		for (Map.Entry<MilepostPair, Set<String>> entry: globalTracks.getTracks().entrySet()) 
+			if (entry.getKey().equals(one, two)) {
+				return entry;
+			}
+		return null;
 	}
 }

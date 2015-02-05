@@ -1,7 +1,6 @@
 package test;
 
 import static org.junit.Assert.*;
-
 import map.MilepostId;
 
 import org.slf4j.Logger;
@@ -90,5 +89,17 @@ public class GameTest {
         return gid;
 	}
 	
+	protected static String ruleSet(int handSize, int startingMoney, int numTrains, boolean multiPlayerTrack) {
+		return String.format("{\"handSize\":%s, \"startingMoney\":%s, \"numTrains\":%s, \"multiPlayerTrack\":%s }", 
+				handSize, startingMoney, numTrains, multiPlayerTrack);
+	}
+	
+	protected static String newGame(String name, String pid, String color, String geography, String rules) throws GameException {
+		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"name\":\"%s\", \"ruleSet\":%s, \"gameType\":\"%s\"}", 
+				pid, color, name, rules, geography);
+        String responseMessage = TrainServer.newGame(jsonPayload);
+        String gid = responseMessage.substring(8, 16);
+		return gid;
+	}
 
 }
