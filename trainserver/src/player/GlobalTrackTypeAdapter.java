@@ -30,6 +30,7 @@ public GlobalTrack read(final JsonReader reader) throws IOException {
 	reader.beginArray();
 	while (reader.hasNext()) {                                                                              
 		// Read each map entry                
+		reader.beginObject();
 				
 		// read MilepostPair
 		/*String pairName = */ reader.nextName();
@@ -51,6 +52,7 @@ public GlobalTrack read(final JsonReader reader) throws IOException {
 			System.out.println("Reading empty player track list " + pids.size());
 		tracks.put(pair, pids);
 		reader.endArray();
+		reader.endObject();
 		}
 	reader.endArray();
 	return new GlobalTrack(tracks);

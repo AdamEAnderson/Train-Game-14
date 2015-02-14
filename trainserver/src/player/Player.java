@@ -19,6 +19,8 @@ public class Player {
 	private boolean readyToEnd;
 	private boolean hasResigned;
 	
+	private RequestQueue requestQueue = null;
+	
 	private Stats stats;
 	
 	private static Logger log = LoggerFactory.getLogger(Player.class);
@@ -36,6 +38,7 @@ public class Player {
 		readyToEnd = false;
 		hasResigned = false;
 		this.stats = new Stats();
+		this.requestQueue = null;
 	}
 	
 	public void placeTrain(Milepost m, int t) throws GameException{
@@ -144,6 +147,23 @@ public class Player {
 		money -= withdrawal;
 	}
 	
+	/** Queue up a request for later execution */
+	public void queueRequest(String request) {
+		if (requestQueue == null)
+			requestQueue = new RequestQueue();
+		requestQueue.requestQueue. add(request);
+	}
+	
+	/** Pop the next queued request to do, if there is one. Returns null otherwise. */
+	public String getQueuedRequest() {
+		return requestQueue != null ? requestQueue.requestQueue.poll() : null;
+	}
+	
+	public void clearRequestQueue() {
+		if (requestQueue != null)
+			requestQueue.requestQueue.clear();
+	}
+		
 	public void readyToStart(boolean ready) { readyToStart = ready;}
 	
 	public boolean readyToStart() { return readyToStart; }

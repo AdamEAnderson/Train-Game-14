@@ -27,6 +27,8 @@ import player.GlobalTrackTypeAdapter;
 import player.Player;
 import player.Rail;
 import player.RailTypeAdapter;
+import player.RequestQueue;
+import player.RequestQueueTypeAdapter;
 import player.TurnData;
 import reference.Card;
 import reference.UpgradeType;
@@ -38,6 +40,8 @@ public class Game implements AbstractGame {
 	public transient GameData gameData;
 	private transient RuleSet ruleSet;
 	
+	private final String name;
+
 	//joinable can be represented by "turnData == null"
 	private boolean ended; // game has ended
 	private int turns; //the number of completed turns; 0, 1, and 2 are building turns
@@ -52,7 +56,6 @@ public class Game implements AbstractGame {
 	//useful for undo and deletion
 	private transient int transaction;
 	private transient Date lastChange;
-	private String name;
 	private transient UndoRedoStack undoStack;
 	private transient UndoRedoStack redoStack;
 		
@@ -62,6 +65,7 @@ public class Game implements AbstractGame {
 	public Game() {
 		undoStack = new UndoRedoStack(GameException.NOTHING_TO_UNDO);
 		redoStack = new UndoRedoStack(GameException.NOTHING_TO_REDO);
+		name = null;
 	}
 	
 	/** Constructor. 
@@ -150,7 +154,8 @@ public class Game implements AbstractGame {
 	public boolean testBuildTrack(String pid, MilepostId[] mileposts)
 			throws GameException {
 		logMileposts("testBuildTrack", pid, mileposts);
-		checkActive(pid);
+		// Since this doesn't change game state, allow it 
+		//checkActive(pid);
 		Milepost[] mps = convert(mileposts);
 		int cost = globalRail.checkBuild(pid, mps, ruleSet.multiPlayerTrack);
 		return ((cost != -1) && turnData.checkSpending(cost));
@@ -552,23 +557,25 @@ public class Game implements AbstractGame {
 		return ended;
 	}
 	
-	public String toString() {
+	private static GsonBuilder createGsonBuilder(Game refGame) {
 		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(this));
+		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
 		gsonBuilder.registerTypeAdapter(MilepostId.class, new MilepostIdShortFormTypeAdapter());
 		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter());
 		gsonBuilder.registerTypeAdapter(GlobalTrack.class, new GlobalTrackTypeAdapter());
+		gsonBuilder.registerTypeAdapter(RequestQueue.class, new RequestQueueTypeAdapter());
+		return gsonBuilder;
+	}
+	
+	public String toString() {
+		GsonBuilder gsonBuilder = createGsonBuilder(this);
 		Gson gson = gsonBuilder.create();
 		return gson.toJson(this);
 	}
 	
 	//serialization
 	public static Game fromString(String gameString, Game refGame) {
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostShortFormTypeAdapter(refGame));
-		gsonBuilder.registerTypeAdapter(MilepostId.class, new MilepostIdShortFormTypeAdapter());
-		gsonBuilder.registerTypeAdapter(Rail.class, new RailTypeAdapter());
-		gsonBuilder.registerTypeAdapter(GlobalTrack.class, new GlobalTrackTypeAdapter());
+		GsonBuilder gsonBuilder = createGsonBuilder(refGame);
 		Gson gson = gsonBuilder.create();
 		log.info("undo " + gameString);
 		Game newGame = gson.fromJson(gameString, Game.class);
@@ -580,12 +587,18 @@ public class Game implements AbstractGame {
 		newGame.lastChange = refGame.lastChange;
 		newGame.undoStack = refGame.undoStack;
 		newGame.redoStack = refGame.redoStack;
-//		newGame.globalRail = new HashMap<Milepost, Set<Rail.Track>>();
-//		for (Player p: newGame.players) 
-//			p.fixup(newGame, newGame.globalRail);
-//		newGame.setActive(newGame.players.get(refGame.activeIndex));
 		
 		return newGame;
+	}
+	
+	// Queue a player's command for later execution when it is their turn
+	public void queueRequest(String pid, String request) throws GameException {
+		Player player = getPlayer(pid);
+		player.queueRequest(request);
+	}
+	
+	public String getQueuedRequest(String pid) throws GameException {
+		return getPlayer(pid).getQueuedRequest();
 	}
 
 	public Player getPlayer(String pid) throws GameException {
@@ -606,6 +619,10 @@ public class Game implements AbstractGame {
 			throw new GameException("GameNotStarted");
 		if (!(pid.equals(turnData.getPid()))) 
 			throw new GameException(GameException.PLAYER_NOT_ACTIVE);
+	}
+	
+	public boolean isActivePlayer(String pid) {
+		return pid.equals(turnData.getPid());
 	}
 
 	private void checkBuilding() throws GameException{

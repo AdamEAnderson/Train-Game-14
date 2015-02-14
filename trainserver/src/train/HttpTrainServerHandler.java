@@ -149,6 +149,42 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 		}
 	}
 	
+	public static void executeMessage(String message) throws GameException {
+		String requestType = parseMessageType(message);
+		switch (requestType) {
+			case BUILD_TRACK:
+				TrainServer.buildTrack(message, true);
+				break;
+			case UPGRADE_TRAIN:
+				TrainServer.upgradeTrain(message, true);
+				break;
+			case PLACE_TRAIN:
+				TrainServer.placeTrain(message, true);
+				break;
+			case MOVE_TRAIN:
+				TrainServer.moveTrain(message, true);
+				break;
+			case PICKUP_LOAD:
+				TrainServer.pickupLoad(message, true);
+				break;
+			case DELIVER_LOAD:
+				TrainServer.deliverLoad(message, true);
+				break;
+			case DUMP_LOAD:
+				TrainServer.dumpLoad(message, true);
+				break;
+			case TURN_IN_CARDS:
+				TrainServer.turnInCards(message, true);
+				break;
+			case END_TURN:
+				TrainServer.endTurn(message, true);
+				break;
+			default:
+				throw new GameException(GameException.INVALID_MESSAGE_TYPE);
+		}
+	}
+	
+	
 	private void handleMessage(TrainMessage message) {
 		String requestType = parseMessageType(message.jsonMessage);
 		try {
@@ -172,31 +208,31 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					TrainServer.testBuildTrack(message.jsonMessage);
 					break;
 				case BUILD_TRACK:
-					TrainServer.buildTrack(message.jsonMessage);
+					TrainServer.buildTrack(message.jsonMessage, false);
 					break;
 				case UPGRADE_TRAIN:
-					TrainServer.upgradeTrain(message.jsonMessage);
+					TrainServer.upgradeTrain(message.jsonMessage, false);
 					break;
 				case PLACE_TRAIN:
-					TrainServer.placeTrain(message.jsonMessage);
+					TrainServer.placeTrain(message.jsonMessage, false);
 					break;
 				case TEST_MOVE_TRAIN:
 					TrainServer.testMoveTrain(message.jsonMessage);
 					break;
 				case MOVE_TRAIN:
-					TrainServer.moveTrain(message.jsonMessage);
+					TrainServer.moveTrain(message.jsonMessage, false);
 					break;
 				case PICKUP_LOAD:
-					TrainServer.pickupLoad(message.jsonMessage);
+					TrainServer.pickupLoad(message.jsonMessage, false);
 					break;
 				case DELIVER_LOAD:
-					TrainServer.deliverLoad(message.jsonMessage);
+					TrainServer.deliverLoad(message.jsonMessage, false);
 					break;
 				case DUMP_LOAD:
-					TrainServer.dumpLoad(message.jsonMessage);
+					TrainServer.dumpLoad(message.jsonMessage, false);
 					break;
 				case TURN_IN_CARDS:
-					TrainServer.turnInCards(message.jsonMessage);
+					TrainServer.turnInCards(message.jsonMessage, false);
 					break;
 				case UNDO:
 					TrainServer.undo(message.jsonMessage);
@@ -205,7 +241,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 					TrainServer.redo(message.jsonMessage);
 					break;
 				case END_TURN:
-					TrainServer.endTurn(message.jsonMessage);
+					TrainServer.endTurn(message.jsonMessage, false);
 					break;
 				case END_GAME:
 					TrainServer.endGame(message.jsonMessage);

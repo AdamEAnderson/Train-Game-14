@@ -311,7 +311,7 @@ public class TrainServer {
 		
 		GameData gameData = new GameData(data.gameType);
 		if (data.ruleSet == null)
-			data.ruleSet = new RuleSet(4, 70, 1, false);
+			data.ruleSet = new RuleSet(4, 70, 1, false, true);
 		Game game = new Game(data.name, gameData, data.ruleSet);
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
@@ -411,14 +411,19 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException if the track cannot be buit, game or player is unknown
 	 */
-	static public void buildTrack(String requestText) throws GameException {
+	static public void buildTrack(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		BuildTrackData data = gson.fromJson(requestText, BuildTrackData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (data.mileposts.length > 0)
-			game.buildTrack(data.pid, data.mileposts);
+		if (data.mileposts.length > 0) {
+			if (!queueRequest(game, data.pid, requestText)) {
+				if (!immediateExecution)
+					runQueuedMessages(game, data.pid);
+				game.buildTrack(data.pid, data.mileposts);
+			}
+		}
 	}
 
 	static class UpgradeTrainData {
@@ -434,7 +439,7 @@ public class TrainServer {
 
 	/** Upgrade the player's train, either to go faster or to carry more loads
 	 */
-	static public void upgradeTrain(String requestText) throws GameException {
+	static public void upgradeTrain(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		UpgradeTrainData data = gson.fromJson(requestText,
 				UpgradeTrainData.class);
@@ -443,9 +448,13 @@ public class TrainServer {
 			throw new GameException(GameException.GAME_NOT_FOUND);
 		if (!data.upgradeType.equals("Capacity") && !data.upgradeType.equals("Speed"))
 			throw new GameException(GameException.INVALID_UPGRADE);
-		game.upgradeTrain(data.pid, data.train,
-				data.upgradeType.equals("Capacity") ? UpgradeType.CAPACITY
-						: UpgradeType.SPEED);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.upgradeTrain(data.pid, data.train,
+					data.upgradeType.equals("Capacity") ? UpgradeType.CAPACITY
+							: UpgradeType.SPEED);
+		}
 	}
 
 	static class PlaceTrainData {
@@ -462,13 +471,17 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException
 	 */
-	static public void placeTrain(String requestText) throws GameException {
+	static public void placeTrain(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PlaceTrainData data = gson.fromJson(requestText, PlaceTrainData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.placeTrain(data.pid, data.train, data.where);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.placeTrain(data.pid, data.train, data.where);
+		}
 	}
 
 	static class MoveTrainData {
@@ -497,13 +510,17 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException
 	 */
-	static public void moveTrain(String requestText) throws GameException {
+	static public void moveTrain(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		MoveTrainData data = gson.fromJson(requestText, MoveTrainData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.moveTrain(data.pid, data.train, data.mileposts);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.moveTrain(data.pid, data.train, data.mileposts);
+		}
 	}
 
 	static class PickupLoadData {
@@ -518,13 +535,17 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException
 	 */
-	static public void pickupLoad(String requestText) throws GameException {
+	static public void pickupLoad(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		PickupLoadData data = gson.fromJson(requestText, PickupLoadData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.pickupLoad(data.pid, data.train, data.load);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.pickupLoad(data.pid, data.train, data.load);
+		}
 	}
 
 	static class DeliverLoadData {
@@ -541,14 +562,18 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException
 	 */
-	static public void deliverLoad(String requestText) throws GameException {
+	static public void deliverLoad(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DeliverLoadData data = gson
 				.fromJson(requestText, DeliverLoadData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.deliverLoad(data.pid, data.train, data.load, data.card);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.deliverLoad(data.pid, data.train, data.load, data.card);
+		}
 	}
 
 	static class DumpLoadData {
@@ -563,13 +588,17 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException
 	 */
-	static public void dumpLoad(String requestText) throws GameException {
+	static public void dumpLoad(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		DumpLoadData data = gson.fromJson(requestText, DumpLoadData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.dumpLoad(data.pid, data.train, data.load);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.dumpLoad(data.pid, data.train, data.load);
+		}
 	}
 
 	static class TurnInCardsData{
@@ -583,13 +612,17 @@ public class TrainServer {
 	 * @param requestText
 	 * @throws GameException
 	 */
-	static public void turnInCards(String requestText) throws GameException {
+	static public void turnInCards(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		TurnInCardsData data = gson.fromJson(requestText, TurnInCardsData.class);
 		Game game = games.get(data.gid);
 		if(game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.turnInCards(data.pid);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.turnInCards(data.pid);
+		}
 	}
 	
 	static class UndoData {
@@ -649,13 +682,17 @@ public class TrainServer {
 	/* Player declares their turn is over, and control goes to the next player
 	 * 
 	 */
-	static public void endTurn(String requestText) throws GameException {
+	static public void endTurn(String requestText, boolean immediateExecution) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		EndTurnData data = gson.fromJson(requestText, EndTurnData.class);
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.endTurn(data.pid);
+		if (!queueRequest(game, data.pid, requestText)) {
+			if (!immediateExecution)
+				runQueuedMessages(game, data.pid);
+			game.endTurn(data.pid);
+		}
 	}
 
 	static class ResignData {
@@ -722,4 +759,32 @@ public class TrainServer {
 		removeOldGames(game -> game.lastChangeDate().before(oldestPlayed));
 	}
 	
+	
+	static private boolean queueRequest(Game game, String pid, String requestText) throws GameException {
+		if (!game.isActivePlayer(pid) && game.getRuleSet().playAhead) {
+			game.queueRequest(pid, requestText);
+			return true;
+		}
+		return false;
+	}
+
+	static private void	runQueuedMessages(Game game, String pid) throws GameException {
+		if (!game.isActivePlayer(pid)) 
+			return;
+		
+		String request = null;
+		while (true) {
+			request = game.getQueuedRequest(pid);
+			if (request == null)
+				break;
+			try {
+				HttpTrainServerHandler.executeMessage(request);
+			} catch (GameException e) {
+				game.getPlayer(pid).clearRequestQueue();
+				throw e;
+			}
+		} 
+	}
+
+
 }
