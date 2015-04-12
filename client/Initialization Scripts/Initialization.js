@@ -228,6 +228,11 @@ var drawMileposts = function () {
                 case 'CITY':
                     milepostsGroup.push(paper.circle(x, y, 9).attr({ 'fill': '#d00', 'stroke-width': '0px', 'stroke': '#d00' }));
                     $('#milepostsGroup > circle:last').attr('id', 'milepost' + w.toString() + ',' + h.toString());
+					if(gameData.mapData.orderedMileposts[mp].city){
+						if(!citiesTable[gameData.mapData.orderedMileposts[mp].city.name])
+							citiesTable[gameData.mapData.orderedMileposts[mp].city.name] = [];
+						citiesTable[gameData.mapData.orderedMileposts[mp].city.name].push(gameData.mapData.orderedMileposts[mp]);
+					}
                     break;
                 case 'MAJORCITY':
                     var cityName = gameData.mapData.orderedMileposts[mp].city.name;
@@ -263,6 +268,9 @@ var drawMileposts = function () {
                         milepostsGroup.push(paper.path(pathString));
                         $('#milepostsGroup > path:last').attr({ 'stroke-width': '4px', 'stroke': '#d00' });
                     }
+					if(!citiesTable[gameData.mapData.orderedMileposts[mp].city.name])
+						citiesTable[gameData.mapData.orderedMileposts[mp].city.name] = [];
+					citiesTable[gameData.mapData.orderedMileposts[mp].city.name].push(gameData.mapData.orderedMileposts[mp]);
                     // fall through
                 case 'NORMAL':
                     milepostsGroup.push(paper.circle(x, y, 3).attr({ 'fill': '#000', 'stroke-width': '0px' }));

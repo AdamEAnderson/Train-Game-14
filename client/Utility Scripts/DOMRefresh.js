@@ -29,7 +29,77 @@ var refreshCards = function (cards) {
         card = cards[c];
         for (var t = 0; t < card.trips.length; ++t) {
             var iconPNG = iconPath +  "/" + card.trips[t].load + '.png';
-            $('#hand').children().eq(c).append('<div class="trip"><table><tr>' + '<td style="width:6%"><img width=30px height=30px src="' + iconPNG + '" /></td>' + '<td style="width:39%">' + card.trips[t].load + '</td>' + '</td><td style="width:39%">' + card.trips[t].dest + '</td><td style="width:6%">' + card.trips[t].cost + '</td></tr></table></div>');
+            $('#hand').children().eq(c).append('<div class="trip"><table><tr>' + '<td style="width:6%"><img width=30px height=30px src="' + iconPNG + '" /></td>' + '<td class="cardloadtd" style="width:39%">' + card.trips[t].load + '</td>' + '</td><td class="carddesttd" style="width:39%">' + card.trips[t].dest + '</td><td style="width:6%">' + card.trips[t].cost + '</td></tr></table></div>');
+			$('#hand').children().eq(c).children().last().find('.cardloadtd').dblclick([JSON.parse(JSON.stringify(t)),JSON.parse(JSON.stringify(card))],function(e){
+				var cities = gameData.loadset[e.data[1].trips[e.data[0]].load];
+				for(var i = 0; i < cities.length; i++) {
+					var cityMs = citiesTable[cities[i]];
+					for(var j = 0; j < cityMs.length; j++){
+						var city = cityMs[j];
+						var jQ = $(document.getElementById('milepost' + city.x + ',' + city.y));
+						//jQ.hide();
+						var ex = true;
+						var stop = false;
+						var interval = setInterval(function (k,l,cit) {
+						    if (stop)
+						        return;
+						    var r = parseInt($(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).css('r').replace('px', ''));
+						    var smallVal = cit.type == "MAJORCITY" ? 3 : 9;
+						    var largeVal = cit.type == "MAJORCITY" ? 13 : 19;
+						    //console.log((r < 10 ? 'expanding' : 'contracting') + ' for the ' + (cit.type == "MAJORCITY"?'major ':'') + 'city of ' + cit.city.name);
+						    if (r < 10)
+						        $(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).animate({ 'r': largeVal },500);
+						    else if(r > 10)
+						        $(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).animate({ 'r': smallVal },500);
+						    else
+						        $(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).animate({ 'r': largeVal },500);
+						}, 500, JSON.parse(JSON.stringify(i)), JSON.parse(JSON.stringify(j)), JSON.parse(JSON.stringify(city)));
+						setTimeout(function (k,l,inter,cit) {
+						    $(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).stop();
+						    clearInterval(inter);
+						    //console.log('clearing interval for ' + (cit.type == "MAJORCITY"?'major city ':'') + cit.city.name);
+						    var smallVal = cit.type == "MAJORCITY" ? 3 : 9;
+						    $(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).attr('r', smallVal);
+						    $(document.getElementById('milepost' + citiesTable[cities[k]][l].x + ',' + citiesTable[cities[k]][l].y)).css({ 'r': smallVal });
+						    stop = true;
+						}, 3500, JSON.parse(JSON.stringify(i)), JSON.parse(JSON.stringify(j)), JSON.parse(JSON.stringify(interval)), JSON.parse(JSON.stringify(city)));
+					}
+				}
+			});
+			$('#hand').children().eq(c).children().last().find('.carddesttd').dblclick([JSON.parse(JSON.stringify(t)),JSON.parse(JSON.stringify(card))],function(e){
+				var cityMs = citiesTable[e.data[1].trips[e.data[0]].dest];
+				for(var i = 0; i < cityMs.length; i++){
+					var city = JSON.parse(JSON.stringify({x:cityMs[i].x,y:cityMs[i].y}));
+					var jQ = $(document.getElementById('milepost' + city.x + ',' + city.y));
+					var jQstring = 'milepost' + city.x + ',' + city.y;
+					var stop = false;
+					var interval = setInterval(function(str,cit){
+						var jQN = $(document.getElementById(str));
+						if (stop)
+						    return;
+						var r = parseInt(jQN.css('r').replace('px', ''));
+						var smallVal = cit.type == "MAJORCITY" ? 3 : 9;
+						var largeVal = cit.type == "MAJORCITY" ? 13 : 19;
+						//console.log((r < 10 ? 'expanding' : 'contracting') + ' for the ' + (cit.type == "MAJORCITY" ? 'major ' : '') + 'city of ' + cit.city.name);
+						if (r < 10)
+						    jQN.animate({ 'r': largeVal },500);
+						else if (r > 10)
+						    jQN.animate({ 'r': smallVal },500);
+						else
+						    jQN.animate({ 'r': largeVal },500);
+					},500,jQstring.toString(),JSON.parse(JSON.stringify(cityMs[i])));
+					setTimeout(function(str,int,cit){
+						var jQN = $(document.getElementById(str));
+						jQN.stop();  
+						clearInterval(int);
+					    //console.log('clearing interval for ' + (cit.type == "MAJORCITY"?'major city ':'') + cit.city.name);
+						var smallVal = cit.type == "MAJORCITY" ? 3 : 9;
+						jQN.attr('r', smallVal);
+						jQN.css({ 'r': smallVal });
+						stop = true;
+					}, 3500, jQstring.toString(), JSON.parse(JSON.stringify(interval)), JSON.parse(JSON.stringify(cityMs[i])));
+				}
+			});
         }
     }
 };

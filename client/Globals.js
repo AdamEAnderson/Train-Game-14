@@ -39,6 +39,7 @@ var edgesBuilt; //Array of all jQuery elements of edges drawn
 var placeTrainLocations; //Array of objects where index corresponds to train index and objects have a milepost and a train property
 var trainLocations = []; //Array of objects where index corresponds to train index and object are mileposts
 var infoTimeoutHandle;
+var citiesTable = {};
 var infoColors = {
     'error': '#c00',
     'info': '#008'
