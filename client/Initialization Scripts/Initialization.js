@@ -28,9 +28,9 @@ $(document).ready(function () {
     $('#mainMenu').append('<select id="gamePicker"/>');
     $('#mainMenu').append('<h4>Game Name</h4>');
     $('#mainMenu').append('<input id="gameNamePicker" type="text" size="32" style="width:200px;"/>');
-    $('#mainMenu').append('<h4>Handle</h4>');
+    $('#mainMenu').append('<h4>Player Handle</h4>');
     $('#mainMenu').append('<input id="handlePicker" type="text" size="32"style="width:200px;"/>');
-    $('#mainMenu').append('<h4>Game Color</h4>');
+    $('#mainMenu').append('<h4>Player Color</h4>');
     $('#mainMenu').append('<select id="colorPicker"/>');
     $('#mainMenu').append('<h4 id="geographyPicker-label">Geography</h4>');
     populateGeographies();
@@ -336,8 +336,11 @@ var populateGeographies = function() {
 var processResume = function (data) {
     lastStatusMessage = data;
     var player = findPid(data.players, pid);
+    var yourTurn = (data.turnData != null && data.turnData.pid == pid);
     for (var i = 0; i < player.trains.length; i++) {
-        movesMadeThisTurn[i] = player.movesMade[i];
+        if (yourTurn)
+            movesMadeThisTurn[i] = data.turnData.movesMade[i];
+        else movesMadeThisTurn[i] = 0;
         if ($('#train' + pid + i).length != 0 || !player.trains[i].loc || player.trains[i].loc == '')
             continue;
         $('#move').show();
@@ -347,7 +350,9 @@ var processResume = function (data) {
         var mpsvg = findMilepost(milepost.x, milepost.y);
         drawTrain(i, pid, mpsvg.x, mpsvg.y);
     }
-    moneySpent = player.spendings;
+    if (yourTurn)
+        moneySpent = data.turnData.moneySpent;
+    else moneySpent = 0;
     checkBuildMoney();
     $('#pid' + pid).empty();
     var rail = player.rail;
@@ -366,8 +371,11 @@ var processResume = function (data) {
     
     checkMoveButton();
     checkLoadButtons(lastStatusMessage.players, true);
-    refreshTrains(player.trains,lastStatusMessage.activeid == pid);
+    refreshTrains(player.trains,lastStatusMessage.turnData.pid == pid);
     refreshCards(player.hand);
-    refreshMoney(player.money);
+    var money = player.money;
+    if (yourTurn)
+        money = money + (data.turnData.moneySpent - data.turnData.moneySpent);
+    refreshMoney(money);
     justResumed = false;
 };

@@ -15,7 +15,6 @@ public class Train {
 		speed = 12;
 		capacity = 2;
 		loads = new String[2];
-		loc = null;
 		index = newIndex;
 	}
 		
@@ -27,13 +26,17 @@ public class Train {
 	void moveTrain(Milepost location){ loc = location;}
 	
 	public void upgradeSpeed() throws GameException {
-		if(speed < 20){
+		if(testUpgradeSpeed()){
 			speed += 4;
 		} else throw new GameException("InvalidUpgrade");
 	}
 	
+	public boolean testUpgradeSpeed(){
+		return speed < 20;
+	}
+	
 	public void upgradeLoads() throws GameException {
-		if(capacity < 3){
+		if(testUpgradeLoads()){
 			String[] temp = new String[capacity + 1];
 			for(int i = 0; i < capacity; i++){
 				temp[i] = loads[i];
@@ -41,6 +44,10 @@ public class Train {
 			loads = temp;
 			capacity ++;
 		} else throw new GameException("InvalidUpgrade");
+	}
+	
+	public boolean testUpgradeLoads(){
+		return capacity < 3;
 	}
 	
 	/** Returns true if the load was successfully dropped, false 

@@ -24,6 +24,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import map.Milepost;
+import map.MilepostId;
 import map.TrainMap;
 import reference.Card;
 import reference.City;
@@ -45,6 +47,7 @@ class DirectoryFileFilter implements FileFilter {
 public class GameData {
 
 	private List<Card> deck;	/** Cards holding delivery possibilities */
+	private int currentCard;
 	private TrainMap map;		/** Mileposts, cities, building costs */
 	private Map<String, City> cities;	/** Cities indexed by city name, contains loads found in each city */
 	private Map<String, Set<City>> loads; /** Key=load, Value= cities where loads can be obtained */
@@ -65,12 +68,17 @@ public class GameData {
 		loads = new HashMap<String, Set<City>>();
 		cities = getCityData(gameType);
 		deck = getCardData(gameType);
+		currentCard = -1;
 		Collections.shuffle(deck);
 		map = getMapData(gameType, cities);
 		geography = gameType;
 	}
 	
 	public List<Card> getDeck() { return deck; }
+	public Card draw() {
+		currentCard++;
+		return deck.get(currentCard);
+	}
 	public Map<String,City> getCities() { return cities; }
 	public TrainMap getMap() { return map; }
 	public Map<String, Set<City>> getLoads() { return loads; }
@@ -278,4 +286,7 @@ public class GameData {
 		return geographyList;
 	}
 
+	public Milepost getMilepost(MilepostId mid){
+		return map.getMilepost(mid);
+	}
 }

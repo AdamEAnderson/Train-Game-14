@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import player.Player;
 import player.Stats;
 import player.Train;
+import player.TurnData;
 import reference.Card;
 import reference.City;
 import reference.UpgradeType;
@@ -116,41 +117,26 @@ public class TrainServer {
 		public String color;
 		public Train[] trains;
 		public int money;
-		public Map<MilepostId, Set<MilepostId>> rail;
 		public Card[] hand;
-		public int spendings;
-		public int[] movesMade;
 		public Stats stats;
+		public Map<MilepostId, Set<MilepostId>> rail;
 		PlayerStatus() {}
-		PlayerStatus(Player p) {
+		PlayerStatus(Player p, Map<MilepostId, Set<MilepostId>> r) {
 			pid = p.name;
 			color = p.color;
 			trains = p.getTrains();
 			money = p.getMoney();
-			spendings = p.getSpending();
-			movesMade = p.getMovesMade();
 			stats = p.stats();
-			
-			Map<Milepost, Set<Milepost>> railMileposts = p.getRail().getRail();
-			Map<MilepostId, Set<MilepostId>> railIds = new HashMap<MilepostId, Set<MilepostId>>();
-			for(Milepost outer : railMileposts.keySet()){
-				Set<MilepostId> inner = new HashSet<MilepostId>();
-				railIds.put(new MilepostId(outer.x, outer.y), inner);
-				for(Milepost m : railMileposts.get(outer)){
-					inner.add(new MilepostId(m.x, m.y));
-				}
-			}
-			rail = railIds;
 			hand = p.getCards();
+			rail = r;
 		}
 	}
 	
 	static class GameStatus {
 		public String gid;
-		public String activeid;
+		public TurnData turnData;
 		public String lastid;
 		public String geography;
-		public boolean joinable;
 		public boolean ended;
 		public int turns;
 		public List<PlayerStatus> players; //in turn order beginning with the active player
@@ -183,26 +169,14 @@ public class TrainServer {
 		status.players = new ArrayList<PlayerStatus>();
 		status.geography = game.gameData.getGeography();
 		status.transaction = game.transaction();
-		status.joinable = game.getJoinable();
+		status.turnData = game.getTurnData();
 		status.ended = game.isOver();
 		status.turns = game.getTurns();
-		Player activePlayer = game.getActivePlayer();
-		status.activeid = activePlayer != null ? activePlayer.name : "";
-		Player lastPlayer = game.getLastPlayer();
-		status.lastid = lastPlayer != null ? lastPlayer.name : "";
+		status.lastid = game.getLastPid();
 		
-		// If the game is in progress, report the players in the order in which they are 
-		// playing, with the active player first. If the game has ended, there is no active
-		// player, and players are reported in the order in which they joined the game
-		Player p = game.getActivePlayer();
-		if (p != null) {
-			do {
-				status.players.add(new PlayerStatus(p));
-				p = game.getNextPlayer(p);
-			} while(p != game.getActivePlayer());
-		} else {
-			for (Player player : game.getPlayers()) 
-				status.players.add(new PlayerStatus(player));
+		for(String pid : game.getPids()){
+			PlayerStatus p = new PlayerStatus(game.getPlayer(pid), game.getGlobalRail().getRail(pid).getRail());
+			status.players.add(p);
 		}
 		
 		statusCache = gsonBuilder.serializeNulls().create().toJson(status);
@@ -319,7 +293,8 @@ public class TrainServer {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Milepost.class, new MilepostTypeAdapter());
 
-		return gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
+		String s = gsonBuilder.serializeNulls().create().toJson(newGameResponse(gid, gameData));
+		return s;
 	}
 	
 	/** Create a new game */
@@ -436,7 +411,8 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		game.buildTrack(data.pid, data.mileposts);
+		if (data.mileposts.length > 0)
+			game.buildTrack(data.pid, data.mileposts);
 	}
 
 	static class UpgradeTrainData {
@@ -507,8 +483,7 @@ public class TrainServer {
 		Game game = games.get(data.gid);
 		if (game == null)
 			throw new GameException(GameException.GAME_NOT_FOUND);
-		if (!game.testMoveTrain(data.pid, data.train, data.mileposts))
-			throw new GameException(GameException.INVALID_MOVE);
+		game.testMoveTrain(data.pid, data.train, data.mileposts);
 	}
 
 	/** Move the train through a set of mileposts

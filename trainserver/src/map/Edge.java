@@ -55,8 +55,8 @@ public class Edge {
 
 	// Serialize as a set of json-encoded milepostIds
 	public String toString() {
-		MilepostId destinationId = new MilepostId(destination.x, destination.y);
-		return "{" + "\"destination\":" + destinationId.toString() + "}";
+//		MilepostId destinationId = new MilepostId(destination.x, destination.y);
+		return "{" + "\"destination\":" + destination.id.toString() + "}";
 	}
 	
 }

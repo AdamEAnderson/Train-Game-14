@@ -21,8 +21,8 @@ public class MilepostTypeAdapter extends TypeAdapter<Milepost> {
 			return;
         }
 		writer.beginObject();
-		writer.name("x").value(value.x);
-		writer.name("y").value(value.y);
+		writer.name("x").value(value.id.x);
+		writer.name("y").value(value.id.y);
 		writer.name("type").value(value.type.toString());
 		if (value.city != null) {
 			writer.name("city");
@@ -57,8 +57,8 @@ public class MilepostTypeAdapter extends TypeAdapter<Milepost> {
 			return;
         }
 		writer.beginObject();
-		writer.name("x").value(value.destination.x);
-		writer.name("y").value(value.destination.y);
+		writer.name("x").value(value.destination.id.x);
+		writer.name("y").value(value.destination.id.y);
 		writer.name("cost").value(value.cost);
 		writer.endObject();
 	}

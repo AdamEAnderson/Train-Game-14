@@ -80,6 +80,7 @@ interface AbstractGame {
 	 */
 	void placeTrain(String player, int train, MilepostId where) throws GameException; 
 	
+	
 	/** Check to see if move is possible
 	 * @param pid		Player whose train is being moved
 	 * @param train		Which train
@@ -90,8 +91,9 @@ interface AbstractGame {
 	 * INVALID_TRACK (train must start on a city milepost)
 	 * GAME_NOT_FOUND
 	 * PLAYER_NOT_FOUND
-	 */
-	boolean testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
+	 */ 
+	void testMoveTrain(String player, int train, MilepostId[] mileposts) throws GameException;
+	
 	
 	/** Player moves their train
 	 * @param pid		Player whose train is being moved
