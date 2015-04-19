@@ -118,9 +118,9 @@ var refreshMovesRemaining = function (trains) {
         countMovesMade = movesMadeThisTurn[t];
         if (movesMade != undefined)
             countMovesMade += movesMade[t].length;
-        if ($('#trains').children().eq(t).children().length < 2) // move counter not yet created
-            $('#trains').children().eq(t).append('<div class="moveCounter"/>');
-        var moveCounterJS = $('#trains').children().eq(t).children().eq(1);
+        if ($('#train' + t + ' > .trainCard > .moveCounter').length == 0) // move counter not yet created
+            $('#train' + t + ' > .trainCard').append('<div class="moveCounter"/>');
+        var moveCounterJS = $('#train' + t + ' > .trainCard > .moveCounter');
         moveCounterJS.empty();
         var movesRemaining = trains[t].speed - countMovesMade;
         moveCounterJS.append('<p><span>' + movesRemaining + '</span></p>');
@@ -128,6 +128,7 @@ var refreshMovesRemaining = function (trains) {
 }
 
 var refreshTrains = function (trains, myturn) {
+    var imageSizes = { '122': 20, '123': 15, '162': 20, '163': 15, '202': 20, '203': 15 };
     var iconPath = location.origin + join(location.pathname, '../../data/icons');
     for (var t = 0; t < trains.length; ++t) {
         var train;
@@ -140,12 +141,12 @@ var refreshTrains = function (trains, myturn) {
             var train = $('#trains').children().eq(t);
         }
         train.append('<div class="trainCard"/>');
-        //$('#train' + t + '>.trainCard').addClass('trainCard' + trains[t].speed + trains[t].loads.length).append($('<img src="../../data/artwork/12 Train 2.png"/>'));
+        $('#train' + t + '>.trainCard').addClass('trainCard' + trains[t].speed + trains[t].loads.length).append($('<img src="../../data/artwork/' + trains[t].speed + ' Train ' + trains[t].loads.length + '.png"/>'));
         var trainCard = train.children().eq(0);
-        if(trains.length - 1 > 0)
-            trainCard.append('<p><span>#' + (t + 1) + ' - ' + trains[t].speed + '</span></p>');
-        else
-            trainCard.append('<p><span>' + trains[t].speed + '</span></p>');
+        //if(trains.length - 1 > 0)
+        //    trainCard.append('<p><span>#' + (t + 1) + ' - ' + trains[t].speed + '</span></p>');
+        //else
+        //    trainCard.append('<p><span>' + trains[t].speed + '</span></p>');
         for (var l = 0; l < trains[t].loads.length; ++l) {
             var load = trains[t].loads[l];
             if (!load) {
@@ -154,12 +155,16 @@ var refreshTrains = function (trains, myturn) {
             }
             else {
                 var iconPNG = iconPath + "/" + load + '.png';
-                trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width=30px height=30px src="' + iconPNG + '" /></p>');
+                trainCard.append('<p><span>' + trains[t].loads[l] + '</span><img width="' + imageSizes[trains[t].speed + '' + trains[t].loads.length] + '" height="' + imageSizes[trains[t].speed + '' + trains[t].loads.length] + '" src="' + iconPNG + '" /></p>');
             }
+            $('#train' + t + ' > div.trainCard > p:last-child').addClass('compartment');
+            $('#train' + t + ' > div.trainCard > p:last-child').attr('id', 'compartment' + (l + 1));
         }
     }
     if (myturn) 
         refreshMovesRemaining(trains);
+    $('div.trainCard122 > p.compartment').height(0.4 * $('div.trainCard122').height());
+    $('div.trainCard122 > p.compartment').css({ 'top': (73 / 200) * $('div.trainCard122').height() });
 };
 
 var refreshTrainLocations = function (players) {
