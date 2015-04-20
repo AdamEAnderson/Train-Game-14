@@ -27,6 +27,14 @@
     margin: 2px;
 }
 
+div.trip.selected {
+    background-color:black;
+}
+
+    div.trip.selected > table > tbody > tr {
+        background-color:gold;
+    }
+
     .trip > table > tbody > tr > td {
         margin: 0px;
 	    font-size: 1.2em;

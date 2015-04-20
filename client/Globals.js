@@ -44,6 +44,7 @@ var infoColors = {
     'error': '#c00',
     'info': '#008'
 };
+var selectedTrip = [];
 var infoIndex = 0;
 var milepostSize = 20;
 var gamePicked;
