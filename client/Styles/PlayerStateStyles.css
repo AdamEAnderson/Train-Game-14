@@ -4,7 +4,8 @@
     right: 0;
     height: calc(90% - 5px);
     width: 30%;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x:hidden;
 }
 
 #hand {
@@ -26,6 +27,14 @@
     margin: 2px;
 }
 
+div.trip.selected {
+    background-color:black;
+}
+
+    div.trip.selected > table > tbody > tr {
+        background-color:gold;
+    }
+
     .trip > table > tbody > tr > td {
         margin: 0px;
 	    font-size: 1.2em;
@@ -43,12 +52,12 @@ div.trip > p:not(:last-child) {
 
 .trainCard {
     display: inline-block;
-    border: 2px solid black;
-    width: 120px;
-    padding: 2px;
-    border-radius: 3px;
     margin-right: 5px;
     margin-top: 2px;
+}
+
+.trainCard>img {
+    width:80%;
 }
 
 div.trainCard > p:first-child {
@@ -57,24 +66,198 @@ div.trainCard > p:first-child {
     text-align: center;
 }
 
-div.trainCard > p {
-    margin: 5px 0;
-    min-height: 30px;
+div.trainCard122 > p.compartment {
+    width: 18.8%;
+    height: 42%;
+    top: 32%;
+    position: absolute;
+    /*border: 1px dashed grey;*/
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.trainCard122 > p#compartment1 {
+    margin-left:35.1%;
+}
+
+div.trainCard122 > p#compartment2 {
+    margin-left:58.2%;
+}
+
+div.trainCard123 > p.compartment {
+    width: 14.5%;
+    height: 40%;
+    top:34%;
+    position: absolute;
+    /*border: 1px dashed grey;*/
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.trainCard123 > p#compartment1 {
+    margin-left:27.1%;
+}
+
+div.trainCard123 > p#compartment2 {
+    margin-left:45%;
+}
+
+div.trainCard123 > p#compartment3 {
+    margin-left:62.9%;
+}
+
+div.trainCard162 > p.compartment {
+    width: 18.8%;
+    height: 66%;
+    top: 10%;
+    position: absolute;
+    /*border: 1px dashed grey;*/
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.trainCard162 > p#compartment1 {
+    margin-left:35.8%;
+}
+
+div.trainCard162 > p#compartment2 {
+    margin-left:58.2%;
+}
+
+div.trainCard163 > p.compartment {
+    width: 15.3%;
+    height: 45%;
+    top:8%;
+    position: absolute;
+    /*border: 1px dashed grey;*/
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.trainCard163 > p#compartment1 {
+    margin-left:27.9%;
+}
+
+div.trainCard163 > p#compartment2 {
+    margin-left:45.3%;
+}
+
+div.trainCard163 > p#compartment3 {
+    margin-left:62.6%;
+}
+
+div.trainCard202 > p.compartment {
+    width: 20.5%;
+    height: 40%;
+    top: 10%;
+    position: absolute;
+    /*border: 1px dashed grey;*/
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.trainCard202 > p#compartment1 {
+    margin-left:36%;
+}
+
+div.trainCard202 > p#compartment2 {
+    margin-left:57.7%;
+}
+
+div.trainCard203 > p.compartment {
+    width: 16.1%;
+    height: 74%;
+    top:8%;
+    position: absolute;
+    /*border: 1px dashed grey;*/
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.trainCard203 > p#compartment1 {
+    margin-left:28.2%;
+}
+
+div.trainCard203 > p#compartment2 {
+    margin-left:45.1%;
+}
+
+div.trainCard203 > p#compartment3 {
+    margin-left:62%;
 }
 
 	div.trainCard > p > span {
     	vertical-align: middle;
     	alignment-baseline: middle;
-	    font-size: 1.2em;
+	}
+
+    div.trainCard122 > p > span {
+        font-size:0.9em;
+	}
+
+    div.trainCard123 > p > span {
+	    font-size: 0.7em;
+	}
+
+    div.trainCard162 > p > span {
+        font-size:0.85em;
+	}
+
+    div.trainCard163 > p > span {
+        font-size:0.7em;
+	}
+
+    div.trainCard202 > p > span {
+        font-size:0.9em;
+	}
+    
+    div.trainCard203 > p > span {
+        font-size:0.7em;
 	}
 	
 	div.trainCard > p > img {
 		float: right;
 	}
 	
-    div.trainCard > p:not(:last-child) {
+    /*div.trainCard > p:not(:last-child) {
         border-bottom: 1px solid black;
-    }
+    }*/
+
+div.trainCard122 > .moveCounter {
+    position:absolute;
+    top:35%;
+    left:80%;
+}
+
+div.trainCard123 > .moveCounter {
+    position:absolute;
+    top:35%;
+    left:80%;
+}
+
+div.trainCard162 > .moveCounter {
+    position:absolute;
+    top:0;
+    left:80%;
+}
+
+div.trainCard163 > .moveCounter {
+    position:absolute;
+    top:0;
+    left:80%;
+}
+
+div.trainCard202 > .moveCounter {
+    position:absolute;
+    top:0;
+    left:80%;
+}
+
+div.trainCard203 > .moveCounter {
+    position:absolute;
+    top:0;
+    left:80%;
+}
 
 .moveCounter > p {
 	text-align:center;
