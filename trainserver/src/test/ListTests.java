@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class ListTests extends GameTest{
 
@@ -14,7 +13,7 @@ public class ListTests extends GameTest{
 	public void testListGeographies() {
 		try {
 	        String request = String.format("{\"messageType\":\"listGeographies\"}");
-	        String result = TrainServer.listGeographies(request);
+	        String result = trainServer.listGeographies(request);
 	        log.info("listGeographies result {}", result);
 	        assertTrue(result.startsWith("[\""));
 	        assertTrue(result.contains("africa"));
@@ -27,16 +26,16 @@ public class ListTests extends GameTest{
 	public void testListColors() {
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-			Game game = TrainServer.getGame(gid);
+			Game game = trainServer.getGame(gid);
 	        game.joinGame("Tim", "black");
 	        game.joinGame("Ann", "green");
 	        game.joinGame("Julio", "red");
 	        game.joinGame("Xavier", "mauve");
 	        String request = String.format("{\"messageType\":\"listColors\", \"gid\":\"%s\"}", gid);
-	        String result = TrainServer.listColors(request);
+	        String result = trainServer.listColors(request);
 	        log.info("listColor result {}", result);
 	        startGame(game);
-	        String result2 = TrainServer.listColors(request);
+	        String result2 = trainServer.listColors(request);
 	        log.info("listColor result {}", result2);
 	        assertTrue(result.startsWith("[\""));
 	        assertTrue(result2.startsWith("[\""));

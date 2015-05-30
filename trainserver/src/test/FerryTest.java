@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class FerryTest extends GameTest{
 
@@ -19,7 +18,7 @@ public class FerryTest extends GameTest{
 		Game game = null;
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-	        game = TrainServer.getGame(gid);
+	        game = trainServer.getGame(gid);
 	        startGame(game);
 	        String pid = game.getActivePid();
 	        

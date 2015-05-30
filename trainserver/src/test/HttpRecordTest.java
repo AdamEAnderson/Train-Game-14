@@ -1,19 +1,21 @@
 package test;
 
-//import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import train.HttpTrainServer;
 
+public class HttpRecordTest extends HttpTest {
 
-public class HttpTrainTest extends HttpTest {
-
-	
-	// Send a stream of requests to the server check the results
+	// Play a short game with two trains
 	@Test
-	public void testTrain() throws Exception {
+	public void testRecord() throws Exception {
 		Thread serverThread = startServer();
+		
+		endRecording();
+
+		String recordName = "httpRecordTest";
+		startRecording(recordName);
 		
         String gid = newGame("Huey", "red");
         list("joinable", gid);	// the new game should appear in the list of joinable games
@@ -43,15 +45,24 @@ public class HttpTrainTest extends HttpTest {
         // deliverLoad(gid, currentPlayer, "turnips");
         dumpLoad(gid, currentPlayer, 0, "Arms");
         endTurn(gid, currentPlayer);
-        endGame(gid, "Huey");
-        endGame(gid, "Louie");
+        
+		endRecording();
+		
+        //restart server
+        HttpTrainServer.stopServer();
+        serverThread.join();
+		serverThread = startServer();
+		
+		Thread.sleep(2000);
+
+        playRecording(recordName);
+
+        //endGame(gid, "Huey");
+        //endGame(gid, "Louie");
         
         //join game
         HttpTrainServer.stopServer();
         serverThread.join();
-    }
-
-
-
+		}
 
 }

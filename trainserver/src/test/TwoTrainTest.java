@@ -9,7 +9,6 @@ import player.Player;
 import reference.Card;
 import reference.Trip;
 import train.Game;
-import train.TrainServer;
 
 public class TwoTrainTest extends GameTest {
 
@@ -17,10 +16,10 @@ public class TwoTrainTest extends GameTest {
 		@Test
 		public void testTwoTrain() throws Exception {
 			String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"name\":\"TestGame\", \"ruleSet\":{\"handSize\":4, \"startingMoney\":100, \"numTrains\":2}, \"gameType\":\"africa\"}";
-	        String responseMessage = TrainServer.newGame(jsonPayload);
+	        String responseMessage = trainServer.newGame(jsonPayload);
 	        log.info("newGame response {}", responseMessage);
 	        String gid = responseMessage.substring(8, 16);
-	        Game game = TrainServer.getGame(gid);
+	        Game game = trainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
 	        startGame(game);

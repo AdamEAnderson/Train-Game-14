@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class EndGameTest extends GameTest{
 
@@ -15,10 +14,10 @@ public class EndGameTest extends GameTest{
 		Game game = null;
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-	        game = TrainServer.getGame(gid);
+	        game = trainServer.getGame(gid);
 	        endGame(game);
 	        String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
-	        String statusMsg = TrainServer.status(jsonStatusPayload);
+	        String statusMsg = trainServer.status(jsonStatusPayload);
 	        log.info("endGame status message {}", statusMsg);
 	        assertTrue(statusMsg.contains("\"ended\":true"));
 	        assertTrue(statusMsg.contains("stats"));

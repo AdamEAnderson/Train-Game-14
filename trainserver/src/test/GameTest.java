@@ -16,7 +16,8 @@ public class GameTest {
 
 	protected static Logger log = LoggerFactory.getLogger(GameTest.class);
 	
-	
+	protected TrainServer trainServer = new TrainServer(false);
+		
 	// Reverse the array (Arrays.sort can't be used because it doesn't work on primitive types)
 	protected static void reverse(MilepostId[] b) {
 	   int left  = 0;          // index of leftmost element
@@ -36,14 +37,14 @@ public class GameTest {
 	
 	protected Game undo(String gid, String pid) throws GameException {
     	String undoPayload = String.format("{\"messageType\":\"undo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, pid);
-		TrainServer.undo(undoPayload);
-		return TrainServer.getGame(gid);
+		trainServer.undo(undoPayload);
+		return trainServer.getGame(gid);
 	}
 	
 	protected Game redo(String gid, String pid) throws GameException {
     	String redoPayload = String.format("{\"messageType\":\"redo\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, pid);
-		TrainServer.redo(redoPayload);
-		return TrainServer.getGame(gid);
+		trainServer.redo(redoPayload);
+		return trainServer.getGame(gid);
 	}
 	
 	protected void skipPastBuildingTurns(Game game) throws GameException {
@@ -71,18 +72,18 @@ public class GameTest {
 	protected void endGame(Game game) throws GameException {
 		for (Player p: game.getPlayers()) {
 			String jsonPayload = String.format("{\"messageType\":\"endGame\", \"gid\":\"%s\", \"pid\":\"%s\", \"ready\":true}", 
-				TrainServer.getGameId(game), p.name);
-			TrainServer.endGame(jsonPayload);
+				trainServer.getGameId(game), p.name);
+			trainServer.endGame(jsonPayload);
 		}
 	}
 	
-	protected static String newGame(String pid, String color, String gameType) throws GameException {
+	protected String newGame(String pid, String color, String gameType) throws GameException {
 		return newGame("TestGame", pid, color, gameType);
 	}
 	
-	private static String newGame(String name, String pid, String color, String gameType) throws GameException {
+	private String newGame(String name, String pid, String color, String gameType) throws GameException {
 		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"gameType\":\"%s\", \"name\":\"%s\"}", pid, color, gameType, name);
-		String responseMessage = TrainServer.newGame(jsonPayload);
+		String responseMessage = trainServer.newGame(jsonPayload);
         //log.info("Got response message: {}", responseMessage);
         assertTrue(responseMessage.startsWith("{\"gid\":\""));
         String gid = responseMessage.substring(8, 16);
@@ -94,10 +95,10 @@ public class GameTest {
 				handSize, startingMoney, numTrains, multiPlayerTrack);
 	}
 	
-	protected static String newGame(String name, String pid, String color, String geography, String rules) throws GameException {
+	protected String newGame(String name, String pid, String color, String geography, String rules) throws GameException {
 		String jsonPayload = String.format("{\"messageType\":\"newGame\", \"pid\":\"%s\", \"color\":\"%s\", \"name\":\"%s\", \"ruleSet\":%s, \"gameType\":\"%s\"}", 
 				pid, color, name, rules, geography);
-        String responseMessage = TrainServer.newGame(jsonPayload);
+        String responseMessage = trainServer.newGame(jsonPayload);
         String gid = responseMessage.substring(8, 16);
 		return gid;
 	}

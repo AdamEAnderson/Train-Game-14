@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class BuildFromUnconnectedMpTest extends GameTest {
 
@@ -17,7 +16,7 @@ public class BuildFromUnconnectedMpTest extends GameTest {
 		Game game = null;;
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-	        game = TrainServer.getGame(gid);
+	        game = trainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
 	        game.startGame("Louie", true);

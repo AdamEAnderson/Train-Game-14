@@ -110,6 +110,7 @@ public class GlobalRail {
 	 * @param two
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<String> getPlayers(MilepostId one, MilepostId two) {
 		for (Map.Entry<MilepostPair, Set<String>> entry: globalTracks.getTracks().entrySet()) 
 			if (entry.getKey().equals(one, two)) {

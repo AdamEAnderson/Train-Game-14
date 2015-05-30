@@ -26,6 +26,9 @@ public class GameException extends Exception {
 	public static String TRAIN_ALREADY_STARTED = "TrainAlreadyStarted";
 	public static String NOTHING_TO_UNDO = "NothingToUndo";
 	public static String NOTHING_TO_REDO = "NothingToRedo";
+	public static String CANNOT_SAVE_FILE = "CannotSaveFile";
+	public static String CANNOT_OPEN_FILE = "CannotOpenFile";
+	public static String ALREADY_RECORDING = "AlreadyRecording";
 	
 	public static final long serialVersionUID = 1;
 	

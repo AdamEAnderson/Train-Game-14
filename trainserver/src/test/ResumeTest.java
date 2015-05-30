@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import train.GameException;
-import train.TrainServer;
 
 public class ResumeTest extends GameTest {
 
@@ -14,10 +13,10 @@ public class ResumeTest extends GameTest {
 		String gid = null;
 		try {
 			String jsonPayload = "{\"messageType\":\"newGame\", \"pid\":\"Louie\", \"color\":\"blue\", \"gameType\":\"africa\", \"name\":\"TestGame\"}";
-	        String newGameData = TrainServer.newGame(jsonPayload);
+	        String newGameData = trainServer.newGame(jsonPayload);
 	        gid = newGameData.substring(8, 16);
 			String resumePayload = String.format("{\"messageType\":\"resumeGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, "Louie");
-	        String resumeGameData = TrainServer.resumeGame(resumePayload);
+	        String resumeGameData = trainServer.resumeGame(resumePayload);
 	        assertEquals(newGameData, resumeGameData);
 		} catch (GameException e) {
 	    	fail("GameException not expected here");
@@ -26,7 +25,7 @@ public class ResumeTest extends GameTest {
 		// Check that resuming a game with a bad player string throws an exception
 		try {
 			String resumePayload = String.format("{\"messageType\":\"resumeGame\", \"gid\":\"%s\", \"pid\":\"%s\"}", gid, "BADPLAYER");
-	        TrainServer.resumeGame(resumePayload);
+			trainServer.resumeGame(resumePayload);
 	    	fail("GameException expected -- should have thrown player not found");
 		} catch (GameException e) {
 	    }

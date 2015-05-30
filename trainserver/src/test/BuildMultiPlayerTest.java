@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class BuildMultiPlayerTest extends GameTest {
 
@@ -20,7 +19,7 @@ public class BuildMultiPlayerTest extends GameTest {
 	public void testBuild() throws GameException {
 		String ruleSet = ruleSet(4, 70, 1, true);
 		String gid = newGame("TestGame", "Louie", "blue", "africa", ruleSet);
-        Game game = TrainServer.getGame(gid);
+        Game game = trainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Huey", "green");
         game.startGame("Louie", true);

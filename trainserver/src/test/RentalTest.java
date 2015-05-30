@@ -9,7 +9,6 @@ import player.Player;
 import reference.UpgradeType;
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class RentalTest extends GameTest {
 
@@ -19,7 +18,7 @@ public class RentalTest extends GameTest {
 		Game game = null;
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-	        game = TrainServer.getGame(gid);
+	        game = trainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Tim", "black");
 	        game.joinGame("Ann", "green");
@@ -299,7 +298,7 @@ public class RentalTest extends GameTest {
         	endGame(game);
 
         	String jsonStatusPayload = "{\"gid\":\"" + gid + "\"}";
-	        String statusMsg = TrainServer.status(jsonStatusPayload);
+	        String statusMsg = trainServer.status(jsonStatusPayload);
 	        log.info("endGame status message {}", statusMsg);
 		} catch (GameException e) {
 			fail("Unexpected exception in test setup");

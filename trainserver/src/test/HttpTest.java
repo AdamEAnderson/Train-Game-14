@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.HttpURLConnection;
 
-import org.junit.Test;
+//import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +33,11 @@ public class HttpTest {
 	         }
 		});
 		t.start();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+		}
 		return t;
 	}
 	
@@ -274,6 +279,29 @@ public class HttpTest {
         	log.info("Got response message {}", responseMessage);
 	}
 	
+	public static void startRecording(String name) throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"startRecording\", \"file\":\"%s\"}", name);
+		log.info("jsonPayload {}", jsonPayload);
+		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
+        sendPostMessage(connection, jsonPayload);
+        assertEquals(connection.getResponseCode(), 200);
+	}
+
+	public static void endRecording() throws IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"endRecording\"}");
+		log.info("jsonPayload {}", jsonPayload);
+		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
+        sendPostMessage(connection, jsonPayload);
+        assertEquals(connection.getResponseCode(), 200);
+	}
+	
+	public static void playRecording(String name) throws  IOException, InterruptedException {
+		String jsonPayload = String.format("{\"messageType\":\"playRecording\", \"file\":\"%s\"}", name);
+		log.info("jsonPayload {}", jsonPayload);
+		HttpURLConnection connection = (HttpURLConnection) new URL(serverURL).openConnection();
+        sendPostMessage(connection, jsonPayload);
+        assertEquals(connection.getResponseCode(), 200);
+	}
 
 	public String getActivePlayer(String gid) throws Exception {
         String playerName = status(gid);

@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class TurnsTest extends GameTest {
 
@@ -17,7 +16,7 @@ public class TurnsTest extends GameTest {
 		Game game = null;
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-	        game = TrainServer.getGame(gid);
+	        game = trainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Tim", "black");
 	        game.joinGame("Ann", "green");

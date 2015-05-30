@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import reference.UpgradeType;
 import train.Game;
-import train.TrainServer;
 
 public class UpgradeCapacityTest extends GameTest {
 
@@ -15,7 +14,7 @@ public class UpgradeCapacityTest extends GameTest {
 		@Test
 		public void testUpgradeCapacity() throws Exception {
 			String gid = newGame("Louie", "blue", "africa");
-	        Game game = TrainServer.getGame(gid);
+	        Game game = trainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
 	        game.joinGame("Esmeralda", "red");

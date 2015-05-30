@@ -8,14 +8,13 @@ import org.junit.Test;
 import reference.Card;
 import reference.Trip;
 import train.Game;
-import train.TrainServer;
 
 public class TrainTest extends GameTest {
 
 	@Test
 	public void testTrain() throws Exception {
 		String gid = newGame("Louie", "blue", "africa");
-        Game game = TrainServer.getGame(gid);
+        Game game = trainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Huey", "green");
         game.joinGame("Esmeralda", "red");

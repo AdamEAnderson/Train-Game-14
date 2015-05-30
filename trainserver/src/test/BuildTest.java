@@ -8,7 +8,6 @@ import org.junit.Test;
 import player.Player;
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class BuildTest extends GameTest {
 
@@ -18,7 +17,7 @@ public class BuildTest extends GameTest {
 		int expectedTotalSpent = 0;
 		int accumulatedTotal = 70;
 		String gid = newGame("Louie", "blue", "africa");
-        Game game = TrainServer.getGame(gid);
+        Game game = trainServer.getGame(gid);
         assertTrue(game != null);
         game.joinGame("Huey", "green");
         game.startGame("Louie", true);

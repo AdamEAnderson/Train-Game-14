@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class ResignTest extends GameTest {
 
@@ -14,7 +13,7 @@ public class ResignTest extends GameTest {
 	public void testResign() {
 		try {
 			String gid = newGame("Louie", "blue", "africa");
-	        Game game = TrainServer.getGame(gid);
+	        Game game = trainServer.getGame(gid);
 	        assertTrue(game != null);
 	        game.joinGame("Huey", "green");
 	        game.startGame("Huey", true);

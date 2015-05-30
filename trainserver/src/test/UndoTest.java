@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import train.Game;
 import train.GameException;
-import train.TrainServer;
 
 public class UndoTest extends GameTest{
 
@@ -44,7 +43,7 @@ public class UndoTest extends GameTest{
 		String gid = null;
 		try {
 			gid = newGame("Louie", "blue", "africa");
-			game = TrainServer.getGame(gid);
+			game = trainServer.getGame(gid);
 	        game.joinGame("Xavier", "black");
 	        startGame(game);
 			skipPastBuildingTurns(game);

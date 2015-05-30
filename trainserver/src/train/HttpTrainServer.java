@@ -29,6 +29,7 @@ package train;
     	  // Set up logging
     	  Logger logger = LoggerFactory.getLogger(HttpTrainServer.class);
     	  logger.info("Hello World");
+    	  
 
     	    // Configure SSL.
           final SslContext sslCtx;
@@ -90,9 +91,13 @@ package train;
           }
       }
       
-      static public void stopServer() {
+      static public void stopServer() throws InterruptedException {
           bossGroup.shutdownGracefully();
           workerGroup.shutdownGracefully();
+          
+          // Wait until all threads are terminated.
+          bossGroup.terminationFuture().sync();
+          workerGroup.terminationFuture().sync();
       }
 
   }
