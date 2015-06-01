@@ -74,6 +74,21 @@ public class GameData {
 		geography = gameType;
 	}
 	
+	public GameData(String gameType, List<Card>  deck) throws GameException {
+		try {
+			setDataFolder();
+		} catch (IOException e) {
+			log.error("Cannot find data folder");
+			throw new GameException(GameException.BAD_MAP_DATA);
+		}
+		loads = new HashMap<String, Set<City>>();
+		cities = getCityData(gameType);
+		currentCard = -1;
+		map = getMapData(gameType, cities);
+		geography = gameType;
+		this.deck = deck;
+	}
+	
 	public List<Card> getDeck() { return deck; }
 	public Card draw() {
 		currentCard++;

@@ -66,7 +66,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 				// or status on a particular game
 				String query = request.getUri().substring(request.getUri().indexOf("?") + 1);	// get the query part
 				query = query.replaceAll("%22", "\""); // quick and dirty url decode
-				trainServer.addMessage(this, ctx, msg, query);
+				trainServer.addMessage(this, ctx, msg, query, false);
 				return;
 			}
 			else if (request.getMethod() == HttpMethod.POST) 
@@ -74,7 +74,7 @@ public class HttpTrainServerHandler extends SimpleChannelInboundHandler<Object> 
 		} 
 		if (isPost && requestText != null) {
 			log.info("requestText: {}", requestText);
-			trainServer.addMessage(this, ctx, msg, requestText);
+			trainServer.addMessage(this, ctx, msg, requestText, true);
 		}
 	}
 

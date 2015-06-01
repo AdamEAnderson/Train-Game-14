@@ -112,8 +112,8 @@ public class TrainServer  implements Runnable {
 	private final static String START_RECORDING = "startRecording";
 	private final static String END_RECORDING = "endRecording";
 	private final static String PLAY_RECORDING = "playRecording";
+	private final static String RECREATE_GAME = "recreateGame"; // recreate a game new game for recording playback
 	
-	private final static String REMAP_GID = "RemapGID"; // part of hack for recording
 	private Logger log = LoggerFactory.getLogger(TrainServer.class);
 	
 	private FileOutputStream recordingStream = null;
@@ -154,7 +154,7 @@ public class TrainServer  implements Runnable {
 	}
 
 	public TrainServer() {
-		autoRecord(false);
+		autoRecord(true);
 
 		// start the message loop
 		messageHandler = new Thread(this);
@@ -220,7 +220,7 @@ public class TrainServer  implements Runnable {
 					playRecording(message.jsonMessage);
 					break;
 				default: 
-					message.handler.appendToResponse(executeMessage(message.jsonMessage));
+					message.handler.appendToResponse(executeMessage(message.jsonMessage, false));
 					break;
 			}
 			if (!message.handler.writeResponse(message.httpMessage, message.ctx)) {
@@ -239,22 +239,15 @@ public class TrainServer  implements Runnable {
 		message.ctx.flush();
 	}
 	
-	public String executeMessage(String message) throws GameException {
+	public String executeMessage(String message, boolean playback) throws GameException {
 		String requestType = parseMessageType(message);
 		String response = null;
 		switch (requestType) {
 			case NEW_GAME:
 				response = newGame(message);
-				if (recordingStream != null) {
-			        String gid = response.substring(8, 16);
-			        String annotation = "{\"" + REMAP_GID + "\":\"" + gid + "\"}";
-			        try {
-						recordingStream.write(annotation.getBytes());
-						recordingStream.write('\n');
-					} catch (IOException e) {
-						log.error("Error writing to redirect file {}", e.getMessage());
-					}
-				}
+				break;
+			case RECREATE_GAME:
+				response = recreateGame(message);
 				break;
 			case JOIN_GAME:
 				response = joinGame(message);
@@ -552,6 +545,34 @@ public class TrainServer  implements Runnable {
 		return s;
 	}
 	
+	class RecreateGameData extends NewGameData {
+		public String messageType;
+		public String gid;
+		public List<Card> deck;
+		
+		RecreateGameData(NewGameData request) {
+			this.messageType = RECREATE_GAME;
+			this.pid = request.pid;
+			this.color = request.color;
+			this.ruleSet = request.ruleSet;
+			this.gameType = request.gameType;
+			this.name = request.name;
+		}
+	};
+	
+	public String buildRecreateGameData(String gid, GameData gameData, NewGameData requestData) {
+
+		RecreateGameData response = new RecreateGameData(requestData);
+		response.gid = gid;
+		response.deck = getGame(gid).gameData.getDeck();
+		
+		// Build a JSON string that has gid, serialized deck of cards
+		GsonBuilder gsonBuilder = new GsonBuilder();
+
+		String s = gsonBuilder.serializeNulls().create().toJson(response);
+		return s;
+	}
+	
 	/** Create a new game */
 	public String newGame(String requestText) throws GameException {			
 		String gameId = null;
@@ -565,9 +586,35 @@ public class TrainServer  implements Runnable {
 		gameId = gameNamer.nextString();
 		games.put(gameId, game);
 		game.joinGame(data.pid, data.color);
+		
+		if (recordingStream != null) {
+			String recreateInstruction = buildRecreateGameData(gameId, gameData, data);
+	        try {
+				recordingStream.write(recreateInstruction.getBytes());
+				recordingStream.write('\n');
+				recordingStream.flush();
+			} catch (IOException e) {
+				log.error("Error writing to redirect file {}", e.getMessage());
+			}
+		}
+
 		return buildNewGameResponse(gameId, gameData);
 	}
 
+	public String recreateGame(String requestText) throws GameException {
+		Gson gson = new GsonBuilder().create();
+		RecreateGameData data = gson.fromJson(requestText, RecreateGameData.class);
+		
+		GameData gameData = new GameData(data.gameType, data.deck);
+		if (data.ruleSet == null)
+			data.ruleSet = new RuleSet(4, 70, 1, false, true);
+		Game game = new Game(data.name, gameData, data.ruleSet);
+		games.put(data.gid, game);
+		game.joinGame(data.pid, data.color);
+		
+		return buildNewGameResponse(data.gid, gameData);
+	}
+	
 	class JoinGameData {
 		public String gid;
 		public String pid;
@@ -1023,26 +1070,10 @@ public class TrainServer  implements Runnable {
 			Charset charset = Charset.forName("US-ASCII");
 			BufferedReader reader = Files.newBufferedReader(path, charset);
 			String line = reader.readLine();
-			String gid = null;
-			Map<String, String> gidMap = new HashMap<String, String>();
 			while (line != null) {
-				// Following is a hack for remapping gids from old values to new
-				int gidIndex = line.indexOf("\"gid\":");
-				if (gidIndex >= 0) {
-			        String oldgid = line.substring(gidIndex + 7, gidIndex + 15);
-			        String newgid = gidMap.get(oldgid);
-			        if (newgid != null)
-			        	line = line.substring(0, gidIndex + 7) + newgid + line.substring(gidIndex + 15);
-				}
-				if (line.contains(REMAP_GID)) {
-					int remapIndex = line.indexOf(REMAP_GID);
-					String oldGid = line.substring(remapIndex + 11, remapIndex + 19);
-					gidMap.put(oldGid, gid);
-				}
-				else {
-  					String response = executeMessage(line);
-					if (line.contains(NEW_GAME)) 
-				        gid = response.substring(8, 16);
+				if (!line.contains(NEW_GAME)) {
+					// skip new game, wait for recreate_game
+  					executeMessage(line, true);
 				}
 				line = reader.readLine();
 			}
@@ -1100,7 +1131,7 @@ public class TrainServer  implements Runnable {
 			if (request == null)
 				break;
 			try {
-				executeMessage(request);
+				executeMessage(request, true);
 			} catch (GameException e) {
 				game.getPlayer(pid).clearRequestQueue();
 				throw e;
@@ -1109,13 +1140,12 @@ public class TrainServer  implements Runnable {
 	}
 
 	
-	public void addMessage(HttpTrainServerHandler handler, ChannelHandlerContext ctx, Object message, String requestText) {
-		if (recordingStream != null && !requestText.contains(END_RECORDING)) {
+	public void addMessage(HttpTrainServerHandler handler, ChannelHandlerContext ctx, Object message, String requestText, boolean record) {
+		if (record && recordingStream != null && !requestText.contains(END_RECORDING)) {
 			try {
-				//redirectStream.write(message.getBytes());
-				//redirectStream.write('\t');
 				recordingStream.write(requestText.getBytes());
 				recordingStream.write('\n');
+				recordingStream.flush();
 			} catch (IOException e) {
 				log.error("Error writing to redirect file {}", e.getMessage());
 			}
@@ -1152,7 +1182,7 @@ public class TrainServer  implements Runnable {
 	private String getDateAsString() {
 		// Create an instance of SimpleDateFormat used for formatting 
 		// the string representation of date (month/day/year)
-		DateFormat df = new SimpleDateFormat("MM_dd_yyyy_HH:mm:ss");
+		DateFormat df = new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss");
 
 		// Get the date today using Calendar object.
 		Date today = Calendar.getInstance().getTime();        

@@ -239,7 +239,7 @@ public class Game implements AbstractGame {
 					rid.retainAll(owners);
 				}
 		}
-		if (rid != null && rid.size() != 1)	// we've rented from more than one player in a single move
+		if (rid != null && rid.size() != 1 && !rid.contains(pid))	// we've rented from more than one player in a single move
 			throw new GameException(GameException.INVALID_MOVE);
 
 		// Any ferry crossing must be the first milepost of the move
@@ -275,7 +275,8 @@ public class Game implements AbstractGame {
 		MilepostId previous = activePlayer.getTrain(train).getLocation().getMilepostId();
 		for (int i = 0; i < mileposts.length; ++i) {
 			Set<String> owners = globalRail.getPlayers(previous, mileposts[i]);
-			if (owners.isEmpty() && !owners.contains(pid)) {  
+			// Owners is null if passing through a major city
+			if (owners != null && owners.isEmpty() && !owners.contains(pid)) {  
 				// TODO - better logic for picking owner when multiple choices for rental
 				String owner = owners.iterator().next();
 				if (!turnData.rentedFrom(owner))
