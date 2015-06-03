@@ -33,7 +33,7 @@ var resumeGame = function (GID, handle) {
         $('#loading').show();
         loading = true;
         gameData = data;
-        gid = GID;
+        gid = data.gid;
         pid = handle;
         justResumed = true;
         geography = gameData.geography;

@@ -8,6 +8,7 @@ import io.netty.util.ReferenceCountUtil;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -135,6 +137,7 @@ public class TrainServer  implements Runnable {
 
 	private BlockingQueue<TrainMessage> messageQueue = new ArrayBlockingQueue<TrainMessage>(1000);
 	Map<String, Game> games = new HashMap<String, Game>(); // games currently in progress;
+	Map<String, String> resumeGamesFromFile = new HashMap<String, String>();	// games resumed from recording (playback)
 	private boolean isStopped = false;		// when true, stop handling new messages
 	private Thread messageHandler;
 	
@@ -484,11 +487,20 @@ public class TrainServer  implements Runnable {
 			}
 		}
 		else if (data.listType.equals("resumeable")) {
+			// Include games currently in progress
 			for (String gid : games.keySet()) {
 				Game game = games.get(gid);
 				if (!game.isJoinable())
 					responseData.gidNames.put(gid, game.name());
 			}
+			// Include games that have been recorded and saved
+			File dir = new File(".");
+			File[] directoryListing = dir.listFiles();
+			if (directoryListing != null) {
+				for (File child : directoryListing) 
+					if (child.isFile() && child.getName().endsWith(".tr"))
+						responseData.gidNames.put(child.getName(), child.getName());
+			} 
 		}
 		else if (data.listType == "all") {
 			for (String gid : games.keySet()) 
@@ -647,7 +659,22 @@ public class TrainServer  implements Runnable {
 	public String resumeGame(String requestText) throws GameException {
 		Gson gson = new GsonBuilder().create();
 		JoinGameData data = gson.fromJson(requestText, JoinGameData.class);
-		Game game = games.get(data.gid);
+		String gid = data.gid;
+		Game game = games.get(gid);
+		if (game == null)
+		{
+			// See if its something that was recorded
+			gid = resumeGamesFromFile.get(data.gid);
+			if (gid == null && new File(data.gid).exists()) {
+				FileOutputStream suspendRecording = recordingStream;
+				recordingStream = null;
+				gid = playRecordingFromFile(data.gid);
+				resumeGamesFromFile.put(data.gid, gid);
+				recordingStream = suspendRecording;
+			}
+			if (gid != null) 
+				game = games.get(gid);
+		}
 		if (game == null)
 		{
 			log.warn("Can't find game {}", data.gid);
@@ -658,7 +685,9 @@ public class TrainServer  implements Runnable {
 		game.getPlayer(data.pid);	// throws PLAYER_NOT_FOUND if player not in game
 		log.info("resumeGame(pid={})", data.pid);
 		
-		return buildNewGameResponse(data.gid, game.gameData);
+		String response =  buildNewGameResponse(gid, game.gameData);
+		log.info("Resuming: {}", response);
+		return response;
 	}
 
 	class StartGameData {
@@ -1039,6 +1068,8 @@ public class TrainServer  implements Runnable {
 		log.info("startRecording: {}", requestText);
 		Gson gson = new GsonBuilder().create();
 		Redirect data = gson.fromJson(requestText, Redirect.class);
+		if (!data.file.endsWith(".tr"))
+			data.file += ".tr";
 		try {
 			recordingStream = new FileOutputStream(data.file);
 		} catch (FileNotFoundException e) {
@@ -1064,12 +1095,13 @@ public class TrainServer  implements Runnable {
 		playRecordingFromFile(data.file);
 	}
 
-	public void playRecordingFromFile(String fileName) throws GameException {
+	public String playRecordingFromFile(String fileName) throws GameException {
 		try {
 			Path path = FileSystems.getDefault().getPath(fileName);
 			Charset charset = Charset.forName("US-ASCII");
 			BufferedReader reader = Files.newBufferedReader(path, charset);
 			String line = reader.readLine();
+			String[] savedGids = games.keySet().toArray(new String[games.size()]);
 			while (line != null) {
 				if (!line.contains(NEW_GAME)) {
 					// skip new game, wait for recreate_game
@@ -1077,12 +1109,17 @@ public class TrainServer  implements Runnable {
 				}
 				line = reader.readLine();
 			}
+			Arrays.sort(savedGids);
+			for (String gid: games.keySet()) {
+				if (Arrays.binarySearch(savedGids, 0, savedGids.length, gid) < 0)
+					return gid;
+			}
 		} catch (FileNotFoundException e) {
 			throw new GameException(GameException.CANNOT_OPEN_FILE);
 		} catch (IOException e) {
 			throw new GameException(GameException.CANNOT_OPEN_FILE);
 		}
-		
+		return null;
 	}
 	
 	/** Delete specified games */
@@ -1138,10 +1175,13 @@ public class TrainServer  implements Runnable {
 			}
 		} 
 	}
-
 	
 	public void addMessage(HttpTrainServerHandler handler, ChannelHandlerContext ctx, Object message, String requestText, boolean record) {
-		if (record && recordingStream != null && !requestText.contains(END_RECORDING)) {
+		if (record && recordingStream != null && 
+			 !requestText.contains(END_RECORDING) && 
+			 !requestText.contains(PLAY_RECORDING) && 
+			 !requestText.contains(TEST_BUILD_TRACK) && 
+			 !requestText.contains(TEST_MOVE_TRAIN)) {
 			try {
 				recordingStream.write(requestText.getBytes());
 				recordingStream.write('\n');

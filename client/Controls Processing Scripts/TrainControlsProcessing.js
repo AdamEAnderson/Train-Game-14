@@ -17,7 +17,7 @@
 
 var upgradeClick = function (e) {
     var data = e.data;
-    for (var i = 0; i < lastStatusMessage.players.length; i++)
+    for (var i = 0; i < lastStatusMessage.players.length; i++)  {
         if (lastStatusMessage.players[i].pid == pid) {
             var player = lastStatusMessage.players[i];
             $('#gameDisplay').append('<div id="upgradeDialog" title="Upgrade Your Train" />').find('div:last').dialog({
@@ -31,9 +31,9 @@ var upgradeClick = function (e) {
                 }]
             });
             var trains = player.trains.clone();
-            for (var i = 0; i < trains.length; i++) {
-                if (trains[i].capacity == 3 && trains[i].speed == 20) {
-                    trains.splice(i, 1);
+            for (var j = 0; j < trains.length; j++) {
+                if (trains[j].capacity == 3 && trains[j].speed == 20) {
+                    trains.splice(j, 1);
                 }
             }
             if (trains.length == 1) {
@@ -41,10 +41,10 @@ var upgradeClick = function (e) {
             }
             else if (trains.length > 1) {
                 $('#upgradeDialog').append('<ul/>');
-                for (var i = 0; i < player.trains.length; i++) {
-                    if (trains.indexOf(player.trains[i]) == -1)
+                for (var k = 0; k < player.trains.length; k++) {
+                    if (trains.indexOf(player.trains[k]) == -1)
                         continue;
-                    $('#upgradeDialog > ul').append('<li>Train ' + (i + 1) + '</li>').find('li:last').click(function () {
+                    $('#upgradeDialog > ul').append('<li>Train ' + (k + 1) + '</li>').find('li:last').click(function () {
                         $('#upgradeDialog > ul > li').removeClass('clicked');
                         $(this).addClass('clicked');
                     });
@@ -64,6 +64,7 @@ var upgradeClick = function (e) {
                 $('#upgradeDialog').dialog('option', 'buttons', buttons);
             }
         }
+    }
 };
 
 var moveClick = function (e) {

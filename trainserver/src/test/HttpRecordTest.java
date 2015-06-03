@@ -14,7 +14,7 @@ public class HttpRecordTest extends HttpTest {
 		
 		endRecording();
 
-		String recordName = "httpRecordTest";
+		String recordName = "httpRecordTest.tr";
 		startRecording(recordName);
 		
         String gid = newGame("Huey", "red");

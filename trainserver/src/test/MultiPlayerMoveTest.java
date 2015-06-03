@@ -14,11 +14,8 @@ public class MultiPlayerMoveTest extends HttpTest {
 		
 		endRecording();
 
-        playRecording("testMultiPlayerMove");
+        playRecording("testMultiPlayerMove.tr");
 
-        //endGame(gid, "Huey");
-        //endGame(gid, "Louie");
-        
         //join game
         HttpTrainServer.stopServer();
         serverThread.join();

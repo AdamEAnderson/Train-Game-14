@@ -104,7 +104,8 @@ $(document).ready(function () {
     $('#gamePicker').selectmenu({
         select: function (event, ui) {
             gamePicked = ui.item.element.attr('data-gid');
-            listColors();
+            if (document.getElementById("actionPicker").value != "Resume")
+            	listColors();
         }
     });
     $('#colorPicker').css('font-size', '0.8em');
